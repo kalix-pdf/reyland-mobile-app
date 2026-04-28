@@ -5,6 +5,5 @@ import { useAuth } from "@/context/auth-context";
 export default function ProfileScreen() {
   const { user, login, logout } = useAuth();
 
-  if (!user) return <LoginForm onLogin={login} />
-  return <ViewProfile user={user} onLogout={logout} />
+  return user ? <ViewProfile user={user} onLogout={logout} /> : <LoginForm onLogin={login} />;
 }

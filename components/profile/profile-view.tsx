@@ -2,24 +2,22 @@ import SettingsRow from "@/components/settings-row";
 import { Colors } from "@/constants/color";
 import { User } from "@/data/user";
 import React, { useState } from "react";
-import {
-    Alert,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    View,
-} from "react-native";
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 
-export function ViewProfile({ user, onLogout }: {user: User; onLogout: () => void}) {
+export function ViewProfile({ user, onLogout }: { user: User; onLogout: () => void }) {
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
   const handleLogout = () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Log Out", style: "destructive", onPress: () => {onLogout} },
+      {
+        text: "Log Out",
+        style: "destructive",
+        onPress: () => {
+          onLogout;
+        },
+      },
     ]);
   };
 
@@ -62,16 +60,8 @@ export function ViewProfile({ user, onLogout }: {user: User; onLogout: () => voi
         {/* Account Settings */}
         <Text style={styles.sectionTitle}>Account</Text>
         <View style={styles.section}>
-          <SettingsRow
-            icon="👤"
-            label="Edit Profile"
-            onPress={() => Alert.alert("Edit Profile")}
-          />
-          <SettingsRow
-            icon="🔑"
-            label="Change Password"
-            onPress={() => Alert.alert("Change Password")}
-          />
+          <SettingsRow icon="👤" label="Edit Profile" onPress={() => Alert.alert("Edit Profile")} />
+          <SettingsRow icon="🔑" label="Change Password" onPress={() => Alert.alert("Change Password")} />
           <SettingsRow
             icon="📱"
             label="Phone Number"
@@ -123,21 +113,9 @@ export function ViewProfile({ user, onLogout }: {user: User; onLogout: () => voi
         {/* Support */}
         <Text style={styles.sectionTitle}>Support</Text>
         <View style={styles.section}>
-          <SettingsRow
-            icon="❓"
-            label="Help Center"
-            onPress={() => Alert.alert("Help Center")}
-          />
-          <SettingsRow
-            icon="⭐"
-            label="Rate the App"
-            onPress={() => Alert.alert("Rate App")}
-          />
-          <SettingsRow
-            icon="📄"
-            label="Privacy Policy"
-            onPress={() => Alert.alert("Privacy Policy")}
-          />
+          <SettingsRow icon="❓" label="Help Center" onPress={() => Alert.alert("Help Center")} />
+          <SettingsRow icon="⭐" label="Rate the App" onPress={() => Alert.alert("Rate App")} />
+          <SettingsRow icon="📄" label="Privacy Policy" onPress={() => Alert.alert("Privacy Policy")} />
           <SettingsRow
             icon="📋"
             label="Terms of Service"
@@ -149,13 +127,7 @@ export function ViewProfile({ user, onLogout }: {user: User; onLogout: () => voi
         {/* Danger Zone */}
         <Text style={styles.sectionTitle}>Account Actions</Text>
         <View style={styles.section}>
-          <SettingsRow
-            icon="🚪"
-            label="Log Out"
-            onPress={handleLogout}
-            danger
-            showArrow={false}
-          />
+          <SettingsRow icon="🚪" label="Log Out" onPress={handleLogout} danger showArrow={false} />
           <SettingsRow
             icon="🗑"
             label="Delete Account"
