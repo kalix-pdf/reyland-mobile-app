@@ -1,57 +1,66 @@
-import { Colors } from "@/constants/color";
 import { AuthProvider } from "@/context/auth-context";
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { AppThemeProvider, useAppTheme } from "@/context/theme-context";
+import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "../hooks/use-color-scheme";
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+function RootNavigator() {
+  const { colors, isDarkMode } = useAppTheme();
 
   const navigationTheme = {
-    ...(isDark ? DarkTheme : DefaultTheme),
+    ...DefaultTheme,
+    dark: isDarkMode,
     colors: {
-      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
-      primary: Colors.accent,
-      background: Colors.background,
-      card: Colors.surface,
-      text: Colors.textPrimary,
-      border: Colors.border,
-      notification: Colors.accent,
+      ...DefaultTheme.colors,
+      primary: colors.accent,
+      background: colors.background,
+      card: colors.surface,
+      text: colors.textPrimary,
+      border: colors.border,
+      notification: colors.accent,
     },
   };
 
   return (
-    <AuthProvider>
-      <ThemeProvider value={navigationTheme}>
-        <Stack
-          screenOptions={{
-            contentStyle: {
-              backgroundColor: Colors.background,
-            },
-            headerStyle: {
-              backgroundColor: Colors.surface,
-            },
-            headerTintColor: Colors.textPrimary,
-            headerTitleStyle: {
-              fontWeight: "800",
-            },
+    <ThemeProvider value={navigationTheme}>
+      <Stack
+        screenOptions={{
+          contentStyle: {
+            backgroundColor: colors.background,
+          },
+          headerStyle: {
+            backgroundColor: colors.surface,
+          },
+          headerTintColor: colors.textPrimary,
+          headerTitleStyle: {
+            fontWeight: "800",
+          },
+        }}
+      >
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="sign-up" options={{ headerShown: false }} />
+        <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
+
+        <Stack.Screen
+          name="property/[id]"
+          options={{
+            title: "Property Detail",
+            headerBackTitle: "Back",
           }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        />
+      </Stack>
 
-          <Stack.Screen
-            name="property/[id]"
-            options={{
-              title: "Property Detail",
-              headerBackTitle: "Back",
-            }}
-          />
-        </Stack>
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
+    </ThemeProvider>
+  );
+}
 
-        <StatusBar style={isDark ? "light" : "dark"} />
-      </ThemeProvider>
-    </AuthProvider>
+export default function RootLayout() {
+  return (
+    <AppThemeProvider>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </AppThemeProvider>
   );
 }

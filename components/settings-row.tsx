@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/color";
+import { Colors } from "@/constants/colors";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -11,28 +11,14 @@ type Props = {
   danger?: boolean;
 };
 
-export default function SettingsRow({
-  icon,
-  label,
-  value,
-  onPress,
-  showArrow = true,
-  danger = false,
-}: Props) {
+export default function SettingsRow({ icon, label, value, onPress, showArrow = true, danger = false }: Props) {
   return (
-    <TouchableOpacity
-      style={styles.row}
-      onPress={onPress}
-      activeOpacity={0.7}
-      disabled={!onPress}
-    >
+    <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.7} disabled={!onPress}>
       <View style={styles.left}>
         <View style={[styles.iconWrap, danger && styles.dangerIconWrap]}>
           <Text style={styles.icon}>{icon}</Text>
         </View>
-        <Text style={[styles.label, danger && styles.dangerLabel]}>
-          {label}
-        </Text>
+        <Text style={[styles.label, danger && styles.dangerLabel]}>{label}</Text>
       </View>
       <View style={styles.right}>
         {value ? <Text style={styles.value}>{value}</Text> : null}

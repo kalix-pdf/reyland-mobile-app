@@ -1,17 +1,17 @@
-import { Colors } from "@/constants/color";
+import { Colors } from "@/constants/colors";
 import { PROPERTIES } from "@/data/properties";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
-    Alert,
-    Image,
-    Linking,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  Linking,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function PropertyDetailScreen() {
@@ -40,10 +40,7 @@ export default function PropertyDetailScreen() {
   };
 
   const handleInquire = () => {
-    Alert.alert(
-      "Inquiry Sent!",
-      `Your inquiry for "${property.title}" has been sent to ${property.agent.name}.`,
-    );
+    Alert.alert("Inquiry Sent!", `Your inquiry for "${property.title}" has been sent to ${property.agent.name}.`);
   };
 
   return (
@@ -52,27 +49,12 @@ export default function PropertyDetailScreen() {
         {/* Image */}
         <View style={styles.imageWrap}>
           <Image source={{ uri: property.image }} style={styles.image} />
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => router.back()}
-          >
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
-          <View
-            style={[
-              styles.badge,
-              property.type === "For Rent"
-                ? styles.rentBadge
-                : styles.saleBadge,
-            ]}
-          >
+          <View style={[styles.badge, property.type === "For Rent" ? styles.rentBadge : styles.saleBadge]}>
             <Text
-              style={[
-                styles.badgeText,
-                property.type === "For Rent"
-                  ? styles.rentBadgeText
-                  : styles.saleBadgeText,
-              ]}
+              style={[styles.badgeText, property.type === "For Rent" ? styles.rentBadgeText : styles.saleBadgeText]}
             >
               {property.type}
             </Text>
@@ -81,9 +63,7 @@ export default function PropertyDetailScreen() {
 
         <View style={styles.content}>
           {/* Title & Price */}
-          <Text style={styles.price}>
-            {formatPrice(property.price, property.type)}
-          </Text>
+          <Text style={styles.price}>{formatPrice(property.price, property.type)}</Text>
           <Text style={styles.title}>{property.title}</Text>
           <Text style={styles.address}>📍 {property.address}</Text>
 
@@ -118,9 +98,7 @@ export default function PropertyDetailScreen() {
           <Text style={styles.sectionTitle}>Listed By</Text>
           <View style={styles.agentCard}>
             <View style={styles.agentAvatar}>
-              <Text style={styles.agentAvatarText}>
-                {property.agent.avatar}
-              </Text>
+              <Text style={styles.agentAvatarText}>{property.agent.avatar}</Text>
             </View>
             <View style={styles.agentInfo}>
               <Text style={styles.agentName}>{property.agent.name}</Text>

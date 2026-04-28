@@ -1,5 +1,5 @@
 import PropertyCard from "@/components/property-card";
-import { Colors } from "@/constants/color";
+import { Colors } from "@/constants/colors";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
