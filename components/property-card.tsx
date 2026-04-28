@@ -1,14 +1,7 @@
 import { Href, useRouter } from "expo-router";
 import React from "react";
-import {
-    Dimensions,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-} from "react-native";
-import { Colors } from "../constants/color";
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Colors } from "../constants/colors";
 import { Property } from "../data/properties";
 
 const { width } = Dimensions.get("window");
@@ -35,28 +28,14 @@ export default function PropertyCard({ property }: Props) {
     >
       <Image source={{ uri: property.image }} style={styles.image} />
 
-      <View
-        style={[
-          styles.badge,
-          property.type === "For Rent" ? styles.rentBadge : styles.saleBadge,
-        ]}
-      >
-        <Text
-          style={[
-            styles.badgeText,
-            property.type === "For Rent"
-              ? styles.rentBadgeText
-              : styles.saleBadgeText,
-          ]}
-        >
+      <View style={[styles.badge, property.type === "For Rent" ? styles.rentBadge : styles.saleBadge]}>
+        <Text style={[styles.badgeText, property.type === "For Rent" ? styles.rentBadgeText : styles.saleBadgeText]}>
           {property.type}
         </Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.price}>
-          {formatPrice(property.price, property.type)}
-        </Text>
+        <Text style={styles.price}>{formatPrice(property.price, property.type)}</Text>
         <Text style={styles.title} numberOfLines={1}>
           {property.title}
         </Text>
