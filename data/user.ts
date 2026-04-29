@@ -7,10 +7,12 @@ export type User = {
   avatar: string;
   phone: string;
   memberSince: string;
+  role: number;
 };
 
 export const DUMMY_USER: User = {
   id: 1,
+  role: 0,
   name: "Juan dela Cruz",
   email: "juan@email.com",
   password: "password123",

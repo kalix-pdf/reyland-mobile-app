@@ -1,22 +1,100 @@
 import { Colors } from "@/constants/colors";
 import { PROPERTIES } from "@/data/properties";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   Alert,
+  Dimensions,
+  FlatList,
   Image,
   Linking,
+  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+
+const { width } = Dimensions.get("window");
+
+function PropertyImages({images, onClose }: {
+  images: { image_id: number; public_id: string; image_url: string }[];
+  onClose: () => void; }) 
+  {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+      {/* Header */}
+      <View style={modalStyles.header}>
+        <TouchableOpacity onPress={onClose}>
+          <Text style={modalStyles.closeText}>✕ Close</Text>
+        </TouchableOpacity>
+        <Text style={modalStyles.counter}>
+          {activeIndex + 1} / {images.length}
+        </Text>
+      </View>
+
+      {/* Horizontal swipeable images */}
+      <FlatList
+        data={images}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.image_id.toString()}
+        onMomentumScrollEnd={(e) => {
+          const index = Math.round(e.nativeEvent.contentOffset.x / width);
+          setActiveIndex(index);
+        }}
+        renderItem={({ item }) => (
+          <Image
+            source={{ uri: item.image_url }}
+            style={{ width, height: 400 }}
+            resizeMode="cover"
+          />
+        )}
+      />
+
+      {/* Dot indicators */}
+      <View style={modalStyles.dotsRow}>
+        {images.map((_, i) => (
+          <View
+            key={i}
+            style={[
+              modalStyles.dot,
+              i === activeIndex ? modalStyles.dotActive : modalStyles.dotInactive,
+            ]}
+          />
+        ))}
+      </View>
+
+      {/* Thumbnail strip */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={modalStyles.thumbnails}
+      >
+        {images.map((img, i) => (
+          <Image
+            key={img.image_id}
+            source={{ uri: img.image_url }}
+            style={[
+              modalStyles.thumb,
+              i === activeIndex && modalStyles.thumbActive,
+            ]}
+          />
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
 
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const [openModal, setOpenModal] = useState(false);
 
   const property = PROPERTIES.find((p) => p.id === id);
 
@@ -45,13 +123,27 @@ export default function PropertyDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+        <Modal
+          visible={openModal}
+          animationType="slide"
+          statusBarTranslucent
+          onRequestClose={() => setOpenModal(false)}
+          >
+        <PropertyImages
+          images={property.image}
+          onClose={() => setOpenModal(false)}
+        />
+      </Modal>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Image */}
         <View style={styles.imageWrap}>
-          <Image source={{ uri: property.image }} style={styles.image} />
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <Text style={styles.backIcon}>←</Text>
+          <Image source={{ uri: property.image[0].image_url }} style={styles.image} />
+          <TouchableOpacity style={styles.viewImagesBtn} onPress={() => setOpenModal(true)}>
+            <Text style={styles.viewImagesBtnText}>🖼 View Images</Text>
           </TouchableOpacity>
+          {/* <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity> */}
           <View style={[styles.badge, property.type === "For Rent" ? styles.rentBadge : styles.saleBadge]}>
             <Text
               style={[styles.badgeText, property.type === "For Rent" ? styles.rentBadgeText : styles.saleBadgeText]}
@@ -120,6 +212,44 @@ export default function PropertyDetailScreen() {
     </SafeAreaView>
   );
 }
+
+//modal styles
+const modalStyles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+  closeText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
+  counter: { color: "#FFF", fontSize: 14, fontWeight: "600" },
+  dotsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 16,
+    gap: 6,
+  },
+  dot: { width: 8, height: 8, borderRadius: 4 },
+  dotActive: { backgroundColor: "#FFF" },
+  dotInactive: { backgroundColor: "rgba(255,255,255,0.35)" },
+  thumbnails: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 8,
+  },
+  thumb: {
+    width: 64,
+    height: 64,
+    borderRadius: 8,
+    opacity: 0.5,
+  },
+  thumbActive: {
+    opacity: 1,
+    borderWidth: 2,
+    borderColor: "#FFF",
+  }
+});
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
@@ -275,4 +405,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   inquireBtnText: { color: "#FFF", fontSize: 16, fontWeight: "800" },
+  viewImagesBtn: {                   
+    position: "absolute",
+    bottom: 12,
+    right: 12,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  viewImagesBtnText: { color: "#FFF", fontSize: 13, fontWeight: "700" },
 });

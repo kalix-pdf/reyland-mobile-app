@@ -58,7 +58,7 @@ export default function HomeScreen() {
 
               <View style={styles.header}>
                 <View style={styles.headerTextGroup}>
-                  <Text style={styles.greeting}>Good morning</Text>
+                  <Text style={styles.greeting}>Reyland Development</Text>
                   <Text style={styles.headline}>Find your dream home</Text>
                   <Text style={styles.subtitle}>Search curated properties for sale and rent.</Text>
                 </View>
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
     color: "rgba(255,255,255,0.82)",
-    maxWidth: 285,
+    minWidth: 300,
   },
 
   avatar: {
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   },
 
   contentPanel: {
-    marginTop: -42,
+    marginTop: -35,
     backgroundColor: Colors.surface,
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,

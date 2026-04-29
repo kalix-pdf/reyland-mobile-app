@@ -26,7 +26,7 @@ export default function PropertyCard({ property }: Props) {
       onPress={() => router.push({ pathname: "/property/[id]", params: { id: property.id } } as unknown as Href)}
       activeOpacity={0.92}
     >
-      <Image source={{ uri: property.image }} style={styles.image} />
+      <Image source={{ uri: property.image[0].image_url }} style={styles.image} />
 
       <View style={[styles.badge, property.type === "For Rent" ? styles.rentBadge : styles.saleBadge]}>
         <Text style={[styles.badgeText, property.type === "For Rent" ? styles.rentBadgeText : styles.saleBadgeText]}>

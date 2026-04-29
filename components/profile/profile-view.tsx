@@ -186,6 +186,7 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
             </View>
 
             <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.type}>{user.role === 0 ? 'Buyer' : 'Investor'}</Text>
 
             <View style={styles.badge}>
               <Ionicons name="checkmark-circle" size={15} color={colors.accent} />
@@ -208,6 +209,14 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
               icon={<Feather name="user" size={19} color={colors.accent} />}
               label="Edit Profile"
               onPress={() => Alert.alert("Edit Profile")}
+            />
+
+            <SettingItem
+              styles={styles}
+              colors={colors}
+              icon={<Feather name="user" size={19} color={colors.accent} />}
+              label="Register as Investor!"
+              onPress={() => Alert.alert("Investor")}
             />
 
             <SettingItem
@@ -476,6 +485,11 @@ const createStyles = (Colors: AppColors) =>
       fontWeight: "900",
       color: Colors.textPrimary,
       letterSpacing: -0.4,
+    },
+
+    type: {
+      fontSize: 15,
+      color: Colors.textMuted
     },
 
     badge: {
