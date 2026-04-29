@@ -36,9 +36,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async (): Promise<void> => {
     setIsLoading(true);
-    setUser(null);
-    await new Promise((resolve) => setTimeout(resolve, 900));
-    setIsLoading(false);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 900));
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

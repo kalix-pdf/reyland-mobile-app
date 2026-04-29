@@ -8,7 +8,7 @@ export default function ForgotPasswordScreen() {
         console.log("Reset password:", email);
         return true;
       }}
-      onLogin={() => router.back()}
+      onLogin={() => router.replace("/login")}
     />
   );
 }
