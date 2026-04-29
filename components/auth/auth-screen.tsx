@@ -29,22 +29,31 @@ export function AuthScreen({ heroTitle, children }: AuthScreenProps) {
               contentFit="cover"
             />
 
-            <View style={styles.heroOverlay} />
+            <LinearGradient
+              colors={["rgba(7, 16, 20, 0.93)", "rgba(7, 16, 20, 0.69)", "rgba(7, 16, 20, 0.90)"]}
+              locations={[0, 0.5, 1]}
+              style={styles.heroOverlay}
+            />
 
-            <View style={styles.heroDecorCircleOne} />
-            <View style={styles.heroDecorCircleTwo} />
+            <LinearGradient
+              colors={["rgba(79, 196, 122, 0.18)", "rgba(0, 140, 79, 0)"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroAccent}
+            />
 
             <View style={styles.heroContent}>
-              <Text style={styles.heroTitle}>{heroTitle}</Text>
+              <View style={styles.heroCopy}>
+                <View style={styles.heroRule} />
 
-              <LinearGradient
-                colors={["rgba(0, 23, 28, 0.95)", "rgba(0, 140, 79, 0.55)", "rgba(0, 23, 28, 0.95)"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.logoCard}
-              >
-                <Image source={require("@/assets/images/logo.png")} style={styles.logoImage} contentFit="contain" />
-              </LinearGradient>
+                <View style={styles.brandPill}>
+                  <View style={styles.brandDot} />
+                  <Text style={styles.brandPillText}>REYLAND</Text>
+                </View>
+
+                <Text style={styles.heroTitle}>{heroTitle}</Text>
+                <Text style={styles.heroSubtitle}>Find verified homes, lots, and investment-ready properties.</Text>
+              </View>
             </View>
           </View>
 
@@ -72,26 +81,35 @@ const createStyles = (Colors: AppColors) =>
     },
 
     hero: {
-      minHeight: 390,
+      minHeight: 416,
       backgroundColor: Colors.logoBackground,
       paddingHorizontal: 24,
-      paddingTop: 80,
+      paddingTop: 64,
+      paddingBottom: 74,
       overflow: "hidden",
       position: "relative",
     },
 
     heroBackgroundImage: {
       position: "absolute",
-      width: "150%",
-      height: "150%",
-      left: "50%",
-      top: "50%",
-      transform: [{ translateX: "-46%" }, { translateY: "-50%" }],
+      width: "138%",
+      height: "138%",
+      left: "-12%",
+      top: "15%",
     },
 
     heroOverlay: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: "rgba(0, 23, 28, 0.69)",
+    },
+
+    heroAccent: {
+      position: "absolute",
+      width: 220,
+      height: 220,
+      right: -88,
+      top: 24,
+      borderRadius: 110,
+      transform: [{ rotate: "16deg" }],
     },
 
     heroContent: {
@@ -100,13 +118,63 @@ const createStyles = (Colors: AppColors) =>
       zIndex: 2,
     },
 
-    heroTitle: {
-      maxWidth: 320,
+    heroCopy: {
+      minHeight: 160,
+      justifyContent: "flex-start",
+      gap: 14,
+      maxWidth: 312,
+    },
+
+    heroRule: {
+      width: 44,
+      height: 3,
+      borderRadius: 999,
+      backgroundColor: "rgba(255, 255, 255, 0.7)",
+      marginBottom: 4,
+    },
+
+    brandPill: {
+      alignSelf: "flex-start",
+      minHeight: 30,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: "rgba(255, 255, 255, 0.14)",
+      backgroundColor: "rgba(255, 255, 255, 0.06)",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 12,
+    },
+
+    brandDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: Colors.logoGreenLight,
+    },
+
+    brandPillText: {
       color: Colors.white,
-      fontSize: 25,
-      lineHeight: 33,
+      fontSize: 11,
+      lineHeight: 14,
       fontWeight: "900",
-      letterSpacing: -0.5,
+      letterSpacing: 1.4,
+    },
+
+    heroTitle: {
+      color: Colors.white,
+      fontSize: 31,
+      lineHeight: 38,
+      fontWeight: "900",
+      letterSpacing: -0.7,
+    },
+
+    heroSubtitle: {
+      maxWidth: 276,
+      color: "rgba(255, 255, 255, 0.72)",
+      fontSize: 13,
+      lineHeight: 20,
+      fontWeight: "600",
     },
 
     heroDecorCircleOne: {
@@ -133,45 +201,21 @@ const createStyles = (Colors: AppColors) =>
       zIndex: 1,
     },
 
-    logoCard: {
-      alignSelf: "center",
-      width: 170,
-      height: 135,
-      borderRadius: 30,
-      overflow: "hidden",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 50,
-      shadowColor: Colors.black,
-      shadowOpacity: 0.28,
-      shadowRadius: 18,
-      shadowOffset: {
-        width: 0,
-        height: 10,
-      },
-      elevation: 8,
-    },
-
-    logoImage: {
-      width: 290,
-      height: 230,
-    },
-
     formPanel: {
       flex: 1,
-      marginTop: -30,
+      marginTop: -26,
       backgroundColor: Colors.surface,
-      borderTopLeftRadius: 34,
-      borderTopRightRadius: 34,
+      borderTopLeftRadius: 32,
+      borderTopRightRadius: 32,
       paddingHorizontal: 24,
-      paddingTop: 26,
-      paddingBottom: 30,
+      paddingTop: 28,
+      paddingBottom: 34,
       shadowColor: Colors.black,
-      shadowOpacity: 0.08,
-      shadowRadius: 20,
+      shadowOpacity: 0.1,
+      shadowRadius: 24,
       shadowOffset: {
         width: 0,
-        height: -8,
+        height: -10,
       },
       elevation: 8,
     },

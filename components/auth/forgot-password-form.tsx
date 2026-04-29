@@ -125,6 +125,26 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
         <AuthButton title="Send Reset Link" loadingTitle="Sending link..." loading={isLoading} onPress={handleSubmit} />
       </View>
 
+      <View style={styles.supportCard}>
+        <View style={styles.supportIconWrap}>
+          <Ionicons name="mail-open-outline" size={18} color={colors.accent} />
+        </View>
+
+        <View style={styles.supportCopy}>
+          <Text style={styles.supportTitle}>Check your inbox and spam folder</Text>
+          <Text style={styles.supportText}>
+            Reset emails can take a minute to arrive. If nothing shows up, try requesting a new link.
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.helpRow}>
+        <Text style={styles.helpLabel}>Still having trouble?</Text>
+        <Pressable hitSlop={8}>
+          <Text style={styles.helpLink}> Contact support</Text>
+        </Pressable>
+      </View>
+
       <Pressable style={styles.backButton} onPress={handleLogin} hitSlop={8}>
         <Ionicons name="arrow-back" size={16} color={colors.accent} />
         <Text style={styles.backButtonText}>Back to Login</Text>
@@ -140,16 +160,17 @@ const createStyles = (Colors: AppColors) =>
       fontSize: 30,
       fontWeight: "900",
       textAlign: "center",
-      marginBottom: 10,
+      marginBottom: 8,
     },
 
     description: {
       color: Colors.textSecondary,
       fontSize: 13,
-      lineHeight: 20,
+      lineHeight: 21,
       textAlign: "center",
       fontWeight: "600",
-      marginBottom: 14,
+      marginBottom: 16,
+      minHeight: 42,
     },
 
     accountRow: {
@@ -177,6 +198,65 @@ const createStyles = (Colors: AppColors) =>
 
     buttonWrap: {
       marginTop: 22,
+    },
+
+    supportCard: {
+      marginTop: 18,
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 12,
+      backgroundColor: Colors.background,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      paddingHorizontal: 14,
+      paddingVertical: 14,
+    },
+
+    supportIconWrap: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: Colors.tag,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+
+    supportCopy: {
+      flex: 1,
+      gap: 3,
+    },
+
+    supportTitle: {
+      color: Colors.textPrimary,
+      fontSize: 13,
+      fontWeight: "800",
+    },
+
+    supportText: {
+      color: Colors.textSecondary,
+      fontSize: 12,
+      lineHeight: 18,
+      fontWeight: "600",
+    },
+
+    helpRow: {
+      marginTop: 16,
+      alignSelf: "center",
+      flexDirection: "row",
+      alignItems: "center",
+    },
+
+    helpLabel: {
+      color: Colors.textMuted,
+      fontSize: 12,
+      fontWeight: "600",
+    },
+
+    helpLink: {
+      color: Colors.accent,
+      fontSize: 12,
+      fontWeight: "900",
     },
 
     backButton: {

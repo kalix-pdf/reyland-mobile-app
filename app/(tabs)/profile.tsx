@@ -1,12 +1,16 @@
-import { LoginForm } from "@/components/auth/login-form";
 import { ViewProfile } from "@/components/profile/profile-view";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth-context";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { ActivityIndicator, SafeAreaView, StyleSheet, Text } from "react-native";
 
 export default function ProfileScreen() {
-  const { user, isLoading, login, logout } = useAuth();
+  const { user, isLoading, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace("/");
+  };
 
   if (isLoading) {
     return (
@@ -19,15 +23,11 @@ export default function ProfileScreen() {
     );
   }
 
-  return user ? (
-    <ViewProfile user={user} onLogout={logout} />
-  ) : (
-    <LoginForm
-      onLogin={login}
-      onCreateAccount={() => router.push("/sign-up")}
-      onForgotPassword={() => router.push("/forgot-password")}
-    />
-  );
+  if (!user) {
+    return <Redirect href="/" />;
+  }
+
+  return <ViewProfile user={user} onLogout={handleLogout} />;
 }
 
 const styles = StyleSheet.create({

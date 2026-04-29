@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type ViewProfileProps = {
   user: User;
-  onLogout: () => void;
+  onLogout: () => Promise<void>;
 };
 
 type Styles = ReturnType<typeof createStyles>;
@@ -131,7 +131,9 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
       {
         text: "Log Out",
         style: "destructive",
-        onPress: onLogout,
+        onPress: () => {
+          void onLogout();
+        },
       },
     ]);
   };
