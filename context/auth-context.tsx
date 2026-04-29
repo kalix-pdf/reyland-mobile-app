@@ -3,26 +3,49 @@ import { DUMMY_USER, User } from "../data/user";
 
 type AuthContextType = {
   user: User | null;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<boolean>; 
+  logout: () => Promise<void>;                                  
 };
 
-const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isLoading: false,
+  login: async () => false,
+  logout: async () => {},
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const login = (email: string, password: string): boolean => {
-    if (email === DUMMY_USER.email && password === DUMMY_USER.password) {
-      setUser(DUMMY_USER);
-      return true;
+  const login = async (email: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      if (email === DUMMY_USER.email && password === DUMMY_USER.password) {
+        setUser(DUMMY_USER);
+        return true;
+      }
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-    return false;
   };
 
-  const logout = () => setUser(null);
+  const logout = async (): Promise<void> => {
+    setIsLoading(true);
+    setUser(null);
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    setIsLoading(false);
+  };
 
-  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export const useAuth = () => useContext(AuthContext);
