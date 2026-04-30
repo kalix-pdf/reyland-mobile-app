@@ -1,7 +1,10 @@
-import { Text } from "react-native";
+import { SafeAreaView, Text } from "react-native";
 
 export function InvestorDashboard() {
     return (
-        <Text>Investor Dashboard</Text>
+        <SafeAreaView>
+            <Text>THIS IS THE Investor Dashboard!!! OKS OKS</Text>
+
+        </SafeAreaView>
     );
 }

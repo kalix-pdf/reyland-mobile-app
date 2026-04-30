@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState } from "react";
-import { DUMMY_USER, User } from "../data/user";
+import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { DUMMY_USERS, User } from "../data/user";
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>; 
-  logout: () => Promise<void>;                                  
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -19,22 +19,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      if (email === DUMMY_USER.email && password === DUMMY_USER.password) {
-        setUser(DUMMY_USER);
+      const found = DUMMY_USERS.find(
+        (u) => u.email === email && u.password === password
+      );
+      if (found) {
+        setUser(found);
         return true;
       }
+      
       return false;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const logout = async (): Promise<void> => {
+  const logout = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 900));
@@ -42,10 +45,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({ user, isLoading, login, logout }),
+    [user, isLoading, login, logout]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

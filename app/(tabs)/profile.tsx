@@ -1,31 +1,45 @@
 import { ViewProfile } from "@/components/profile/profile-view";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth-context";
-import { Redirect, router } from "expo-router";
+import { router } from "expo-router";
+import { useCallback, useEffect, useRef } from "react";
 import { ActivityIndicator, SafeAreaView, StyleSheet, Text } from "react-native";
 
 export default function ProfileScreen() {
   const { user, isLoading, logout } = useAuth();
+  const isLoggingOut = useRef(false);
 
-  const handleLogout = async () => {
-    await logout();
-    router.replace("/");
-  };
+  useEffect(() => {
+    if (!isLoading && !user && !isLoggingOut.current) {
+      router.replace("/login");
+    }
+  }, [user, isLoading]);
+
+  const handleLogout = useCallback(async () => {
+    if (isLoggingOut.current) return; // prevent double-tap
+    isLoggingOut.current = true;
+
+    try {
+      await logout();
+      router.replace("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      isLoggingOut.current = false;
+    }
+  }, [logout]);
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color={Colors.accent} />
         <Text style={styles.loadingText}>
-          {user ? "Signing out..." : "Signing in..."}
+          {isLoggingOut.current ? "Signing out..." : "Loading profile..."}
         </Text>
-      </SafeAreaView> 
+      </SafeAreaView>
     );
   }
 
-  if (!user) {
-    return <Redirect href="/" />;
-  }
+  if (!user) return null;
 
   return <ViewProfile user={user} onLogout={handleLogout} />;
 }

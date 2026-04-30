@@ -1,12 +1,12 @@
 import PropertyCard from "@/components/property-card";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth-context";
+import { PROPERTIES } from "@/data/properties";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PROPERTIES } from "@/data/properties";
 
 const FILTERS = ["All", "For Sale", "For Rent"] as const;
 
@@ -61,7 +61,7 @@ export function HomeScreen() {
 
                 {user ? (
                   <Pressable style={({ pressed }) => [styles.avatar, pressed && styles.headerActionPressed]}>
-                    <Text style={styles.avatarText}>JD</Text>
+                    <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
                   </Pressable>
                 ) : (
                   <Pressable
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.35)",
+    borderColor: "rgba(0, 0, 0, 0.88)",
   },
 
   avatarText: {
@@ -424,4 +424,10 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     textAlign: "center",
   },
+
+  avatarImage: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 41,
+    },
 });

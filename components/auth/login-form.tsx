@@ -35,7 +35,7 @@ export function LoginForm({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const [email, setEmail] = useState("juan@email.com");
+  const [email, setEmail] = useState("jakepogi123@email.com");
   const [password, setPassword] = useState("password123");
 
   const [loginError, setLoginError] = useState("");

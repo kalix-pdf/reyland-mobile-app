@@ -12,16 +12,16 @@ const TAB_SCREENS = [
     activeIcon: "home",
   },
   {
-    name: "profile",
-    title: "Profile",
-    icon: "person-outline",
-    activeIcon: "person",
-  },
-  {
     name: "investor",
     title: "Investor",
     icon: "business-outline",
     activeIcon: "business"
+  },
+  {
+    name: "profile",
+    title: "Profile",
+    icon: "person-outline",
+    activeIcon: "person",
   }
 ] as const;
 

@@ -2,17 +2,19 @@ import { InvestorDashboard } from "@/components/investor/investor-dashboard";
 import { useAuth } from "@/context/auth-context";
 import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
-export function Investor() {
-    const { user, login, logout } = useAuth();
+export default function Investor() {
+    const { user } = useAuth();
 
-    return !user ? (
+    return user?.role !== 1 ? (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Become an Investor!</Text>
             <Text style={styles.subtitle}>
                 Join our platform and start investing today.
             </Text>
             <View style={styles.buttonWrapper}>
-                <Button title="Sign Up as Investor" />
+                <Button title="Sign Up as Investor" 
+                // onPress={() => {router.push("/")}} 
+                />
             </View>
         </SafeAreaView>
     ) : (
