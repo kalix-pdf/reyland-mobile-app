@@ -10,7 +10,7 @@ export default function SignUpScreen() {
         // Temporary mock success
         return true;
       }}
-      onLogin={() => router.back()}
+      onLogin={() => router.replace("/login")}
       onGoogleSignUp={() => console.log("Google sign up")}
       onFacebookSignUp={() => console.log("Facebook sign up")}
     />

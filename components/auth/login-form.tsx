@@ -202,12 +202,15 @@ export function LoginForm({
           <Text style={styles.rememberText}>Remember Me</Text>
         </Pressable>
 
-        <Pressable onPress={handleForgotPassword} hitSlop={8}>
-          <Text style={styles.forgotText}>Forgot Password?</Text>
+        <Pressable style={styles.forgotLinkRow} onPress={handleForgotPassword} hitSlop={8}>
+          <Text style={styles.forgotLinkLabel}>Forgot password?</Text>
+          <Text style={styles.forgotLinkText}> Reset it here</Text>
         </Pressable>
       </View>
 
-      <AuthButton title="Login" loadingTitle="Logging in..." loading={isLoading} onPress={handleLogin} />
+      <View style={styles.buttonWrap}>
+        <AuthButton title="Login" loadingTitle="Logging in..." loading={isLoading} onPress={handleLogin} />
+      </View>
 
       <View style={styles.dividerRow}>
         <View style={styles.divider} />
@@ -234,8 +237,6 @@ export function LoginForm({
           <Text style={styles.socialButtonText}>Google</Text>
         </Pressable>
       </View>
-
-      <Text style={styles.hint}>Hint: juan@email.com / password123</Text>
     </AuthScreen>
   );
 }
@@ -282,7 +283,29 @@ const createStyles = (Colors: AppColors) =>
       justifyContent: "space-between",
       alignItems: "center",
       marginTop: 14,
-      marginBottom: 20,
+      marginBottom: 16,
+    },
+
+    buttonWrap: {
+      marginTop: 0,
+    },
+
+    forgotLinkRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginLeft: 12,
+    },
+
+    forgotLinkLabel: {
+      color: Colors.textMuted,
+      fontSize: 12,
+      fontWeight: "600",
+    },
+
+    forgotLinkText: {
+      color: Colors.accent,
+      fontSize: 12,
+      fontWeight: "900",
     },
 
     rememberRow: {
@@ -291,14 +314,21 @@ const createStyles = (Colors: AppColors) =>
       gap: 7,
     },
 
+    rememberText: {
+      color: Colors.textSecondary,
+      fontSize: 12,
+      fontWeight: "600",
+    },
+
     checkbox: {
-      width: 15,
-      height: 15,
+      width: 16,
+      height: 16,
       borderRadius: 4,
       borderWidth: 1.4,
       borderColor: Colors.border,
       alignItems: "center",
       justifyContent: "center",
+      marginTop: 2,
     },
 
     checkboxChecked: {
@@ -306,23 +336,11 @@ const createStyles = (Colors: AppColors) =>
       borderColor: Colors.accent,
     },
 
-    rememberText: {
-      color: Colors.textSecondary,
-      fontSize: 12,
-      fontWeight: "600",
-    },
-
-    forgotText: {
-      color: Colors.accent,
-      fontSize: 12,
-      fontWeight: "800",
-    },
-
     dividerRow: {
       flexDirection: "row",
       alignItems: "center",
       gap: 12,
-      marginTop: 26,
+      marginTop: 18,
       marginBottom: 18,
     },
 
@@ -370,12 +388,5 @@ const createStyles = (Colors: AppColors) =>
       color: Colors.textPrimary,
       fontSize: 14,
       fontWeight: "800",
-    },
-
-    hint: {
-      color: Colors.textMuted,
-      fontSize: 12,
-      textAlign: "center",
-      marginTop: 18,
     },
   });

@@ -5,6 +5,35 @@ import React, { ReactNode, useState } from "react";
 import { Alert, Image, Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type ViewProfileProps = {
+  user: User;
+  onLogout: () => Promise<void>;
+};
+
+type Styles = ReturnType<typeof createStyles>;
+
+type SettingItemProps = {
+  styles: Styles;
+  colors: AppColors;
+  icon: ReactNode;
+  label: string;
+  value?: string;
+  danger?: boolean;
+  showArrow?: boolean;
+  isLast?: boolean;
+  onPress?: () => void;
+};
+
+type ToggleItemProps = {
+  styles: Styles;
+  colors: AppColors;
+  icon: ReactNode;
+  label: string;
+  value: boolean;
+  isLast?: boolean;
+  onValueChange: (value: boolean) => void;
+};
+
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -91,7 +120,9 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
       {
         text: "Log Out",
         style: "destructive",
-        onPress: onLogout,
+        onPress: () => {
+          void onLogout();
+        },
       },
     ]);
   };

@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/colors";
+import { useAuth } from "@/context/auth-context";
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { Platform, StyleSheet } from "react-native";
 
 const TAB_SCREENS = [
@@ -25,6 +26,12 @@ const TAB_SCREENS = [
 ] as const;
 
 export default function TabLayout() {
+  const { user } = useAuth();
+
+  if (!user) {
+    return <Redirect href="/" />;
+  }
+
   return (
     <Tabs
       screenOptions={{
