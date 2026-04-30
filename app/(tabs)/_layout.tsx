@@ -16,6 +16,12 @@ const TAB_SCREENS = [
     icon: "person-outline",
     activeIcon: "person",
   },
+  {
+    name: "investor",
+    title: "Investor",
+    icon: "business-outline",
+    activeIcon: "business"
+  }
 ] as const;
 
 export default function TabLayout() {

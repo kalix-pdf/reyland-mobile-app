@@ -15,7 +15,7 @@ export default function ProfileScreen() {
         <Text style={styles.loadingText}>
           {user ? "Signing out..." : "Signing in..."}
         </Text>
-      </SafeAreaView>
+      </SafeAreaView> 
     );
   }
 
