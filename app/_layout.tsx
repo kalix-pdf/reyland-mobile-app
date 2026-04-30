@@ -42,6 +42,7 @@ function RootNavigator() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="sign-up" options={{ headerShown: false }} />
         <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
+        <Stack.Screen name="investor-signup" options={{ headerShown: false }} />
         <Stack.Screen
           name="property/[id]"
           options={{

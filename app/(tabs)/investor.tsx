@@ -1,5 +1,6 @@
 import { InvestorDashboard } from "@/components/investor/investor-dashboard";
 import { useAuth } from "@/context/auth-context";
+import { router } from "expo-router";
 import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 export default function Investor() {
@@ -13,7 +14,7 @@ export default function Investor() {
             </Text>
             <View style={styles.buttonWrapper}>
                 <Button title="Sign Up as Investor" 
-                // onPress={() => {router.push("/")}} 
+                onPress={() => {router.push("/investor-signup")}} 
                 />
             </View>
         </SafeAreaView>

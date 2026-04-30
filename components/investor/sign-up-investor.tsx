@@ -50,7 +50,7 @@ function PasswordStrength({ value }: { value: string }) {
   );
 }
 
-export function SignUpInvestor() {
+export function SignUpInvestorForm() {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -86,7 +86,7 @@ export function SignUpInvestor() {
           <View style={s.logoMark}>
             <Text style={s.logoIcon}>▲</Text>
           </View>
-          <Text style={s.logoName}>Verdanta</Text>
+          <Text style={s.logoName}>Reyland Development</Text>
         </View>
 
         {/* Hero text */}
