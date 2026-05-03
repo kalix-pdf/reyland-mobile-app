@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/colors";
 import { PROPERTIES } from "@/data/properties";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -141,9 +142,9 @@ export default function PropertyDetailScreen() {
           <TouchableOpacity style={styles.viewImagesBtn} onPress={() => setOpenModal(true)}>
             <Text style={styles.viewImagesBtnText}>🖼 View Images</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <Text style={styles.backIcon}>←</Text>
-          </TouchableOpacity> */}
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.9}>
+            <Ionicons name="arrow-back" size={20} color={Colors.textPrimary} />
+          </TouchableOpacity>
           <View style={[styles.badge, property.type === "For Rent" ? styles.rentBadge : styles.saleBadge]}>
             <Text
               style={[styles.badgeText, property.type === "For Rent" ? styles.rentBadgeText : styles.saleBadgeText]}
@@ -277,7 +278,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-  backIcon: { fontSize: 20, color: Colors.textPrimary, marginTop: -2 },
   badge: {
     position: "absolute",
     top: 16,

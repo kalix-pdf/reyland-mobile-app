@@ -6,7 +6,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FILTERS = ["All", "For Sale", "For Rent"] as const;
 
@@ -14,6 +14,7 @@ type Filter = (typeof FILTERS)[number];
 
 export function HomeScreen() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
   const [activeFilter, setActiveFilter] = useState<Filter>("All");
   const [search, setSearch] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -41,22 +42,30 @@ export function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
       <FlatList
+        contentInsetAdjustmentBehavior="never"
         data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <PropertyCard property={item} />}
         ListHeaderComponent={
           <View>
-            <View style={styles.hero}>
+            <View style={[styles.hero, { paddingTop: insets.top + 18 }]}>
               <View style={styles.heroDecorCircleOne} />
               <View style={styles.heroDecorCircleTwo} />
 
               <View style={styles.header}>
                 <View style={styles.headerTextGroup}>
+                  <View style={styles.brandPill}>
+                    <View style={styles.brandDot} />
+                    <Text style={styles.brandPillText}>DISCOVER</Text>
+                  </View>
+
                   <Text style={styles.greeting}>Reyland Development</Text>
                   <Text style={styles.headline}>Find your dream home</Text>
-                  <Text style={styles.subtitle}>Search curated properties for sale and rent.</Text>
+                  <Text style={styles.subtitle}>
+                    Search curated properties for sale and rent across verified Reyland locations.
+                  </Text>
                 </View>
 
                 {user ? (
@@ -166,10 +175,11 @@ const styles = StyleSheet.create({
   },
 
   hero: {
-    minHeight: 205,
-    backgroundColor: Colors.accent,
+    minHeight: 228,
+    backgroundColor: Colors.primary,
     paddingHorizontal: 22,
     paddingTop: 22,
+    paddingBottom: 42,
     overflow: "hidden",
   },
 
@@ -206,20 +216,51 @@ const styles = StyleSheet.create({
     paddingRight: 18,
   },
 
+  brandPill: {
+    alignSelf: "flex-start",
+    minHeight: 30,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.14)",
+    backgroundColor: "rgba(255,255,255,0.06)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+
+  brandDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: Colors.logoGreenLight,
+  },
+
+  brandPillText: {
+    color: Colors.white,
+    fontSize: 11,
+    lineHeight: 14,
+    fontWeight: "900",
+    letterSpacing: 1.4,
+  },
+
   greeting: {
-    fontSize: 14,
+    fontSize: 13,
     color: "rgba(255,255,255,0.82)",
-    fontWeight: "700",
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
     marginBottom: 8,
   },
 
   headline: {
-    fontSize: 30,
-    lineHeight: 37,
+    fontSize: 31,
+    lineHeight: 38,
     fontWeight: "900",
     color: "#FFFFFF",
-    letterSpacing: -0.8,
-    maxWidth: 285,
+    letterSpacing: -0.9,
+    maxWidth: 300,
   },
 
   subtitle: {
@@ -227,18 +268,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 21,
     color: "rgba(255,255,255,0.82)",
-    minWidth: 300,
+    maxWidth: 320,
   },
 
   avatar: {
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.primaryLight,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "rgba(0, 0, 0, 0.88)",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.24)",
   },
 
   avatarText: {
@@ -272,15 +313,13 @@ const styles = StyleSheet.create({
   },
 
   contentPanel: {
-    marginTop: -35,
+    marginTop: -33,
     backgroundColor: Colors.surface,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
+    borderTopLeftRadius: 34,
+    borderTopRightRadius: 34,
     paddingTop: 22,
     paddingHorizontal: 20,
     paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
     shadowColor: Colors.primary,
     shadowOpacity: 0.08,
     shadowRadius: 18,
@@ -354,17 +393,17 @@ const styles = StyleSheet.create({
   },
 
   sectionHeader: {
-    marginTop: 22,
+    marginTop: 24,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
 
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "900",
     color: Colors.textPrimary,
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
 
   resultCount: {
@@ -426,8 +465,8 @@ const styles = StyleSheet.create({
   },
 
   avatarImage: {
-      width: "100%",
-      height: "100%",
-      borderRadius: 41,
-    },
+    width: "100%",
+    height: "100%",
+    borderRadius: 41,
+  },
 });

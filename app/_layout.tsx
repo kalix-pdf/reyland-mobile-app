@@ -3,6 +3,7 @@ import { AppThemeProvider, useAppTheme } from "@/context/theme-context";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { View } from "react-native";
 
 function RootNavigator() {
   const { colors, isDarkMode } = useAppTheme();
@@ -22,38 +23,25 @@ function RootNavigator() {
   };
 
   return (
-    <ThemeProvider value={navigationTheme}>
-      <Stack
-        screenOptions={{
-          contentStyle: {
-            backgroundColor: colors.background,
-          },
-          headerStyle: {
-            backgroundColor: colors.surface,
-          },
-          headerTintColor: colors.textPrimary,
-          headerTitleStyle: {
-            fontWeight: "800",
-          },
-        }}
-      >
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-        <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
-        <Stack.Screen name="investor-signup" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="property/[id]"
-          options={{
-            title: "Property Detail",
-            headerBackTitle: "Back",
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <ThemeProvider value={navigationTheme}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
           }}
-        />
-      </Stack>
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="login" />
+          <Stack.Screen name="sign-up" />
+          <Stack.Screen name="forgot-password" />
+          <Stack.Screen name="investor-signup" />
+          <Stack.Screen name="property/[id]" />
+        </Stack>
 
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
-    </ThemeProvider>
+        <StatusBar style={isDarkMode ? "light" : "dark"} backgroundColor="transparent" translucent />
+      </ThemeProvider>
+    </View>
   );
 }
 

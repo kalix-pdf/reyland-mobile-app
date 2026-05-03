@@ -3,7 +3,7 @@ import { SettingItemProps, Styles, ToggleItemProps, ViewProfileProps, createStyl
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { ReactNode, useState } from "react";
 import { Alert, Image, Pressable, ScrollView, Switch, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 function getInitials(name: string) {
   return name
@@ -14,11 +14,22 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-function SettingItem({styles, colors, icon, label, value,
-  danger = false, showArrow = true, isLast = false, onPress }: SettingItemProps) {
+function SettingItem({
+  styles,
+  colors,
+  icon,
+  label,
+  value,
+  danger = false,
+  showArrow = true,
+  isLast = false,
+  onPress,
+}: SettingItemProps) {
   return (
-    <Pressable onPress={onPress}
-      style={({ pressed }) => [styles.settingRow, isLast && styles.settingRowLast, pressed && styles.settingRowPressed]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.settingRow, isLast && styles.settingRowLast, pressed && styles.settingRowPressed]}
+    >
       <View style={styles.settingLeft}>
         <View style={[styles.settingIconWrap, danger && styles.settingIconWrapDanger]}>{icon}</View>
 
@@ -75,6 +86,7 @@ function Section({ styles, title, children }: { styles: Styles; title: string; c
 
 export function ViewProfile({ user, onLogout }: ViewProfileProps) {
   const { colors, isDarkMode, toggleDarkMode } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const styles = createStyles(colors);
 
   const [notifications, setNotifications] = useState(true);
@@ -112,16 +124,24 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.hero}>
+    <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
+      <ScrollView
+        contentInsetAdjustmentBehavior="never"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={[styles.hero, { paddingTop: insets.top + 18 }]}>
           <View style={styles.heroDecorCircleOne} />
           <View style={styles.heroDecorCircleTwo} />
 
           <View style={styles.heroHeader}>
             <View>
-              <Text style={styles.heroKicker}>My Account</Text>
+              <View style={styles.brandPill}>
+                <View style={styles.brandDot} />
+                <Text style={styles.brandPillText}>ACCOUNT</Text>
+              </View>
               <Text style={styles.heroTitle}>Profile</Text>
+              <Text style={styles.heroSubtitle}>Manage your account, preferences, and saved activity in one place.</Text>
             </View>
 
             <Pressable
@@ -148,7 +168,8 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
             </View>
 
             <Text style={styles.name}>{user.name}</Text>
-            <Text style={styles.type}>{user.role === 0 ? 'Buyer' : 'Investor'}</Text>
+            <Text style={styles.type}>{user.role === 0 ? "Buyer" : "Investor"}</Text>
+            <Text style={styles.memberSince}>Member since {user.memberSince}</Text>
 
             <View style={styles.badge}>
               <Ionicons name="checkmark-circle" size={15} color={colors.accent} />
@@ -294,4 +315,3 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
     </SafeAreaView>
   );
 }
-

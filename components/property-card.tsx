@@ -1,5 +1,6 @@
 import { Href, useRouter } from "expo-router";
 import React from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../constants/colors";
 import { Property } from "../data/properties";
@@ -10,7 +11,7 @@ type Props = {
   property: Property;
 };
 
-export default function PropertyCard({ property }: Props) {
+function PropertyCard({ property }: Props) {
   const router = useRouter();
 
   const formatPrice = (price: number, type: string) => {
@@ -39,23 +40,26 @@ export default function PropertyCard({ property }: Props) {
         <Text style={styles.title} numberOfLines={1}>
           {property.title}
         </Text>
-        <Text style={styles.address} numberOfLines={1}>
-          📍 {property.address}
-        </Text>
+        <View style={styles.addressRow}>
+          <Ionicons name="location-outline" size={14} color={Colors.accent} />
+          <Text style={styles.address} numberOfLines={1}>
+            {property.address}
+          </Text>
+        </View>
 
         <View style={styles.specs}>
           <View style={styles.spec}>
-            <Text style={styles.specIcon}>🛏</Text>
+            <Ionicons name="bed-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
             <Text style={styles.specText}>{property.bedrooms} Beds</Text>
           </View>
           <View style={styles.specDivider} />
           <View style={styles.spec}>
-            <Text style={styles.specIcon}>🚿</Text>
+            <Ionicons name="water-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
             <Text style={styles.specText}>{property.bathrooms} Baths</Text>
           </View>
           <View style={styles.specDivider} />
           <View style={styles.spec}>
-            <Text style={styles.specIcon}>📐</Text>
+            <Ionicons name="resize-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
             <Text style={styles.specText}>{property.sqft} sqm</Text>
           </View>
         </View>
@@ -64,16 +68,20 @@ export default function PropertyCard({ property }: Props) {
   );
 }
 
+export default React.memo(PropertyCard);
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 16,
-    marginHorizontal: 16,
-    marginBottom: 20,
-    shadowColor: "#000",
+    borderRadius: 24,
+    marginHorizontal: 18,
+    marginBottom: 18,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
     elevation: 4,
     overflow: "hidden",
   },
@@ -86,42 +94,49 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 14,
     left: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
   },
   rentBadge: { backgroundColor: Colors.rentBadge },
   saleBadge: { backgroundColor: Colors.saleBadge },
-  badgeText: { fontSize: 11, fontWeight: "700", letterSpacing: 0.5 },
+  badgeText: { fontSize: 11, fontWeight: "900", letterSpacing: 0.3 },
   rentBadgeText: { color: Colors.rentBadgeText },
   saleBadgeText: { color: Colors.saleBadgeText },
-  content: { padding: 16 },
+  content: { padding: 18 },
   price: {
     fontSize: 22,
-    fontWeight: "800",
+    fontWeight: "900",
     color: Colors.accent,
     marginBottom: 4,
   },
   title: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 18,
+    fontWeight: "900",
     color: Colors.textPrimary,
-    marginBottom: 4,
+    marginBottom: 8,
+  },
+  addressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginBottom: 14,
   },
   address: {
+    flex: 1,
     fontSize: 13,
     color: Colors.textSecondary,
-    marginBottom: 12,
+    fontWeight: "600",
   },
   specs: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 12,
+    paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
   spec: { flexDirection: "row", alignItems: "center", flex: 1 },
-  specIcon: { fontSize: 14, marginRight: 4 },
+  specIcon: { marginRight: 5 },
   specText: { fontSize: 12, color: Colors.textSecondary, fontWeight: "600" },
   specDivider: {
     width: 1,
