@@ -7,13 +7,14 @@ import { useAppTheme } from "@/context/theme-context";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 type SignUpFormProps = {
   onSignUp: (name: string, email: string, password: string) => boolean | Promise<boolean>;
   onLogin?: () => void;
   onGoogleSignUp?: () => void;
   onFacebookSignUp?: () => void;
+  isGoogleLoading?: boolean;
 };
 
 const isValidName = (value: string) => {
@@ -28,7 +29,7 @@ const isValidPassword = (value: string) => {
   return value.length >= 6;
 };
 
-export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp }: SignUpFormProps) {
+export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp, isGoogleLoading }: SignUpFormProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -278,12 +279,28 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
         </Pressable>
 
         <Pressable
-          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && styles.socialButtonPressed]}
-          onPress={handleGoogleSignUp}
-          disabled={isLoading}
+          style={({ pressed }) => [
+            styles.socialButton,
+            pressed && !isLoading && !isGoogleLoading && styles.socialButtonPressed,
+            isGoogleLoading && styles.socialButtonPressed,
+          ]}
+          onPress={onGoogleSignUp}
+          disabled={isLoading || isGoogleLoading}
+          accessibilityLabel="Sign up with Google"
+          accessibilityRole="button"
         >
-          <Image source={require("@/assets/images/google-logo.png")} style={styles.googleIcon} contentFit="contain" />
-          <Text style={styles.socialButtonText}>Google</Text>
+          {isGoogleLoading ? (
+            <ActivityIndicator size="small" color="#4285F4" />
+          ) : (
+            <Image
+              source={require('@/assets/images/google-logo.png')}
+              style={styles.googleIcon}
+              contentFit="contain"
+            />
+          )}
+          <Text style={styles.socialButtonText}>
+            {isGoogleLoading ? 'Signing in…' : 'Google'}
+          </Text>
         </Pressable>
       </View>
     </AuthScreen>
