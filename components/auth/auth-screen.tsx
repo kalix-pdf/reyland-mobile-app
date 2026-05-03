@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type AuthScreenProps = {
   heroTitle: string;
@@ -12,17 +13,19 @@ type AuthScreenProps = {
 
 export function AuthScreen({ heroTitle, children }: AuthScreenProps) {
   const { colors } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const styles = createStyles(colors);
 
   return (
     <KeyboardAvoidingView style={styles.keyboardView} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView
+        contentInsetAdjustmentBehavior="never"
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.screen}>
-          <View style={styles.hero}>
+          <View style={[styles.hero, { paddingTop: insets.top + 18 }]}>
             <Image
               source={require("@/assets/images/background.jpg")}
               style={styles.heroBackgroundImage}
@@ -84,7 +87,6 @@ const createStyles = (Colors: AppColors) =>
       minHeight: 416,
       backgroundColor: Colors.logoBackground,
       paddingHorizontal: 24,
-      paddingTop: 64,
       paddingBottom: 74,
       overflow: "hidden",
       position: "relative",
@@ -92,10 +94,10 @@ const createStyles = (Colors: AppColors) =>
 
     heroBackgroundImage: {
       position: "absolute",
-      width: "138%",
-      height: "138%",
+      width: "141%",
+      height: "141%",
       left: "-12%",
-      top: "15%",
+      top: 0,
     },
 
     heroOverlay: {

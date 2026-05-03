@@ -2,7 +2,7 @@ import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth-context";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, Tabs } from "expo-router";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 
 const TAB_SCREENS = [
   {
@@ -12,17 +12,23 @@ const TAB_SCREENS = [
     activeIcon: "home",
   },
   {
+    name: "discover",
+    title: "Discover",
+    icon: "compass-outline",
+    activeIcon: "compass",
+  },
+  {
     name: "investor",
     title: "Investor",
     icon: "business-outline",
-    activeIcon: "business"
+    activeIcon: "business",
   },
   {
     name: "profile",
     title: "Profile",
     icon: "person-outline",
     activeIcon: "person",
-  }
+  },
 ] as const;
 
 export default function TabLayout() {
@@ -36,6 +42,8 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        lazy: true,
+        freezeOnBlur: true,
 
         tabBarActiveTintColor: Colors.accent,
         tabBarInactiveTintColor: Colors.textMuted,
@@ -54,7 +62,16 @@ export default function TabLayout() {
           options={{
             title,
             tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? activeIcon : icon} size={focused ? 24 : 22} color={color} />
+              <View>
+                <Ionicons
+                  name={focused ? activeIcon : icon}
+                  size={focused ? 24 : 21}
+                  color={focused ? Colors.accent : color}
+                />
+              </View>
+            ),
+            tabBarLabel: ({ color, focused }) => (
+              <Text style={[styles.tabLabelText, { color }, focused && styles.tabLabelTextActive]}>{title}</Text>
             ),
           }}
         />
@@ -65,32 +82,40 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: Platform.OS === "ios" ? 82 : 68,
-    paddingTop: 8,
-    paddingBottom: Platform.OS === "ios" ? 24 : 10,
-    paddingHorizontal: 12,
+    height: Platform.OS === "ios" ? 92 : 78,
+    paddingTop: 10,
+    paddingBottom: Platform.OS === "ios" ? 24 : 12,
+    paddingHorizontal: 14,
 
     backgroundColor: Colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopWidth: 0,
 
     shadowColor: Colors.primary,
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
+    shadowOpacity: 0.12,
+    shadowRadius: 22,
     shadowOffset: {
       width: 0,
-      height: -6,
+      height: -8,
     },
     elevation: 10,
   },
 
   tabBarItem: {
-    borderRadius: 18,
+    borderRadius: 22,
+    paddingTop: 2,
   },
 
   tabBarLabel: {
+    marginTop: 4,
+  },
+
+  tabLabelText: {
     fontSize: 11,
-    fontWeight: "800",
-    marginTop: 2,
+    fontWeight: "700",
+    letterSpacing: 0.1,
+  },
+
+  tabLabelTextActive: {
+    fontWeight: "900",
   },
 });

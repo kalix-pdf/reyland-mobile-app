@@ -3,7 +3,8 @@ import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth-context";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef } from "react";
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text } from "react-native";
+import { ActivityIndicator, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const { user, isLoading, logout } = useAuth();
@@ -32,9 +33,7 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color={Colors.accent} />
-        <Text style={styles.loadingText}>
-          {isLoggingOut.current ? "Signing out..." : "Loading profile..."}
-        </Text>
+        <Text style={styles.loadingText}>{isLoggingOut.current ? "Signing out..." : "Loading profile..."}</Text>
       </SafeAreaView>
     );
   }

@@ -32,7 +32,6 @@ export type ToggleItemProps = {
   onValueChange: (value: boolean) => void;
 };
 
-
 export const createStyles = (Colors: AppColors) =>
   StyleSheet.create({
     safe: {
@@ -45,8 +44,8 @@ export const createStyles = (Colors: AppColors) =>
     },
 
     hero: {
-      minHeight: 190,
-      backgroundColor: Colors.accent,
+      minHeight: 231,
+      backgroundColor: Colors.primary,
       paddingHorizontal: 24,
       paddingTop: 24,
       overflow: "hidden",
@@ -80,11 +79,42 @@ export const createStyles = (Colors: AppColors) =>
       justifyContent: "space-between",
     },
 
+    brandPill: {
+      alignSelf: "flex-start",
+      minHeight: 30,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: "rgba(255,255,255,0.14)",
+      backgroundColor: "rgba(255,255,255,0.06)",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      paddingHorizontal: 12,
+      marginBottom: 12,
+    },
+
+    brandDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: Colors.logoGreenLight,
+    },
+
+    brandPillText: {
+      color: Colors.white,
+      fontSize: 11,
+      lineHeight: 14,
+      fontWeight: "900",
+      letterSpacing: 1.4,
+    },
+
     heroKicker: {
       color: "rgba(255,255,255,0.82)",
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: "800",
       marginBottom: 8,
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
     },
 
     heroTitle: {
@@ -94,15 +124,24 @@ export const createStyles = (Colors: AppColors) =>
       letterSpacing: -0.8,
     },
 
+    heroSubtitle: {
+      marginTop: 10,
+      maxWidth: 290,
+      color: "rgba(255,255,255,0.72)",
+      fontSize: 13,
+      lineHeight: 20,
+      fontWeight: "600",
+    },
+
     headerIconButton: {
       width: 44,
       height: 44,
       borderRadius: 22,
-      backgroundColor: Colors.primary,
+      backgroundColor: Colors.primaryLight,
       alignItems: "center",
       justifyContent: "center",
       borderWidth: 1.5,
-      borderColor: "rgba(255,255,255,0.35)",
+      borderColor: "rgba(255,255,255,0.2)",
     },
 
     headerIconButtonPressed: {
@@ -111,11 +150,11 @@ export const createStyles = (Colors: AppColors) =>
     },
 
     contentPanel: {
-      marginTop: -54,
       backgroundColor: Colors.background,
       borderTopLeftRadius: 34,
       borderTopRightRadius: 34,
       paddingTop: 18,
+      marginTop: -30,
     },
 
     profileCard: {
@@ -189,7 +228,14 @@ export const createStyles = (Colors: AppColors) =>
 
     type: {
       fontSize: 15,
-      color: Colors.textMuted
+      color: Colors.textMuted,
+    },
+
+    memberSince: {
+      fontSize: 12,
+      color: Colors.textSecondary,
+      fontWeight: "700",
+      marginTop: 4,
     },
 
     badge: {
@@ -250,11 +296,10 @@ export const createStyles = (Colors: AppColors) =>
     },
 
     sectionTitle: {
-      color: Colors.textMuted,
-      fontSize: 12,
+      color: Colors.textPrimary,
+      fontSize: 20,
       fontWeight: "900",
-      letterSpacing: 1,
-      textTransform: "uppercase",
+      letterSpacing: -0.4,
       paddingHorizontal: 22,
       marginBottom: 10,
     },
