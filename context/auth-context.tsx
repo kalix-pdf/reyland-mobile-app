@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { DUMMY_USERS } from "../data/user";
-import { User } from "@/types/user";
+import { User } from "@/types/user.types";
 
 type AuthContextType = {
   user: User | null;

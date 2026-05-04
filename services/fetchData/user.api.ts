@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import { User } from "@/types/user.types";
 import { fetchData, API_URL } from "./fetch.api";
 
 export async function getUserInfo(token: string): Promise<User> {

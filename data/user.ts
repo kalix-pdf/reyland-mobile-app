@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import { User } from "@/types/user.types";
 //dummy user data
 
 export const DUMMY_USERS: User[] = [

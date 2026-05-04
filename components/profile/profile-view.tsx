@@ -1,5 +1,5 @@
 import { useAppTheme } from "@/context/theme-context";
-import { SettingItemProps, Styles, ToggleItemProps, ViewProfileProps, createStyles } from "@/types/user";
+import { SettingItemProps, Styles, ToggleItemProps, ViewProfileProps, createStyles } from "@/types/user.types";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { ReactNode, useState } from "react";
 import { Alert, Image, Pressable, ScrollView, Switch, Text, View } from "react-native";
