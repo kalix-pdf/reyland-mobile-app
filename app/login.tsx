@@ -28,7 +28,7 @@ export default function LoginScreen() {
         if (userInfo.uuid) {
           await AsyncStorage.setItem('token', token);
           setUser(userInfo);
-          router.push("/");
+          router.replace('/')
         }
       }
 

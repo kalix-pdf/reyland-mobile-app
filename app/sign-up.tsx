@@ -4,9 +4,12 @@ import { router } from 'expo-router'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SignUpForm } from '../components/auth/sign-up-form'
 import { signInWithGoogle, GoogleAuthError } from '../services/auth/google'
+import { getUserInfo } from '@/services/fetchData/user.api'
+import { useAuth } from '@/context/auth-context'
 
 export default function SignUpScreen() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const { setUser } = useAuth();
 
   const handleGoogleSignUp = async () => {
     if (isGoogleLoading) return
@@ -14,8 +17,17 @@ export default function SignUpScreen() {
 
     try {
       const { token } = await signInWithGoogle()
-      await AsyncStorage.setItem('token', token)
-      router.replace('/')
+      
+      if (token) {
+        const userInfo = await getUserInfo(token);
+
+        if (userInfo.uuid) {
+          await AsyncStorage.setItem('token', token)
+          setUser(userInfo);
+          router.replace('/')
+        }
+      }
+
     } catch (error) {
       if (error instanceof GoogleAuthError && error.code === 'CANCELLED') {
         return
