@@ -1,20 +1,12 @@
+import { User } from "@/types/user.types";
 //dummy user data
-export type User = {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-  avatar: string;
-  phone: string;
-  memberSince: string;
-  role: number;
-};
 
 export const DUMMY_USERS: User[] = [
   {
     // INVESTOR USER
     id: 2 ,
     role: 1,
+    accessToken: "",
     name: "JAKE POGI",
     email: "jakepogi123@email.com",
     password: "password123",
@@ -26,6 +18,7 @@ export const DUMMY_USERS: User[] = [
     // BUYER USER
     id: 1,
     role: 0,
+    accessToken: "",
     name: "Juan dela Cruz",
     email: "juan@email.com",
     password: "password123",

@@ -7,12 +7,13 @@ import { useAppTheme } from "@/context/theme-context";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
 type LoginFormProps = {
   onLogin: (email: string, password: string) => boolean | Promise<boolean>;
   onForgotPassword?: () => void;
-  onGoogleLogin?: () => void;
+  onGoogleLogin: () => void;
+  onLoadingOuth: boolean;
   onFacebookLogin?: () => void;
   onCreateAccount?: () => void;
 };
@@ -29,6 +30,7 @@ export function LoginForm({
   onLogin,
   onForgotPassword,
   onGoogleLogin,
+  onLoadingOuth,
   onFacebookLogin,
   onCreateAccount,
 }: LoginFormProps) {
@@ -229,12 +231,19 @@ export function LoginForm({
         </Pressable>
 
         <Pressable
-          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && styles.socialButtonPressed]}
+          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && !onLoadingOuth &&
+             styles.socialButtonPressed, onLoadingOuth && styles.socialButtonPressed]}
           onPress={handleGoogleLogin}
           disabled={isLoading}
+          accessibilityLabel="Sign-in with Google"
+          accessibilityRole="button"
         >
-          <Image source={require("@/assets/images/google-logo.png")} style={styles.googleIcon} contentFit="contain" />
-          <Text style={styles.socialButtonText}>Google</Text>
+          {onLoadingOuth ? (
+            <ActivityIndicator size="small" color="#4285F4"/>
+          ) : (
+            <Image source={require("@/assets/images/google-logo.png")} style={styles.googleIcon} contentFit="contain" />
+          )}
+          <Text style={styles.socialButtonText}>{onLoadingOuth ? 'Signing in...' : 'Google'}</Text>
         </Pressable>
       </View>
     </AuthScreen>
