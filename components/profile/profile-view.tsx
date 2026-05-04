@@ -126,6 +126,8 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
   return (
     <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
       <ScrollView
+        alwaysBounceVertical={false}
+        bounces={false}
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -141,7 +143,9 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
                 <Text style={styles.brandPillText}>ACCOUNT</Text>
               </View>
               <Text style={styles.heroTitle}>Profile</Text>
-              <Text style={styles.heroSubtitle}>Manage your account, preferences, and saved activity in one place.</Text>
+              <Text style={styles.heroSubtitle}>
+                Manage your account, preferences, and saved activity in one place.
+              </Text>
             </View>
 
             <Pressable

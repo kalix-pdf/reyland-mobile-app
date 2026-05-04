@@ -218,6 +218,8 @@ export function InvestorDashboard() {
   return (
     <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
       <ScrollView
+        alwaysBounceVertical={false}
+        bounces={false}
         contentInsetAdjustmentBehavior="never"
         style={styles.scroll}
         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 18 }]}
