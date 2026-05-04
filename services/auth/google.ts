@@ -8,7 +8,6 @@ if (!BACKEND_URL) {
   throw new Error('EXPO_PUBLIC_BACKEND_URL is not defined')
 }
 
-// Must match the scheme registered in app.json > scheme
 const REDIRECT_SCHEME = process.env.EXPO_PUBLIC_APP_SCHEME ?? 'reylandapp'
 const REDIRECT_URI = `${REDIRECT_SCHEME}://auth/callback`
 
@@ -41,10 +40,11 @@ export async function signInWithGoogle(): Promise<GoogleAuthResult> {
   }
 
   let token: string | null = null
-
+console.log(result);
   try {
     const url = new URL(result.url)
-    token = url.searchParams.get('token')
+    console.log(result);
+    token = url.searchParams.get('access_token')
   } catch {
     throw new GoogleAuthError('Could not parse redirect URL', 'INVALID_RESPONSE')
   }
