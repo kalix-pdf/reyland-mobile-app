@@ -1,3 +1,4 @@
+import { User } from '@/types/user'
 import * as WebBrowser from 'expo-web-browser'
 
 WebBrowser.maybeCompleteAuthSession()
@@ -13,6 +14,7 @@ const REDIRECT_URI = `${REDIRECT_SCHEME}://auth/callback`
 
 export interface GoogleAuthResult {
   token: string
+  // refreshToken: string;
 }
 
 export class GoogleAuthError extends Error {
@@ -40,10 +42,8 @@ export async function signInWithGoogle(): Promise<GoogleAuthResult> {
   }
 
   let token: string | null = null
-console.log(result);
   try {
     const url = new URL(result.url)
-    console.log(result);
     token = url.searchParams.get('access_token')
   } catch {
     throw new GoogleAuthError('Could not parse redirect URL', 'INVALID_RESPONSE')
@@ -55,3 +55,6 @@ console.log(result);
 
   return { token }
 }
+
+
+// export async function getUserInfo(): Promise<User>

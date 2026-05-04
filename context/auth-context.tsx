@@ -1,11 +1,13 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { DUMMY_USERS, User } from "../data/user";
+import { DUMMY_USERS } from "../data/user";
+import { User } from "@/types/user";
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  setUser: (user: User | null) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -13,6 +15,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: false,
   login: async () => false,
   logout: async () => {},
+  setUser: () => {}
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -48,8 +51,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, isLoading, login, logout }),
-    [user, isLoading, login, logout]
+    () => ({ user, isLoading, login, logout, setUser }),
+    [user, isLoading, login, logout, setUser]
   );
 
   return (

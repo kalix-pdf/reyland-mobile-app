@@ -1,5 +1,4 @@
 import { AppColors } from "@/constants/colors";
-import { User } from "@/data/user";
 import { ReactNode } from "react";
 import { StyleSheet } from "react-native";
 
@@ -31,6 +30,20 @@ export type ToggleItemProps = {
   isLast?: boolean;
   onValueChange: (value: boolean) => void;
 };
+
+//user types
+export type User = {
+  uuid: string;
+  name: string;
+  email: string;
+  accessToken: string;
+  password: string;
+  avatar: string;
+  phone: string;
+  memberSince: string;
+  role: number;
+};
+
 
 export const createStyles = (Colors: AppColors) =>
   StyleSheet.create({

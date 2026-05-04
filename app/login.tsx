@@ -5,9 +5,10 @@ import { GoogleAuthError, signInWithGoogle } from "@/services/auth/google";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
+import { getUserInfo } from "@/services/fetchData/user.api";
 
 export default function LoginScreen() {
-  const { login, user } = useAuth();
+  const { login, user, setUser } = useAuth();
   const [isLoadingOuth, setIsLoadingOuth] = useState(false)
 
   if (user) {
@@ -20,8 +21,16 @@ export default function LoginScreen() {
 
     try {
       const { token } = await signInWithGoogle()
-      await AsyncStorage.setItem('token', token);
       
+      if (token) {
+        const userInfo = await getUserInfo(token);
+        
+        if (userInfo.uuid) {
+          await AsyncStorage.setItem('token', token);
+          setUser(userInfo);
+          router.push("/");
+        }
+      }
 
     } catch(error) {
       if (error instanceof GoogleAuthError && error.code === 'CANCELLED') return;
