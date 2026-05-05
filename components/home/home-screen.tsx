@@ -44,6 +44,8 @@ export function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
       <FlatList
+        alwaysBounceVertical={false}
+        bounces={false}
         contentInsetAdjustmentBehavior="never"
         data={filtered}
         keyExtractor={(item) => item.id}

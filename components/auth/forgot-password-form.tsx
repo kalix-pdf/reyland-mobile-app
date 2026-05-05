@@ -88,14 +88,6 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
         Enter the email linked to your account and we’ll send you instructions to reset your password.
       </Text>
 
-      <View style={styles.accountRow}>
-        <Text style={styles.accountText}>Remember your password?</Text>
-
-        <Pressable onPress={handleLogin} hitSlop={8}>
-          <Text style={styles.accountLink}> Login</Text>
-        </Pressable>
-      </View>
-
       <AuthMessage type="error" message={error} />
       <AuthMessage type="success" message={successMessage} />
 
@@ -149,6 +141,7 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
         <Ionicons name="arrow-back" size={16} color={colors.accent} />
         <Text style={styles.backButtonText}>Back to Login</Text>
       </Pressable>
+
     </AuthScreen>
   );
 }

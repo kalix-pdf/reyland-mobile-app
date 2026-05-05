@@ -10,20 +10,23 @@ import {
   Image,
   Linking,
   Modal,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
-function PropertyImages({images, onClose }: {
+function PropertyImages({
+  images,
+  onClose,
+}: {
   images: { image_id: number; public_id: string; image_url: string }[];
-  onClose: () => void; }) 
-  {
+  onClose: () => void;
+}) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
@@ -50,11 +53,7 @@ function PropertyImages({images, onClose }: {
           setActiveIndex(index);
         }}
         renderItem={({ item }) => (
-          <Image
-            source={{ uri: item.image_url }}
-            style={{ width, height: 400 }}
-            resizeMode="cover"
-          />
+          <Image source={{ uri: item.image_url }} style={{ width, height: 400 }} resizeMode="cover" />
         )}
       />
 
@@ -63,28 +62,18 @@ function PropertyImages({images, onClose }: {
         {images.map((_, i) => (
           <View
             key={i}
-            style={[
-              modalStyles.dot,
-              i === activeIndex ? modalStyles.dotActive : modalStyles.dotInactive,
-            ]}
+            style={[modalStyles.dot, i === activeIndex ? modalStyles.dotActive : modalStyles.dotInactive]}
           />
         ))}
       </View>
 
       {/* Thumbnail strip */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={modalStyles.thumbnails}
-      >
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={modalStyles.thumbnails}>
         {images.map((img, i) => (
           <Image
             key={img.image_id}
             source={{ uri: img.image_url }}
-            style={[
-              modalStyles.thumb,
-              i === activeIndex && modalStyles.thumbActive,
-            ]}
+            style={[modalStyles.thumb, i === activeIndex && modalStyles.thumbActive]}
           />
         ))}
       </ScrollView>
@@ -124,18 +113,10 @@ export default function PropertyDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-        <Modal
-          visible={openModal}
-          animationType="slide"
-          statusBarTranslucent
-          onRequestClose={() => setOpenModal(false)}
-          >
-        <PropertyImages
-          images={property.image}
-          onClose={() => setOpenModal(false)}
-        />
+      <Modal visible={openModal} animationType="slide" statusBarTranslucent onRequestClose={() => setOpenModal(false)}>
+        <PropertyImages images={property.image} onClose={() => setOpenModal(false)} />
       </Modal>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView alwaysBounceVertical={false} bounces={false} showsVerticalScrollIndicator={false}>
         {/* Image */}
         <View style={styles.imageWrap}>
           <Image source={{ uri: property.image[0].image_url }} style={styles.image} />
@@ -249,7 +230,7 @@ const modalStyles = StyleSheet.create({
     opacity: 1,
     borderWidth: 2,
     borderColor: "#FFF",
-  }
+  },
 });
 
 const styles = StyleSheet.create({
@@ -405,7 +386,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   inquireBtnText: { color: "#FFF", fontSize: 16, fontWeight: "800" },
-  viewImagesBtn: {                   
+  viewImagesBtn: {
     position: "absolute",
     bottom: 12,
     right: 12,
