@@ -133,14 +133,7 @@ export function LoginForm({
   return (
     <AuthScreen heroTitle="Log in to find your next property with Reyland.">
       <Text style={styles.title}>Login</Text>
-
-      <View style={styles.accountRow}>
-        <Text style={styles.accountText}>Don’t have an account?</Text>
-
-        <Pressable onPress={handleCreateAccount} hitSlop={8}>
-          <Text style={styles.accountLink}> Sign Up</Text>
-        </Pressable>
-      </View>
+      <Text style={styles.subtitle}>Welcome back. Log in to continue browsing verified listings and saved properties.</Text>
 
       <AuthMessage type="error" message={loginError} />
 
@@ -246,6 +239,14 @@ export function LoginForm({
           <Text style={styles.socialButtonText}>{onLoadingOuth ? 'Signing in...' : 'Google'}</Text>
         </Pressable>
       </View>
+
+      <View style={styles.accountFooterRow}>
+        <Text style={styles.accountText}>Don’t have an account?</Text>
+
+        <Pressable onPress={handleCreateAccount} hitSlop={8}>
+          <Text style={styles.accountLink}> Sign Up</Text>
+        </Pressable>
+      </View>
     </AuthScreen>
   );
 }
@@ -257,7 +258,16 @@ const createStyles = (Colors: AppColors) =>
       fontSize: 30,
       fontWeight: "900",
       textAlign: "center",
-      marginBottom: 8,
+      marginBottom: 6,
+    },
+
+    subtitle: {
+      color: Colors.textSecondary,
+      fontSize: 13,
+      lineHeight: 19,
+      textAlign: "center",
+      fontWeight: "600",
+      marginBottom: 16,
     },
 
     accountRow: {
@@ -265,6 +275,13 @@ const createStyles = (Colors: AppColors) =>
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 22,
+    },
+
+    accountFooterRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 18,
     },
 
     accountText: {

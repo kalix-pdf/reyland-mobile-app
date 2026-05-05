@@ -1,166 +1,199 @@
-import { AuthButton } from "@/components/auth/auth-button";
-import { AuthInput } from "@/components/auth/auth-input";
-import { AuthMessage } from "@/components/auth/auth-message";
-import { AuthScreen } from "@/components/auth/auth-screen";
-import { AppColors } from "@/constants/colors";
-import { useAppTheme } from "@/context/theme-context";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { AuthButton } from '@/components/auth/auth-button'
+import { AuthInput } from '@/components/auth/auth-input'
+import { AuthMessage } from '@/components/auth/auth-message'
+import { AuthScreen } from '@/components/auth/auth-screen'
+import { AppColors } from '@/constants/colors'
+import { useAppTheme } from '@/context/theme-context'
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
+import { Image } from 'expo-image'
+import { useState } from 'react'
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native'
 
 type SignUpFormProps = {
-  onSignUp: (name: string, email: string, password: string) => boolean | Promise<boolean>;
-  onLogin?: () => void;
-  onGoogleSignUp?: () => void;
-  onFacebookSignUp?: () => void;
-  isGoogleLoading?: boolean;
-};
+  onSignUp: (name: string, email: string, password: string) => boolean | Promise<boolean>
+  onLogin?: () => void
+  onGoogleSignUp?: () => void
+  onFacebookSignUp?: () => void
+  isGoogleLoading?: boolean
+}
 
 const isValidName = (value: string) => {
-  return value.trim().length >= 2;
-};
+  return value.trim().length >= 2
+}
 
 const isValidEmail = (value: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-};
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+}
 
 const isValidPassword = (value: string) => {
-  return value.length >= 6;
-};
+  return value.length >= 6
+}
 
 export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp, isGoogleLoading }: SignUpFormProps) {
-  const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const { colors } = useAppTheme()
+  const styles = createStyles(colors)
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
-  const [signUpError, setSignUpError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [signUpError, setSignUpError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [acceptTerms, setAcceptTerms] = useState(false)
 
-  const [nameTouched, setNameTouched] = useState(false);
-  const [emailTouched, setEmailTouched] = useState(false);
-  const [passwordTouched, setPasswordTouched] = useState(false);
-  const [termsTouched, setTermsTouched] = useState(false);
+  const [nameTouched, setNameTouched] = useState(false)
+  const [emailTouched, setEmailTouched] = useState(false)
+  const [passwordTouched, setPasswordTouched] = useState(false)
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false)
+  const [termsTouched, setTermsTouched] = useState(false)
 
-  const [submitted, setSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const trimmedName = name.trim();
-  const trimmedEmail = email.trim();
+  const trimmedName = name.trim()
+  const trimmedEmail = email.trim()
 
-  const shouldValidateName = submitted || nameTouched;
-  const shouldValidateEmail = submitted || emailTouched;
-  const shouldValidatePassword = submitted || passwordTouched;
-  const shouldValidateTerms = submitted || termsTouched;
+  const shouldValidateName = submitted || nameTouched
+  const shouldValidateEmail = submitted || emailTouched
+  const shouldValidatePassword = submitted || passwordTouched
+  const shouldValidateConfirmPassword = submitted || confirmPasswordTouched
+  const shouldValidateTerms = submitted || termsTouched
+  const hasConfirmPasswordValue = confirmPassword.trim().length > 0
+  const passwordsMatch = password === confirmPassword
+  const isConfirmPasswordReady = password.length > 0 && hasConfirmPasswordValue
+  const canSubmit =
+    isValidName(trimmedName) && isValidEmail(trimmedEmail) && isValidPassword(password) && passwordsMatch && acceptTerms
 
   const nameError =
     shouldValidateName && trimmedName.length === 0
-      ? "Full name is required."
+      ? 'Full name is required.'
       : shouldValidateName && !isValidName(trimmedName)
-        ? "Name must be at least 2 characters."
-        : "";
+        ? 'Name must be at least 2 characters.'
+        : ''
 
   const emailError =
     shouldValidateEmail && trimmedEmail.length === 0
-      ? "Email is required."
+      ? 'Email is required.'
       : shouldValidateEmail && !isValidEmail(trimmedEmail)
-        ? "Please enter a valid email address."
-        : "";
+        ? 'Please enter a valid email address.'
+        : ''
 
   const passwordError =
     shouldValidatePassword && password.length === 0
-      ? "Password is required."
+      ? 'Password is required.'
       : shouldValidatePassword && !isValidPassword(password)
-        ? "Password must be at least 6 characters."
-        : "";
+        ? 'Password must be at least 6 characters.'
+        : ''
 
-  const termsError = shouldValidateTerms && !acceptTerms ? "Please accept the terms to continue." : "";
+  const confirmPasswordError =
+    shouldValidateConfirmPassword && !hasConfirmPasswordValue
+      ? 'Please confirm your password.'
+      : shouldValidateConfirmPassword && !passwordsMatch
+        ? "Passwords don't match."
+        : ''
+
+  const termsError = shouldValidateTerms && !acceptTerms ? 'Please accept the terms to continue.' : ''
+  const shouldEnableScroll =
+    Boolean(signUpError) ||
+    Boolean(nameError) ||
+    Boolean(emailError) ||
+    Boolean(passwordError) ||
+    Boolean(confirmPasswordError) ||
+    Boolean(termsError)
 
   const handleSignUp = async () => {
-    if (isLoading) return;
+    if (isLoading) return
 
-    setSubmitted(true);
-    setNameTouched(true);
-    setEmailTouched(true);
-    setPasswordTouched(true);
-    setTermsTouched(true);
-    setSignUpError("");
+    setSubmitted(true)
+    setNameTouched(true)
+    setEmailTouched(true)
+    setPasswordTouched(true)
+    setConfirmPasswordTouched(true)
+    setTermsTouched(true)
+    setSignUpError('')
 
-    if (!isValidName(trimmedName)) return;
-    if (!isValidEmail(trimmedEmail)) return;
-    if (!isValidPassword(password)) return;
-    if (!acceptTerms) return;
+    if (!isValidName(trimmedName)) return
+    if (!isValidEmail(trimmedEmail)) return
+    if (!isValidPassword(password)) return
+    if (!passwordsMatch) return
+    if (!acceptTerms) return
 
     try {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      const success = await onSignUp(trimmedName, trimmedEmail, password);
+      const success = await onSignUp(trimmedName, trimmedEmail, password)
 
       if (!success) {
-        setSignUpError("Unable to create account. Please try again.");
+        setSignUpError('Unable to create account. Please try again.')
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleNameChange = (value: string) => {
-    setName(value);
-    setSignUpError("");
+    setName(value)
+    setSignUpError('')
 
     if (submitted) {
-      setNameTouched(true);
+      setNameTouched(true)
     }
-  };
+  }
 
   const handleEmailChange = (value: string) => {
-    setEmail(value);
-    setSignUpError("");
+    setEmail(value)
+    setSignUpError('')
 
     if (submitted) {
-      setEmailTouched(true);
+      setEmailTouched(true)
     }
-  };
+  }
 
   const handlePasswordChange = (value: string) => {
-    setPassword(value);
-    setSignUpError("");
+    setPassword(value)
+    setSignUpError('')
 
     if (submitted) {
-      setPasswordTouched(true);
+      setPasswordTouched(true)
     }
-  };
+  }
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value)
+    setSignUpError('')
+
+    if (submitted) {
+      setConfirmPasswordTouched(true)
+    }
+  }
 
   const handleLogin = () => {
-    if (isLoading) return;
-    onLogin?.();
-  };
+    if (isLoading) return
+    onLogin?.()
+  }
 
   const handleGoogleSignUp = () => {
-    if (isLoading) return;
-    onGoogleSignUp?.();
-  };
+    if (isLoading) return
+    onGoogleSignUp?.()
+  }
 
   const handleFacebookSignUp = () => {
-    if (isLoading) return;
-    onFacebookSignUp?.();
-  };
+    if (isLoading) return
+    onFacebookSignUp?.()
+  }
 
   return (
-    <AuthScreen heroTitle="Create your account and start exploring Reyland properties.">
+    <AuthScreen
+      heroTitle="Create your account and start exploring Reyland properties."
+      layoutDensity="compact"
+      scrollEnabled={shouldEnableScroll}
+    >
       <Text style={styles.title}>Sign Up</Text>
-
-      <View style={styles.accountRow}>
-        <Text style={styles.accountText}>Already have an account?</Text>
-
-        <Pressable onPress={handleLogin} hitSlop={8}>
-          <Text style={styles.accountLink}> Login</Text>
-        </Pressable>
-      </View>
+      <Text style={styles.subtitle}>
+        Create your profile to save listings, track favorites, and continue across devices.
+      </Text>
 
       <AuthMessage type="error" message={signUpError} />
 
@@ -173,7 +206,7 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
           onChangeText={handleNameChange}
           onBlur={() => {
             if (name.trim().length > 0 || submitted) {
-              setNameTouched(true);
+              setNameTouched(true)
             }
           }}
           autoCapitalize="words"
@@ -191,7 +224,7 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
           onChangeText={handleEmailChange}
           onBlur={() => {
             if (email.trim().length > 0 || submitted) {
-              setEmailTouched(true);
+              setEmailTouched(true)
             }
           }}
           keyboardType="email-address"
@@ -211,7 +244,7 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
               style={styles.eyeButton}
               disabled={isLoading}
             >
-              <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={21} color={color} />
+              <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
             </Pressable>
           )}
           error={passwordError}
@@ -220,10 +253,50 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
           onChangeText={handlePasswordChange}
           onBlur={() => {
             if (password.length > 0 || submitted) {
-              setPasswordTouched(true);
+              setPasswordTouched(true)
             }
           }}
           secureTextEntry={!showPassword}
+          autoCapitalize="none"
+          autoCorrect={false}
+          textContentType="newPassword"
+          returnKeyType="next"
+          editable={!isLoading}
+        />
+
+        <View style={styles.passwordHintRow}>
+          <Ionicons
+            name={isValidPassword(password) ? 'checkmark-circle' : 'information-circle-outline'}
+            size={15}
+            color={isValidPassword(password) ? colors.success : colors.textMuted}
+          />
+          <Text style={[styles.passwordHintText, isValidPassword(password) && styles.passwordHintTextSuccess]}>
+            Use at least 6 characters.
+          </Text>
+        </View>
+
+        <AuthInput
+          icon={(color) => <Feather name="lock" size={20} color={color} />}
+          rightElement={(color) => (
+            <Pressable
+              onPress={() => setShowConfirmPassword((current) => !current)}
+              hitSlop={8}
+              style={styles.eyeButton}
+              disabled={isLoading}
+            >
+              <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
+            </Pressable>
+          )}
+          error={confirmPasswordError}
+          placeholder="Confirm password"
+          value={confirmPassword}
+          onChangeText={handleConfirmPasswordChange}
+          onBlur={() => {
+            if (confirmPassword.length > 0 || submitted) {
+              setConfirmPasswordTouched(true)
+            }
+          }}
+          secureTextEntry={!showConfirmPassword}
           autoCapitalize="none"
           autoCorrect={false}
           textContentType="newPassword"
@@ -231,13 +304,20 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
           onSubmitEditing={handleSignUp}
           editable={!isLoading}
         />
+
+        {isConfirmPasswordReady && !confirmPasswordError ? (
+          <View style={styles.matchRow}>
+            <Ionicons name="checkmark-circle" size={15} color={colors.success} />
+            <Text style={styles.matchText}>Passwords match.</Text>
+          </View>
+        ) : null}
       </View>
 
       <Pressable
         style={styles.termsRow}
         onPress={() => {
-          setAcceptTerms((current) => !current);
-          setTermsTouched(true);
+          setAcceptTerms((current) => !current)
+          setTermsTouched(true)
         }}
         hitSlop={8}
       >
@@ -246,7 +326,7 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
         </View>
 
         <Text style={styles.termsText}>
-          I agree to the <Text style={styles.termsLink}>Terms</Text> and{" "}
+          I agree to the <Text style={styles.termsLink}>Terms</Text> and{' '}
           <Text style={styles.termsLink}>Privacy Policy</Text>
         </Text>
       </Pressable>
@@ -255,9 +335,10 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
 
       <View style={styles.buttonWrap}>
         <AuthButton
-          title="Create Account"
+          title={canSubmit ? 'Create Account' : 'Complete Sign Up'}
           loadingTitle="Creating account..."
           loading={isLoading}
+          // disabled={!canSubmit}
           onPress={handleSignUp}
         />
       </View>
@@ -284,7 +365,7 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
             pressed && !isLoading && !isGoogleLoading && styles.socialButtonPressed,
             isGoogleLoading && styles.socialButtonPressed,
           ]}
-          onPress={onGoogleSignUp}
+          onPress={handleGoogleSignUp}
           disabled={isLoading || isGoogleLoading}
           accessibilityLabel="Sign up with Google"
           accessibilityRole="button"
@@ -292,19 +373,21 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
           {isGoogleLoading ? (
             <ActivityIndicator size="small" color="#4285F4" />
           ) : (
-            <Image
-              source={require('@/assets/images/google-logo.png')}
-              style={styles.googleIcon}
-              contentFit="contain"
-            />
+            <Image source={require('@/assets/images/google-logo.png')} style={styles.googleIcon} contentFit="contain" />
           )}
-          <Text style={styles.socialButtonText}>
-            {isGoogleLoading ? 'Signing in…' : 'Google'}
-          </Text>
+          <Text style={styles.socialButtonText}>{isGoogleLoading ? 'Signing in…' : 'Google'}</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.accountFooterRow}>
+        <Text style={styles.accountText}>Already have an account?</Text>
+
+        <Pressable onPress={handleLogin} hitSlop={8}>
+          <Text style={styles.accountLink}> Login</Text>
         </Pressable>
       </View>
     </AuthScreen>
-  );
+  )
 }
 
 const createStyles = (Colors: AppColors) =>
@@ -312,44 +395,94 @@ const createStyles = (Colors: AppColors) =>
     title: {
       color: Colors.textPrimary,
       fontSize: 30,
-      fontWeight: "900",
-      textAlign: "center",
-      marginBottom: 8,
+      fontWeight: '900',
+      textAlign: 'center',
+      marginBottom: 6,
+    },
+
+    subtitle: {
+      color: Colors.textSecondary,
+      fontSize: 13,
+      lineHeight: 19,
+      fontWeight: '600',
+      textAlign: 'center',
+      marginBottom: 14,
     },
 
     accountRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: 22,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+    },
+
+    accountFooterRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 18,
     },
 
     accountText: {
       color: Colors.textMuted,
       fontSize: 13,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     accountLink: {
       color: Colors.accent,
       fontSize: 13,
-      fontWeight: "900",
+      fontWeight: '900',
     },
 
     inputArea: {
-      gap: 12,
+      gap: 10,
     },
 
     eyeButton: {
       paddingLeft: 10,
     },
 
-    termsRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
+    passwordHintRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 8,
-      marginTop: 16,
-      marginBottom: 8,
+      marginTop: -2,
+      marginBottom: 2,
+      marginLeft: 16,
+    },
+
+    passwordHintText: {
+      color: Colors.textMuted,
+      fontSize: 12,
+      fontWeight: '600',
+    },
+
+    passwordHintTextSuccess: {
+      color: Colors.success,
+    },
+
+    matchRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginTop: -2,
+      marginBottom: 2,
+      marginLeft: 16,
+    },
+
+    matchText: {
+      color: Colors.success,
+      fontSize: 12,
+      fontWeight: '700',
+    },
+
+    termsRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 8,
+      marginTop: 12,
+      marginBottom: 6,
     },
 
     checkbox: {
@@ -358,8 +491,8 @@ const createStyles = (Colors: AppColors) =>
       borderRadius: 4,
       borderWidth: 1.4,
       borderColor: Colors.border,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       marginTop: 2,
     },
 
@@ -373,32 +506,32 @@ const createStyles = (Colors: AppColors) =>
       color: Colors.textSecondary,
       fontSize: 12,
       lineHeight: 18,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     termsLink: {
       color: Colors.accent,
-      fontWeight: "900",
+      fontWeight: '900',
     },
 
     termsErrorText: {
       color: Colors.error,
       fontSize: 12,
-      fontWeight: "700",
+      fontWeight: '700',
       marginBottom: 8,
       marginLeft: 24,
     },
 
     buttonWrap: {
-      marginTop: 8,
+      marginTop: 6,
     },
 
     dividerRow: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 12,
-      marginTop: 26,
-      marginBottom: 18,
+      marginTop: 18,
+      marginBottom: 14,
     },
 
     divider: {
@@ -410,11 +543,11 @@ const createStyles = (Colors: AppColors) =>
     dividerText: {
       color: Colors.textMuted,
       fontSize: 13,
-      fontWeight: "700",
+      fontWeight: '700',
     },
 
     socialButtons: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 12,
     },
 
@@ -423,9 +556,9 @@ const createStyles = (Colors: AppColors) =>
       minHeight: 52,
       borderRadius: 26,
       backgroundColor: Colors.surfaceMuted,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       gap: 8,
       borderWidth: 1,
       borderColor: Colors.border,
@@ -444,6 +577,6 @@ const createStyles = (Colors: AppColors) =>
     socialButtonText: {
       color: Colors.textPrimary,
       fontSize: 14,
-      fontWeight: "800",
+      fontWeight: '800',
     },
-  });
+  })
