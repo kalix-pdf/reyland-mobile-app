@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { DUMMY_USERS } from "../data/user";
 import { User } from "@/types/user.types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type AuthContextType = {
   user: User | null;
@@ -44,6 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 900));
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.clear();
       setUser(null);
     } finally {
       setIsLoading(false);
