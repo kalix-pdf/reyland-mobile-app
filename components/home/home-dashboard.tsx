@@ -42,8 +42,6 @@ export function HomeDashboard() {
   return (
     <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
       <ScrollView
-        alwaysBounceVertical={false}
-        bounces={false}
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={[styles.content, { paddingTop: insets.top + 18 }]}
         showsVerticalScrollIndicator={false}

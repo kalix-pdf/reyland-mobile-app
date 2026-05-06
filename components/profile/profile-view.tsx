@@ -127,8 +127,8 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
   return (
     <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
       <ScrollView
-        alwaysBounceVertical={false}
-        bounces={false}
+        // alwaysBounceVertical={false}
+        // bounces={false}
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
