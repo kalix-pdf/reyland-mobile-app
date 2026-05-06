@@ -1,14 +1,18 @@
 import { ViewProfile } from "@/components/profile/profile-view";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth-context";
+import { getUserInfo } from "@/services/fetchData/user.api";
+import { useRefreshControl } from "@/hooks/use-refresh-control";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { useCallback, useEffect, useRef } from "react";
 import { ActivityIndicator, StyleSheet, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
-  const { user, isLoading, logout } = useAuth();
+  const { user, isLoading, logout, setUser } = useAuth();
   const isLoggingOut = useRef(false);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!isLoading && !user && !isLoggingOut.current) {
@@ -29,6 +33,22 @@ export default function ProfileScreen() {
     }
   }, [logout]);
 
+  const handleRefresh = useCallback(async () => {
+    const token = await AsyncStorage.getItem("token");
+
+    if (!token) {
+      return;
+    }
+
+    const refreshedUser = await getUserInfo(token);
+
+    if (refreshedUser.uuid) {
+      setUser(refreshedUser);
+    }
+  }, [setUser]);
+
+  const { refreshing, onRefresh } = useRefreshControl(handleRefresh);
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.centered}>
@@ -40,7 +60,15 @@ export default function ProfileScreen() {
 
   if (!user) return null;
 
-  return <ViewProfile user={user} onLogout={handleLogout} />;
+  return (
+    <ViewProfile
+      user={user}
+      onLogout={handleLogout}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+      refreshOffset={insets.top + 28}
+    />
+  );
 }
 
 const styles = StyleSheet.create({

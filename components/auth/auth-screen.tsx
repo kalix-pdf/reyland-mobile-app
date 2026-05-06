@@ -22,8 +22,8 @@ export function AuthScreen({ heroTitle, children, layoutDensity = 'default', scr
   return (
     <KeyboardAvoidingView style={styles.keyboardView} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
-        alwaysBounceVertical={false}
-        bounces={false}
+        // alwaysBounceVertical={false}
+        // bounces={false}
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"

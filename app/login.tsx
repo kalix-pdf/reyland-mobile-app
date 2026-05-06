@@ -1,91 +1,76 @@
-import { LoginForm } from "@/components/auth/login-form";
-import { useAuth } from "@/context/auth-context";
-import { Redirect, router } from "expo-router";
-import { signInWithGoogle } from "@/services/auth/google";
-import { AuthError } from "@/services/auth/AuthResult";
-import { useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert } from "react-native";
-import { getUserInfo } from "@/services/fetchData/user.api";
-import { signInWithFacebook } from "@/services/auth/facebook";
+import { LoginForm } from '@/components/auth/login-form'
+import { useAuth } from '@/context/auth-context'
+import { AuthError } from '@/services/auth/AuthResult'
+import { completeOAuthSignIn } from '@/services/auth/complete-oauth-sign-in'
+import { signInWithFacebook } from '@/services/auth/facebook'
+import { signInWithGoogle } from '@/services/auth/google'
+import { Redirect, router } from 'expo-router'
+import { useState } from 'react'
+import { Alert } from 'react-native'
 
 export default function LoginScreen() {
-  const { login, user, setUser } = useAuth();
-  const [isLoadingOuth, setIsLoadingOuth] = useState(false)
+  const { login, user, setUser } = useAuth()
+  const [isLoadingGoogleOuth, setIsLoadingGoogleOuth] = useState(false)
+  const [isLoadingFacebookOuth, setIsLoadingFacebookOuth] = useState(false)
 
   if (user) {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/(tabs)" />
   }
 
-  const handleFabookLogin = async() => {
-    if (isLoadingOuth) return;
-    setIsLoadingOuth(true);
+  const handleFabookLogin = async () => {
+    if (isLoadingFacebookOuth) return
+    setIsLoadingFacebookOuth(true)
 
     try {
       const { token } = await signInWithFacebook()
 
       if (token) {
-        await getUserInfoByToken(token);
+        await completeOAuthSignIn(token, setUser)
       }
-
-    } catch (error) {
-
+    } catch {
     } finally {
-      setIsLoadingOuth(false)
+      setIsLoadingFacebookOuth(false)
     }
   }
 
-  const getUserInfoByToken = async(token: string) => {
-    if (!token) return;
-
-    const userInfo = await getUserInfo(token);
-        
-    if (userInfo.uuid) {
-      await AsyncStorage.setItem('token', token);
-      setUser(userInfo);
-      router.replace('/')
-    }
-  }
-
-  const handleGoogleLogin = async() => {
-    if (isLoadingOuth) return;
-    setIsLoadingOuth(true);
+  const handleGoogleLogin = async () => {
+    if (isLoadingGoogleOuth) return
+    setIsLoadingGoogleOuth(true)
 
     try {
       const { token } = await signInWithGoogle()
-      
-      if (token) {
-        await getUserInfoByToken(token);   
-      }
 
-    } catch(error) {
-      if (error instanceof AuthError && error.code === 'CANCELLED') return;
+      if (token) {
+        await completeOAuthSignIn(token, setUser)
+      }
+    } catch (error) {
+      if (error instanceof AuthError && error.code === 'CANCELLED') return
       Alert.alert(
         'Sign-in Failed',
-        error instanceof AuthError ? error.message : 
-        'Something went wrong, Please contact support.'
+        error instanceof AuthError ? error.message : 'Something went wrong, Please contact support.',
       )
     } finally {
-      setIsLoadingOuth(false);
+      setIsLoadingGoogleOuth(false)
     }
   }
 
   return (
     <LoginForm
       onLogin={async (email, password) => {
-        const success = await login(email, password);
+        const success = await login(email, password)
 
         if (success) {
-          router.replace("/(tabs)");
+          router.replace('/(tabs)')
         }
 
-        return success;
+        return success
       }}
       onGoogleLogin={handleGoogleLogin}
       onFacebookLogin={handleFabookLogin}
-      onLoadingOuth={isLoadingOuth}
-      onCreateAccount={() => router.push("/sign-up")}
-      onForgotPassword={() => router.push("/forgot-password")}
+      onLoadingFacebookOuth={isLoadingFacebookOuth}
+      onLoadingGoogleOuth={isLoadingGoogleOuth}
+      onCreateAccount={() => router.push('/sign-up')}
+      onForgotPassword={() => router.push('/forgot-password')}
     />
-  );
+  )
 }

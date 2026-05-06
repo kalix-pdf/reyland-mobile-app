@@ -1,50 +1,60 @@
-import { Colors } from "@/constants/colors";
-import { useAuth } from "@/context/auth-context";
-import { PROPERTIES } from "@/data/properties";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useMemo } from "react";
-import { Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { Colors } from '@/constants/colors'
+import { useAuth } from '@/context/auth-context'
+import { PROPERTIES } from '@/data/properties'
+import { useRefreshControl } from '@/hooks/use-refresh-control'
+import { Ionicons } from '@expo/vector-icons'
+import { router } from 'expo-router'
+import React, { useMemo } from 'react'
+import { Image, ImageBackground, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const QUICK_ACTIONS = [
-  { key: "browse", label: "Browse", icon: "search-outline" as const },
-  { key: "visit", label: "Site Visit", icon: "calendar-outline" as const },
-  { key: "reserve", label: "Reserve", icon: "bookmark-outline" as const },
-  { key: "support", label: "Support", icon: "chatbubble-ellipses-outline" as const },
-] as const;
+  { key: 'browse', label: 'Browse', icon: 'search-outline' as const },
+  { key: 'visit', label: 'Site Visit', icon: 'calendar-outline' as const },
+  { key: 'reserve', label: 'Reserve', icon: 'bookmark-outline' as const },
+  { key: 'support', label: 'Support', icon: 'chatbubble-ellipses-outline' as const },
+] as const
 
 export function HomeDashboard() {
-  const { user } = useAuth();
-  const insets = useSafeAreaInsets();
+  const { user } = useAuth()
+  const insets = useSafeAreaInsets()
+  const { refreshing, onRefresh } = useRefreshControl()
 
-  const featuredProperties = useMemo(() => PROPERTIES.slice(0, 4), []);
+  const featuredProperties = useMemo(() => PROPERTIES.slice(0, 4), [])
 
   const locations = useMemo(() => {
     return Array.from(
       new Set(
         PROPERTIES.map((property) => {
-          const segments = property.address.split(",").map((segment) => segment.trim());
-          return segments[0];
+          const segments = property.address.split(',').map((segment) => segment.trim())
+          return segments[0]
         }),
       ),
-    ).slice(0, 6);
-  }, []);
+    ).slice(0, 6)
+  }, [])
 
   const handleLoginPress = () => {
-    router.push("/login");
-  };
+    router.push('/login')
+  }
 
-  const firstName = user?.name.split(" ")[0] ?? "Guest";
-  const heroImage = featuredProperties[0]?.image[0]?.image_url;
-  const spotlightProperty = featuredProperties[0];
+  const firstName = user?.name.split(' ')[0] ?? 'Guest'
+  const heroImage = featuredProperties[0]?.image[0]?.image_url
+  const spotlightProperty = featuredProperties[0]
 
   return (
-    <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={[styles.content, { paddingTop: insets.top + 18 }]}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.accent}
+            progressViewOffset={insets.top + 28}
+          />
+        }
       >
         <ImageBackground source={{ uri: heroImage }} style={[styles.hero]} imageStyle={styles.heroImage}>
           <View style={styles.heroOverlay} />
@@ -87,18 +97,18 @@ export function HomeDashboard() {
         </ImageBackground>
 
         <View style={styles.quickActionsRow}>
-            {QUICK_ACTIONS.map((action) => (
-              <Pressable
-                key={action.key}
-                style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
-                onPress={() => router.push("/(tabs)/discover")}
-              >
-                <View style={styles.quickActionIconBox}>
-                  <Ionicons name={action.icon} size={22} color={Colors.accent} />
-                </View>
-                <Text style={styles.quickActionLabel}>{action.label}</Text>
-              </Pressable>
-            ))}
+          {QUICK_ACTIONS.map((action) => (
+            <Pressable
+              key={action.key}
+              style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
+              onPress={() => router.push('/(tabs)/discover')}
+            >
+              <View style={styles.quickActionIconBox}>
+                <Ionicons name={action.icon} size={22} color={Colors.accent} />
+              </View>
+              <Text style={styles.quickActionLabel}>{action.label}</Text>
+            </Pressable>
+          ))}
         </View>
 
         <View style={styles.section}>
@@ -110,7 +120,7 @@ export function HomeDashboard() {
 
             <Pressable
               style={({ pressed }) => [styles.linkButton, pressed && styles.pressed]}
-              onPress={() => router.push("/(tabs)/discover")}
+              onPress={() => router.push('/(tabs)/discover')}
             >
               <Text style={styles.linkText}>View All</Text>
             </Pressable>
@@ -126,7 +136,7 @@ export function HomeDashboard() {
               <Pressable
                 key={property.id}
                 style={({ pressed }) => [styles.projectCard, pressed && styles.pressed]}
-                onPress={() => router.push({ pathname: "/property/[id]", params: { id: property.id } })}
+                onPress={() => router.push({ pathname: '/property/[id]', params: { id: property.id } })}
               >
                 <Image source={{ uri: property.image[0].image_url }} style={styles.projectImage} />
 
@@ -148,7 +158,7 @@ export function HomeDashboard() {
 
                   <Text style={styles.projectPrice}>
                     ₱{property.price.toLocaleString()}
-                    {property.type === "For Rent" ? "/mo" : ""}
+                    {property.type === 'For Rent' ? '/mo' : ''}
                   </Text>
 
                   <View style={styles.projectFooter}>
@@ -175,7 +185,7 @@ export function HomeDashboard() {
 
             <Pressable
               style={({ pressed }) => [styles.linkButton, pressed && styles.pressed]}
-              onPress={() => router.push("/(tabs)/discover")}
+              onPress={() => router.push('/(tabs)/discover')}
             >
               <Text style={styles.linkText}>Explore</Text>
             </Pressable>
@@ -192,10 +202,10 @@ export function HomeDashboard() {
                 <View style={styles.locationInitials}>
                   <Text style={styles.locationInitialsText}>
                     {location
-                      .split(" ")
+                      .split(' ')
                       .slice(0, 2)
-                      .map((part) => part[0]?.toUpperCase() ?? "")
-                      .join("")}
+                      .map((part) => part[0]?.toUpperCase() ?? '')
+                      .join('')}
                   </Text>
                 </View>
 
@@ -208,7 +218,7 @@ export function HomeDashboard() {
         {spotlightProperty ? (
           <Pressable
             style={({ pressed }) => [styles.spotlightCard, pressed && styles.pressed]}
-            onPress={() => router.push({ pathname: "/property/[id]", params: { id: spotlightProperty.id } })}
+            onPress={() => router.push({ pathname: '/property/[id]', params: { id: spotlightProperty.id } })}
           >
             <ImageBackground
               source={{ uri: spotlightProperty.image[0].image_url }}
@@ -234,7 +244,7 @@ export function HomeDashboard() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -251,11 +261,11 @@ const styles = StyleSheet.create({
     minHeight: 300,
     marginHorizontal: 18,
     borderRadius: 30,
-    overflow: "hidden",
+    overflow: 'hidden',
     paddingHorizontal: 22,
     paddingTop: 18,
     paddingBottom: 26,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     backgroundColor: Colors.accentDark,
   },
 
@@ -265,38 +275,38 @@ const styles = StyleSheet.create({
 
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 34, 24, 0.56)",
+    backgroundColor: 'rgba(0, 34, 24, 0.56)',
   },
 
   heroGlow: {
-    position: "absolute",
+    position: 'absolute',
     width: 240,
     height: 240,
     borderRadius: 120,
-    backgroundColor: "rgba(79, 196, 122, 0.20)",
+    backgroundColor: 'rgba(79, 196, 122, 0.20)',
     top: -60,
     right: -50,
   },
 
   heroHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   brandBadge: {
-    backgroundColor: "rgba(0, 23, 28, 0.85)",
+    backgroundColor: 'rgba(0, 23, 28, 0.85)',
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.18)",
+    borderColor: 'rgba(255,255,255,0.18)',
   },
 
   brandBadgeText: {
     color: Colors.textOnDark,
     fontSize: 11,
-    fontWeight: "900",
+    fontWeight: '900',
     letterSpacing: 1.2,
   },
 
@@ -311,19 +321,19 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 11,
     lineHeight: 14,
-    fontWeight: "900",
+    fontWeight: '900',
     letterSpacing: 1.4,
   },
 
   brandPill: {
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
     minHeight: 30,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.14)",
-    backgroundColor: "rgba(0, 23, 28, 0.63)",
-    flexDirection: "row",
-    alignItems: "center",
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+    backgroundColor: 'rgba(0, 23, 28, 0.63)',
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
     paddingHorizontal: 12,
   },
@@ -332,12 +342,12 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 11,
     lineHeight: 14,
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   heroBody: {
-    flexDirection: "row",
-    alignItems: "flex-end",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: 16,
   },
 
@@ -346,9 +356,9 @@ const styles = StyleSheet.create({
   },
 
   kicker: {
-    color: "rgba(255,255,255,0.82)",
+    color: 'rgba(255,255,255,0.82)',
     fontSize: 15,
-    fontWeight: "800",
+    fontWeight: '800',
     marginBottom: 10,
   },
 
@@ -356,13 +366,13 @@ const styles = StyleSheet.create({
     color: Colors.textOnDark,
     fontSize: 32,
     lineHeight: 38,
-    fontWeight: "900",
+    fontWeight: '900',
     letterSpacing: -0.9,
   },
 
   heroSubtitle: {
     marginTop: 12,
-    color: "rgba(255,255,255,0.82)",
+    color: 'rgba(255,255,255,0.82)',
     fontSize: 14,
     lineHeight: 21,
     maxWidth: 330,
@@ -379,21 +389,21 @@ const styles = StyleSheet.create({
   // },
 
   avatarImage: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
 
   quickActionsRow: {
     marginTop: 18,
     marginHorizontal: 18,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 12,
   },
 
   quickAction: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     paddingHorizontal: 6,
   },
 
@@ -402,12 +412,12 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 18,
     backgroundColor: Colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 6,
     borderWidth: 1,
     borderColor: Colors.border,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOpacity: 0.04,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
@@ -417,8 +427,8 @@ const styles = StyleSheet.create({
   quickActionLabel: {
     color: Colors.textSecondary,
     fontSize: 11,
-    fontWeight: "700",
-    textAlign: "center",
+    fontWeight: '700',
+    textAlign: 'center',
     letterSpacing: 0.2,
   },
 
@@ -428,16 +438,16 @@ const styles = StyleSheet.create({
 
   sectionHeader: {
     paddingHorizontal: 18,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: 14,
   },
 
   sectionTitle: {
     color: Colors.textPrimary,
     fontSize: 25,
-    fontWeight: "900",
+    fontWeight: '900',
     letterSpacing: -0.7,
   },
 
@@ -445,7 +455,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     fontSize: 13,
     marginTop: 4,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   linkButton: {
@@ -455,7 +465,7 @@ const styles = StyleSheet.create({
   linkText: {
     color: Colors.accent,
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: '800',
   },
 
   projectRow: {
@@ -471,7 +481,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
-    overflow: "hidden",
+    overflow: 'hidden',
     shadowColor: Colors.primary,
     shadowOpacity: 0.05,
     shadowRadius: 14,
@@ -480,7 +490,7 @@ const styles = StyleSheet.create({
   },
 
   projectImage: {
-    width: "100%",
+    width: '100%',
     height: 158,
     backgroundColor: Colors.surfaceMuted,
   },
@@ -490,7 +500,7 @@ const styles = StyleSheet.create({
   },
 
   projectBadge: {
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
     backgroundColor: Colors.tag,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -501,19 +511,19 @@ const styles = StyleSheet.create({
   projectBadgeText: {
     color: Colors.tagText,
     fontSize: 11,
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   projectName: {
     color: Colors.textPrimary,
     fontSize: 18,
-    fontWeight: "900",
+    fontWeight: '900',
     marginBottom: 8,
   },
 
   locationRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
   },
 
@@ -521,22 +531,22 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.textSecondary,
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   projectPrice: {
     color: Colors.accent,
     fontSize: 24,
-    fontWeight: "900",
+    fontWeight: '900',
     marginTop: 14,
     letterSpacing: -0.4,
   },
 
   projectFooter: {
     marginTop: 14,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: 10,
   },
 
@@ -544,7 +554,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.textMuted,
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: '700',
   },
 
   reservePill: {
@@ -557,7 +567,7 @@ const styles = StyleSheet.create({
   reservePillText: {
     color: Colors.textOnDark,
     fontSize: 12,
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   locationList: {
@@ -568,8 +578,8 @@ const styles = StyleSheet.create({
   },
 
   locationChip: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 12,
     backgroundColor: Colors.surface,
     borderRadius: 999,
@@ -584,20 +594,20 @@ const styles = StyleSheet.create({
     height: 42,
     borderRadius: 21,
     backgroundColor: Colors.surfaceMuted,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   locationInitialsText: {
     color: Colors.textPrimary,
     fontSize: 15,
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   locationChipText: {
     color: Colors.textPrimary,
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: '700',
     maxWidth: 140,
   },
 
@@ -605,7 +615,7 @@ const styles = StyleSheet.create({
     marginTop: 28,
     marginHorizontal: 18,
     borderRadius: 28,
-    overflow: "hidden",
+    overflow: 'hidden',
     shadowColor: Colors.primary,
     shadowOpacity: 0.08,
     shadowRadius: 16,
@@ -615,7 +625,7 @@ const styles = StyleSheet.create({
 
   spotlightBackground: {
     minHeight: 214,
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
   },
 
   spotlightImage: {
@@ -624,7 +634,7 @@ const styles = StyleSheet.create({
 
   spotlightOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 44, 34, 0.58)",
+    backgroundColor: 'rgba(0, 44, 34, 0.58)',
   },
 
   spotlightContent: {
@@ -639,20 +649,20 @@ const styles = StyleSheet.create({
     color: Colors.textOnDark,
     fontSize: 30,
     lineHeight: 34,
-    fontWeight: "900",
+    fontWeight: '900',
     letterSpacing: -0.8,
   },
 
   spotlightText: {
     marginTop: 10,
-    color: "rgba(255,255,255,0.82)",
+    color: 'rgba(255,255,255,0.82)',
     fontSize: 14,
     lineHeight: 21,
   },
 
   spotlightButton: {
     marginTop: 18,
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
     backgroundColor: Colors.surface,
     paddingHorizontal: 16,
     paddingVertical: 11,
@@ -662,7 +672,7 @@ const styles = StyleSheet.create({
   spotlightButtonText: {
     color: Colors.primary,
     fontSize: 13,
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   pressed: {
@@ -672,22 +682,22 @@ const styles = StyleSheet.create({
 
   //login
   loginPillText: {
-    color: "#FFFFFF",
+    color: '#FFFFFF',
     fontSize: 13,
-    fontWeight: "900",
+    fontWeight: '900',
   },
 
   loginPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     backgroundColor: Colors.primary,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.35)",
+    borderColor: 'rgba(255,255,255,0.35)',
   },
 
   headerActionPressed: {
@@ -700,9 +710,9 @@ const styles = StyleSheet.create({
     height: 46,
     borderRadius: 23,
     backgroundColor: Colors.primaryLight,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.24)",
+    borderColor: 'rgba(255,255,255,0.24)',
   },
-});
+})
