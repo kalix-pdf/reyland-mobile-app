@@ -1,3 +1,5 @@
+//wala na to par, delete na to, may home dashboard na tayo
+
 import PropertyCard from "@/components/property-card";
 import { Colors } from "@/constants/colors";
 import { useAuth } from "@/context/auth-context";

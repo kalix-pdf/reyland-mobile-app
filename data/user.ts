@@ -4,7 +4,7 @@ import { User } from "@/types/user.types";
 export const DUMMY_USERS: User[] = [
   {
     // INVESTOR USER
-    id: 2 ,
+    uuid: "2",
     role: 1,
     accessToken: "",
     name: "JAKE POGI",
@@ -16,7 +16,7 @@ export const DUMMY_USERS: User[] = [
   },
   {
     // BUYER USER
-    id: 1,
+    uuid: "1",
     role: 0,
     accessToken: "",
     name: "Juan dela Cruz",
