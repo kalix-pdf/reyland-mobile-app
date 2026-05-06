@@ -1,10 +1,11 @@
 import { Colors } from '@/constants/colors'
 import { useAuth } from '@/context/auth-context'
 import { PROPERTIES } from '@/data/properties'
+import { useRefreshControl } from '@/hooks/use-refresh-control'
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import React, { useMemo } from 'react'
-import { Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, ImageBackground, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const QUICK_ACTIONS = [
@@ -17,6 +18,7 @@ const QUICK_ACTIONS = [
 export function HomeDashboard() {
   const { user } = useAuth()
   const insets = useSafeAreaInsets()
+  const { refreshing, onRefresh } = useRefreshControl()
 
   const featuredProperties = useMemo(() => PROPERTIES.slice(0, 4), [])
 
@@ -31,6 +33,10 @@ export function HomeDashboard() {
     ).slice(0, 6)
   }, [])
 
+  const handleLoginPress = () => {
+    router.push('/login')
+  }
+
   const firstName = user?.name.split(' ')[0] ?? 'Guest'
   const heroImage = featuredProperties[0]?.image[0]?.image_url
   const spotlightProperty = featuredProperties[0]
@@ -38,11 +44,17 @@ export function HomeDashboard() {
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
       <ScrollView
-        // alwaysBounceVertical={false}
-        // bounces={false}
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={[styles.content, { paddingTop: insets.top + 18 }]}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.accent}
+            progressViewOffset={insets.top + 28}
+          />
+        }
       >
         <ImageBackground source={{ uri: heroImage }} style={[styles.hero]} imageStyle={styles.heroImage}>
           <View style={styles.heroOverlay} />
@@ -69,10 +81,18 @@ export function HomeDashboard() {
             </View>
 
             {user ? (
-              <View style={styles.avatarFrame}>
+              <Pressable style={({ pressed }) => [styles.avatar, pressed && styles.headerActionPressed]}>
                 <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
-              </View>
-            ) : null}
+              </Pressable>
+            ) : (
+              <Pressable
+                style={({ pressed }) => [styles.loginPill, pressed && styles.headerActionPressed]}
+                onPress={handleLoginPress}
+              >
+                <Ionicons name="person-outline" size={16} color="#FFFFFF" />
+                <Text style={styles.loginPillText}>Login</Text>
+              </Pressable>
+            )}
           </View>
         </ImageBackground>
 
@@ -358,15 +378,15 @@ const styles = StyleSheet.create({
     maxWidth: 330,
   },
 
-  avatarFrame: {
-    width: 96,
-    height: 120,
-    borderRadius: 28,
-    overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.24)',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-  },
+  // avatarFrame: {
+  //   width: 96,
+  //   height: 120,
+  //   borderRadius: 28,
+  //   overflow: "hidden",
+  //   borderWidth: 2,
+  //   borderColor: "rgba(255,255,255,0.24)",
+  //   backgroundColor: "rgba(255,255,255,0.12)",
+  // },
 
   avatarImage: {
     width: '100%',
@@ -658,5 +678,41 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.9,
     transform: [{ scale: 0.98 }],
+  },
+
+  //login
+  loginPillText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+
+  loginPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.35)',
+  },
+
+  headerActionPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.97 }],
+  },
+
+  avatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: Colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.24)',
   },
 })

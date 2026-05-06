@@ -1,23 +1,28 @@
+//wala na to par, delete na to, may home dashboard na tayo
+// 'wag mo idelete, ito yung discover page sa loob ng mobile app.
+
 import PropertyCard from '@/components/property-card'
 import { Colors } from '@/constants/colors'
 import { useAuth } from '@/context/auth-context'
 import { PROPERTIES } from '@/data/properties'
+import { useRefreshControl } from '@/hooks/use-refresh-control'
 import { Feather, Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import React, { useMemo, useState } from 'react'
-import { FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const FILTERS = ['All', 'For Sale', 'For Rent'] as const
 
 type Filter = (typeof FILTERS)[number]
 
-export function HomeScreen() {
+export function PropertiesScreen() {
   const { user } = useAuth()
   const insets = useSafeAreaInsets()
   const [activeFilter, setActiveFilter] = useState<Filter>('All')
   const [search, setSearch] = useState('')
   const [isSearchFocused, setIsSearchFocused] = useState(false)
+  const { refreshing, onRefresh } = useRefreshControl()
 
   const filtered = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
@@ -161,6 +166,14 @@ export function HomeScreen() {
         }
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.accent}
+            progressViewOffset={insets.top + 28}
+          />
+        }
       />
     </SafeAreaView>
   )

@@ -1,46 +1,55 @@
+import { useAuth } from '@/context/auth-context'
+import { AuthError } from '@/services/auth/AuthResult'
+import { completeOAuthSignIn } from '@/services/auth/complete-oauth-sign-in'
+import { router } from 'expo-router'
 import { useState } from 'react'
 import { Alert } from 'react-native'
-import { router } from 'expo-router'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { SignUpForm } from '../components/auth/sign-up-form'
-import { signInWithGoogle, GoogleAuthError } from '../services/auth/google'
-import { getUserInfo } from '@/services/fetchData/user.api'
-import { useAuth } from '@/context/auth-context'
+import { signInWithFacebook } from '../services/auth/facebook'
+import { signInWithGoogle } from '../services/auth/google'
 
 export default function SignUpScreen() {
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
-  const { setUser } = useAuth();
+  const [isLoadingGoogleOuth, setIsLoadingGoogleOuth] = useState(false)
+  const [isLoadingFacebookOuth, setIsLoadingFacebookOuth] = useState(false)
+  const { setUser } = useAuth()
 
   const handleGoogleSignUp = async () => {
-    if (isGoogleLoading) return
-    setIsGoogleLoading(true)
+    if (isLoadingGoogleOuth) return
+    setIsLoadingGoogleOuth(true)
 
     try {
       const { token } = await signInWithGoogle()
-      
+
       if (token) {
-        const userInfo = await getUserInfo(token);
-
-        if (userInfo.uuid) {
-          await AsyncStorage.setItem('token', token)
-          setUser(userInfo);
-          router.replace('/')
-        }
+        await completeOAuthSignIn(token, setUser)
       }
-
     } catch (error) {
-      if (error instanceof GoogleAuthError && error.code === 'CANCELLED') {
+      if (error instanceof AuthError && error.code === 'CANCELLED') {
         return
       }
 
       Alert.alert(
         'Sign-in Failed',
-        error instanceof GoogleAuthError
-          ? error.message
-          : 'Something went wrong. Please try again.'
+        error instanceof AuthError ? error.message : 'Something went wrong. Please try again.',
       )
     } finally {
-      setIsGoogleLoading(false)
+      setIsLoadingGoogleOuth(false)
+    }
+  }
+
+  const handleFabookLogin = async () => {
+    if (isLoadingFacebookOuth) return
+    setIsLoadingFacebookOuth(true)
+
+    try {
+      const { token } = await signInWithFacebook()
+
+      if (token) {
+        await completeOAuthSignIn(token, setUser)
+      }
+    } catch {
+    } finally {
+      setIsLoadingFacebookOuth(false)
     }
   }
 
@@ -53,7 +62,8 @@ export default function SignUpScreen() {
       onLogin={() => router.replace('/login')}
       onGoogleSignUp={handleGoogleSignUp}
       onFacebookSignUp={() => console.log('Facebook sign up')}
-      isGoogleLoading={isGoogleLoading}
+      isGoogleLoading={isLoadingGoogleOuth}
+      isFacebookLoading={isLoadingFacebookOuth}
     />
   )
 }

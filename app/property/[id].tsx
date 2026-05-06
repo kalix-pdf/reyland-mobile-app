@@ -1,8 +1,8 @@
-import { Colors } from "@/constants/colors";
-import { PROPERTIES } from "@/data/properties";
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { Colors } from '@/constants/colors'
+import { PROPERTIES } from '@/data/properties'
+import { Ionicons } from '@expo/vector-icons'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import React, { useState } from 'react'
 import {
   Alert,
   Dimensions,
@@ -15,22 +15,22 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window')
 
 function PropertyImages({
   images,
   onClose,
 }: {
-  images: { image_id: number; public_id: string; image_url: string }[];
-  onClose: () => void;
+  images: { image_id: number; public_id: string; image_url: string }[]
+  onClose: () => void
 }) {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0)
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
       {/* Header */}
       <View style={modalStyles.header}>
         <TouchableOpacity onPress={onClose}>
@@ -49,8 +49,8 @@ function PropertyImages({
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.image_id.toString()}
         onMomentumScrollEnd={(e) => {
-          const index = Math.round(e.nativeEvent.contentOffset.x / width);
-          setActiveIndex(index);
+          const index = Math.round(e.nativeEvent.contentOffset.x / width)
+          setActiveIndex(index)
         }}
         renderItem={({ item }) => (
           <Image source={{ uri: item.image_url }} style={{ width, height: 400 }} resizeMode="cover" />
@@ -78,45 +78,48 @@ function PropertyImages({
         ))}
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 export default function PropertyDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
-  const [openModal, setOpenModal] = useState(false);
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const router = useRouter()
+  const [openModal, setOpenModal] = useState(false)
 
-  const property = PROPERTIES.find((p) => p.id === id);
+  const property = PROPERTIES.find((p) => p.id === id)
 
   if (!property) {
     return (
       <SafeAreaView style={styles.safe}>
         <Text style={styles.notFound}>Property not found.</Text>
       </SafeAreaView>
-    );
+    )
   }
 
   const formatPrice = (price: number, type: string) => {
     if (price >= 1_000_000) {
-      return `₱${(price / 1_000_000).toFixed(2)}M`;
+      return `₱${(price / 1_000_000).toFixed(2)}M`
     }
-    return `₱${price.toLocaleString()}${type === "For Rent" ? " / month" : ""}`;
-  };
+    return `₱${price.toLocaleString()}${type === 'For Rent' ? ' / month' : ''}`
+  }
 
   const handleCall = () => {
-    Linking.openURL(`tel:${property.agent.phone}`);
-  };
+    Linking.openURL(`tel:${property.agent.phone}`)
+  }
 
   const handleInquire = () => {
-    Alert.alert("Inquiry Sent!", `Your inquiry for "${property.title}" has been sent to ${property.agent.name}.`);
-  };
+    Alert.alert('Inquiry Sent!', `Your inquiry for "${property.title}" has been sent to ${property.agent.name}.`)
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
       <Modal visible={openModal} animationType="slide" statusBarTranslucent onRequestClose={() => setOpenModal(false)}>
         <PropertyImages images={property.image} onClose={() => setOpenModal(false)} />
       </Modal>
-      <ScrollView alwaysBounceVertical={false} bounces={false} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        // alwaysBounceVertical={false} bounces={false}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Image */}
         <View style={styles.imageWrap}>
           <Image source={{ uri: property.image[0].image_url }} style={styles.image} />
@@ -126,9 +129,9 @@ export default function PropertyDetailScreen() {
           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()} activeOpacity={0.9}>
             <Ionicons name="arrow-back" size={20} color={Colors.textPrimary} />
           </TouchableOpacity>
-          <View style={[styles.badge, property.type === "For Rent" ? styles.rentBadge : styles.saleBadge]}>
+          <View style={[styles.badge, property.type === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
             <Text
-              style={[styles.badgeText, property.type === "For Rent" ? styles.rentBadgeText : styles.saleBadgeText]}
+              style={[styles.badgeText, property.type === 'For Rent' ? styles.rentBadgeText : styles.saleBadgeText]}
             >
               {property.type}
             </Text>
@@ -144,9 +147,9 @@ export default function PropertyDetailScreen() {
           {/* Specs */}
           <View style={styles.specsRow}>
             {[
-              { icon: "🛏", label: `${property.bedrooms} Bedrooms` },
-              { icon: "🚿", label: `${property.bathrooms} Bathrooms` },
-              { icon: "📐", label: `${property.sqft} sqm` },
+              { icon: '🛏', label: `${property.bedrooms} Bedrooms` },
+              { icon: '🚿', label: `${property.bathrooms} Bathrooms` },
+              { icon: '📐', label: `${property.sqft} sqm` },
             ].map((s) => (
               <View key={s.label} style={styles.specCard}>
                 <Text style={styles.specIcon}>{s.icon}</Text>
@@ -192,29 +195,29 @@ export default function PropertyDetailScreen() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 //modal styles
 const modalStyles = StyleSheet.create({
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 14,
   },
-  closeText: { color: "#FFF", fontSize: 16, fontWeight: "700" },
-  counter: { color: "#FFF", fontSize: 14, fontWeight: "600" },
+  closeText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
+  counter: { color: '#FFF', fontSize: 14, fontWeight: '600' },
   dotsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
     marginTop: 16,
     gap: 6,
   },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  dotActive: { backgroundColor: "#FFF" },
-  dotInactive: { backgroundColor: "rgba(255,255,255,0.35)" },
+  dotActive: { backgroundColor: '#FFF' },
+  dotInactive: { backgroundColor: 'rgba(255,255,255,0.35)' },
   thumbnails: {
     paddingHorizontal: 16,
     paddingTop: 16,
@@ -229,38 +232,38 @@ const modalStyles = StyleSheet.create({
   thumbActive: {
     opacity: 1,
     borderWidth: 2,
-    borderColor: "#FFF",
+    borderColor: '#FFF',
   },
-});
+})
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   notFound: {
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 80,
     fontSize: 16,
     color: Colors.textMuted,
   },
-  imageWrap: { position: "relative" },
-  image: { width: "100%", height: 280, backgroundColor: Colors.border },
+  imageWrap: { position: 'relative' },
+  image: { width: '100%', height: 280, backgroundColor: Colors.border },
   backBtn: {
-    position: "absolute",
+    position: 'absolute',
     top: 16,
     left: 16,
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.92)",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 4,
   },
   badge: {
-    position: "absolute",
+    position: 'absolute',
     top: 16,
     right: 16,
     paddingHorizontal: 12,
@@ -269,19 +272,19 @@ const styles = StyleSheet.create({
   },
   rentBadge: { backgroundColor: Colors.rentBadge },
   saleBadge: { backgroundColor: Colors.saleBadge },
-  badgeText: { fontSize: 12, fontWeight: "700" },
+  badgeText: { fontSize: 12, fontWeight: '700' },
   rentBadgeText: { color: Colors.rentBadgeText },
   saleBadgeText: { color: Colors.saleBadgeText },
   content: { padding: 20, paddingBottom: 100 },
   price: {
     fontSize: 26,
-    fontWeight: "800",
+    fontWeight: '800',
     color: Colors.accent,
     marginBottom: 6,
   },
   title: {
     fontSize: 20,
-    fontWeight: "800",
+    fontWeight: '800',
     color: Colors.textPrimary,
     marginBottom: 6,
     lineHeight: 26,
@@ -291,14 +294,14 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: 20,
   },
-  specsRow: { flexDirection: "row", gap: 10, marginBottom: 16 },
+  specsRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
   specCard: {
     flex: 1,
     backgroundColor: Colors.surface,
     borderRadius: 12,
     padding: 14,
-    alignItems: "center",
-    shadowColor: "#000",
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -308,20 +311,20 @@ const styles = StyleSheet.create({
   specLabel: {
     fontSize: 12,
     color: Colors.textSecondary,
-    fontWeight: "600",
-    textAlign: "center",
+    fontWeight: '600',
+    textAlign: 'center',
   },
-  tags: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 20 },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 },
   tag: {
     backgroundColor: Colors.tag,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
-  tagText: { fontSize: 12, color: Colors.tagText, fontWeight: "600" },
+  tagText: { fontSize: 12, color: Colors.tagText, fontWeight: '600' },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "800",
+    fontWeight: '800',
     color: Colors.textPrimary,
     marginBottom: 10,
   },
@@ -332,12 +335,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   agentCard: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: Colors.surface,
     borderRadius: 16,
     padding: 16,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
@@ -348,15 +351,15 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
   },
-  agentAvatarText: { color: "#FFF", fontWeight: "700", fontSize: 16 },
+  agentAvatarText: { color: '#FFF', fontWeight: '700', fontSize: 16 },
   agentInfo: { flex: 1 },
   agentName: {
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: '700',
     color: Colors.textPrimary,
     marginBottom: 2,
   },
@@ -367,9 +370,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  callBtnText: { fontSize: 13, color: Colors.tagText, fontWeight: "700" },
+  callBtnText: { fontSize: 13, color: Colors.tagText, fontWeight: '700' },
   cta: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
@@ -383,17 +386,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.accent,
     borderRadius: 14,
     paddingVertical: 16,
-    alignItems: "center",
+    alignItems: 'center',
   },
-  inquireBtnText: { color: "#FFF", fontSize: 16, fontWeight: "800" },
+  inquireBtnText: { color: '#FFF', fontSize: 16, fontWeight: '800' },
   viewImagesBtn: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 12,
     right: 12,
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: 'rgba(0,0,0,0.6)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
   },
-  viewImagesBtnText: { color: "#FFF", fontSize: 13, fontWeight: "700" },
-});
+  viewImagesBtnText: { color: '#FFF', fontSize: 13, fontWeight: '700' },
+})

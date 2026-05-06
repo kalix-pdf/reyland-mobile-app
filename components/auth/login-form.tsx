@@ -1,139 +1,142 @@
-import { AuthButton } from "@/components/auth/auth-button";
-import { AuthInput } from "@/components/auth/auth-input";
-import { AuthMessage } from "@/components/auth/auth-message";
-import { AuthScreen } from "@/components/auth/auth-screen";
-import { AppColors } from "@/constants/colors";
-import { useAppTheme } from "@/context/theme-context";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { AuthButton } from '@/components/auth/auth-button'
+import { AuthInput } from '@/components/auth/auth-input'
+import { AuthMessage } from '@/components/auth/auth-message'
+import { AuthScreen } from '@/components/auth/auth-screen'
+import { AppColors } from '@/constants/colors'
+import { useAppTheme } from '@/context/theme-context'
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
+import { useState } from 'react'
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native'
 
 type LoginFormProps = {
-  onLogin: (email: string, password: string) => boolean | Promise<boolean>;
-  onForgotPassword?: () => void;
-  onGoogleLogin: () => void;
-  onLoadingOuth: boolean;
-  onFacebookLogin?: () => void;
-  onCreateAccount?: () => void;
-};
+  onLogin: (email: string, password: string) => boolean | Promise<boolean>
+  onForgotPassword?: () => void
+  onGoogleLogin: () => void
+  onLoadingGoogleOuth: boolean
+  onLoadingFacebookOuth: boolean
+  onFacebookLogin?: () => void
+  onCreateAccount?: () => void
+}
 
 const isValidEmail = (value: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-};
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+}
 
 const isValidPassword = (value: string) => {
-  return value.length >= 6;
-};
+  return value.length >= 6
+}
 
 export function LoginForm({
   onLogin,
   onForgotPassword,
   onGoogleLogin,
-  onLoadingOuth,
+  onLoadingGoogleOuth,
+  onLoadingFacebookOuth,
   onFacebookLogin,
   onCreateAccount,
 }: LoginFormProps) {
-  const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const { colors } = useAppTheme()
+  const styles = createStyles(colors)
 
-  const [email, setEmail] = useState("jakepogi123@email.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState('jakepogi123@email.com')
+  const [password, setPassword] = useState('password123')
 
-  const [loginError, setLoginError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [loginError, setLoginError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
 
-  const [emailTouched, setEmailTouched] = useState(false);
-  const [passwordTouched, setPasswordTouched] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false)
+  const [passwordTouched, setPasswordTouched] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const trimmedEmail = email.trim();
+  const trimmedEmail = email.trim()
 
-  const shouldValidateEmail = submitted || emailTouched;
-  const shouldValidatePassword = submitted || passwordTouched;
+  const shouldValidateEmail = submitted || emailTouched
+  const shouldValidatePassword = submitted || passwordTouched
 
   const emailError =
     shouldValidateEmail && trimmedEmail.length === 0
-      ? "Email is required."
+      ? 'Email is required.'
       : shouldValidateEmail && !isValidEmail(trimmedEmail)
-        ? "Please enter a valid email address."
-        : "";
+        ? 'Please enter a valid email address.'
+        : ''
 
   const passwordError =
     shouldValidatePassword && password.length === 0
-      ? "Password is required."
+      ? 'Password is required.'
       : shouldValidatePassword && !isValidPassword(password)
-        ? "Password must be at least 6 characters."
-        : "";
+        ? 'Password must be at least 6 characters.'
+        : ''
 
   const handleLogin = async () => {
-    if (isLoading) return;
+    if (isLoading) return
 
-    setSubmitted(true);
-    setEmailTouched(true);
-    setPasswordTouched(true);
-    setLoginError("");
+    setSubmitted(true)
+    setEmailTouched(true)
+    setPasswordTouched(true)
+    setLoginError('')
 
-    if (!isValidEmail(trimmedEmail)) return;
-    if (!isValidPassword(password)) return;
+    if (!isValidEmail(trimmedEmail)) return
+    if (!isValidPassword(password)) return
 
     try {
-      setIsLoading(true);
+      setIsLoading(true)
 
-      const success = await onLogin(trimmedEmail, password);
+      const success = await onLogin(trimmedEmail, password)
 
       if (!success) {
-        setLoginError("Invalid email or password.");
+        setLoginError('Invalid email or password.')
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleEmailChange = (value: string) => {
-    setEmail(value);
-    setLoginError("");
+    setEmail(value)
+    setLoginError('')
 
     if (submitted) {
-      setEmailTouched(true);
+      setEmailTouched(true)
     }
-  };
+  }
 
   const handlePasswordChange = (value: string) => {
-    setPassword(value);
-    setLoginError("");
+    setPassword(value)
+    setLoginError('')
 
     if (submitted) {
-      setPasswordTouched(true);
+      setPasswordTouched(true)
     }
-  };
+  }
 
   const handleForgotPassword = () => {
-    if (isLoading) return;
-    onForgotPassword?.();
-  };
+    if (isLoading) return
+    onForgotPassword?.()
+  }
 
   const handleCreateAccount = () => {
-    if (isLoading) return;
-    onCreateAccount?.();
-  };
+    if (isLoading) return
+    onCreateAccount?.()
+  }
 
   const handleGoogleLogin = () => {
-    if (isLoading) return;
-    onGoogleLogin?.();
-  };
+    if (isLoading) return
+    onGoogleLogin?.()
+  }
 
   const handleFacebookLogin = () => {
-    if (isLoading) return;
-    onFacebookLogin?.();
-  };
+    if (isLoading) return
+    onFacebookLogin?.()
+  }
 
   return (
     <AuthScreen heroTitle="Log in to find your next property with Reyland.">
       <Text style={styles.title}>Login</Text>
-      <Text style={styles.subtitle}>Welcome back. Log in to continue browsing verified listings and saved properties.</Text>
+      <Text style={styles.subtitle}>
+        Welcome back. Log in to continue browsing verified listings and saved properties.
+      </Text>
 
       <AuthMessage type="error" message={loginError} />
 
@@ -146,7 +149,7 @@ export function LoginForm({
           onChangeText={handleEmailChange}
           onBlur={() => {
             if (email.trim().length > 0 || submitted) {
-              setEmailTouched(true);
+              setEmailTouched(true)
             }
           }}
           keyboardType="email-address"
@@ -166,7 +169,7 @@ export function LoginForm({
               style={styles.eyeButton}
               disabled={isLoading}
             >
-              <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={21} color={color} />
+              <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
             </Pressable>
           )}
           error={passwordError}
@@ -175,7 +178,7 @@ export function LoginForm({
           onChangeText={handlePasswordChange}
           onBlur={() => {
             if (password.length > 0 || submitted) {
-              setPasswordTouched(true);
+              setPasswordTouched(true)
             }
           }}
           secureTextEntry={!showPassword}
@@ -215,28 +218,41 @@ export function LoginForm({
 
       <View style={styles.socialButtons}>
         <Pressable
-          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && styles.socialButtonPressed]}
+          style={({ pressed }) => [
+            styles.socialButton,
+            pressed && !isLoading && !onLoadingFacebookOuth && styles.socialButtonPressed,
+            onLoadingFacebookOuth && styles.socialButtonPressed,
+          ]}
           onPress={handleFacebookLogin}
           disabled={isLoading}
+          accessibilityLabel="Sign-in with Google"
+          accessibilityRole="button"
         >
-          <Ionicons name="logo-facebook" size={22} color={colors.facebook} />
-          <Text style={styles.socialButtonText}>Facebook</Text>
+          {onLoadingFacebookOuth ? (
+            <ActivityIndicator size="small" color="#4285F4" />
+          ) : (
+            <Ionicons name="logo-facebook" size={22} color={colors.facebook} />
+          )}
+          <Text style={styles.socialButtonText}>{onLoadingFacebookOuth ? 'Signing in...' : 'Facebook'}</Text>
         </Pressable>
 
         <Pressable
-          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && !onLoadingOuth &&
-             styles.socialButtonPressed, onLoadingOuth && styles.socialButtonPressed]}
+          style={({ pressed }) => [
+            styles.socialButton,
+            pressed && !isLoading && !onLoadingGoogleOuth && styles.socialButtonPressed,
+            onLoadingGoogleOuth && styles.socialButtonPressed,
+          ]}
           onPress={handleGoogleLogin}
           disabled={isLoading}
           accessibilityLabel="Sign-in with Google"
           accessibilityRole="button"
         >
-          {onLoadingOuth ? (
-            <ActivityIndicator size="small" color="#4285F4"/>
+          {onLoadingGoogleOuth ? (
+            <ActivityIndicator size="small" color="#4285F4" />
           ) : (
-            <Image source={require("@/assets/images/google-logo.png")} style={styles.googleIcon} contentFit="contain" />
+            <Image source={require('@/assets/images/google-logo.png')} style={styles.googleIcon} />
           )}
-          <Text style={styles.socialButtonText}>{onLoadingOuth ? 'Signing in...' : 'Google'}</Text>
+          <Text style={styles.socialButtonText}>{onLoadingGoogleOuth ? 'Signing in...' : 'Google'}</Text>
         </Pressable>
       </View>
 
@@ -248,7 +264,7 @@ export function LoginForm({
         </Pressable>
       </View>
     </AuthScreen>
-  );
+  )
 }
 
 const createStyles = (Colors: AppColors) =>
@@ -256,8 +272,8 @@ const createStyles = (Colors: AppColors) =>
     title: {
       color: Colors.textPrimary,
       fontSize: 30,
-      fontWeight: "900",
-      textAlign: "center",
+      fontWeight: '900',
+      textAlign: 'center',
       marginBottom: 6,
     },
 
@@ -265,35 +281,35 @@ const createStyles = (Colors: AppColors) =>
       color: Colors.textSecondary,
       fontSize: 13,
       lineHeight: 19,
-      textAlign: "center",
-      fontWeight: "600",
+      textAlign: 'center',
+      fontWeight: '600',
       marginBottom: 16,
     },
 
     accountRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       marginBottom: 22,
     },
 
     accountFooterRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       marginTop: 18,
     },
 
     accountText: {
       color: Colors.textMuted,
       fontSize: 13,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     accountLink: {
       color: Colors.accent,
       fontSize: 13,
-      fontWeight: "900",
+      fontWeight: '900',
     },
 
     inputArea: {
@@ -305,9 +321,9 @@ const createStyles = (Colors: AppColors) =>
     },
 
     optionsRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginTop: 14,
       marginBottom: 16,
     },
@@ -317,33 +333,33 @@ const createStyles = (Colors: AppColors) =>
     },
 
     forgotLinkRow: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       marginLeft: 12,
     },
 
     forgotLinkLabel: {
       color: Colors.textMuted,
       fontSize: 12,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     forgotLinkText: {
       color: Colors.accent,
       fontSize: 12,
-      fontWeight: "900",
+      fontWeight: '900',
     },
 
     rememberRow: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 7,
     },
 
     rememberText: {
       color: Colors.textSecondary,
       fontSize: 12,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     checkbox: {
@@ -352,8 +368,8 @@ const createStyles = (Colors: AppColors) =>
       borderRadius: 4,
       borderWidth: 1.4,
       borderColor: Colors.border,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       marginTop: 2,
     },
 
@@ -363,8 +379,8 @@ const createStyles = (Colors: AppColors) =>
     },
 
     dividerRow: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 12,
       marginTop: 18,
       marginBottom: 18,
@@ -379,11 +395,11 @@ const createStyles = (Colors: AppColors) =>
     dividerText: {
       color: Colors.textMuted,
       fontSize: 13,
-      fontWeight: "700",
+      fontWeight: '700',
     },
 
     socialButtons: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 12,
     },
 
@@ -392,9 +408,9 @@ const createStyles = (Colors: AppColors) =>
       minHeight: 52,
       borderRadius: 26,
       backgroundColor: Colors.surfaceMuted,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       gap: 8,
       borderWidth: 1,
       borderColor: Colors.border,
@@ -413,6 +429,6 @@ const createStyles = (Colors: AppColors) =>
     socialButtonText: {
       color: Colors.textPrimary,
       fontSize: 14,
-      fontWeight: "800",
+      fontWeight: '800',
     },
-  });
+  })

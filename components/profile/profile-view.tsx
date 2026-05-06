@@ -2,7 +2,7 @@ import { useAppTheme } from "@/context/theme-context";
 import { SettingItemProps, Styles, ToggleItemProps, ViewProfileProps, createStyles } from "@/types/user.types";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { ReactNode, useState } from "react";
-import { Alert, Image, Pressable, ScrollView, Switch, Text, View } from "react-native";
+import { Alert, Image, Pressable, RefreshControl, ScrollView, Switch, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 function getInitials(name: string) {
@@ -84,7 +84,7 @@ function Section({ styles, title, children }: { styles: Styles; title: string; c
   );
 }
 
-export function ViewProfile({ user, onLogout }: ViewProfileProps) {
+export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, refreshOffset = 0 }: ViewProfileProps) {
   const { colors, isDarkMode, toggleDarkMode } = useAppTheme();
   const insets = useSafeAreaInsets();
   const styles = createStyles(colors);
@@ -127,11 +127,19 @@ export function ViewProfile({ user, onLogout }: ViewProfileProps) {
   return (
     <SafeAreaView style={styles.safe} edges={["left", "right", "bottom"]}>
       <ScrollView
-        alwaysBounceVertical={false}
-        bounces={false}
+        // alwaysBounceVertical={false}
+        // bounces={false}
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={() => void onRefresh?.()}
+            tintColor={colors.accent}
+            progressViewOffset={refreshOffset}
+          />
+        }
       >
         <View style={[styles.hero, { paddingTop: insets.top + 18 }]}>
           <View style={styles.heroDecorCircleOne} />

@@ -15,6 +15,7 @@ type SignUpFormProps = {
   onGoogleSignUp?: () => void
   onFacebookSignUp?: () => void
   isGoogleLoading?: boolean
+  isFacebookLoading?: boolean
 }
 
 const isValidName = (value: string) => {
@@ -29,7 +30,14 @@ const isValidPassword = (value: string) => {
   return value.length >= 6
 }
 
-export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp, isGoogleLoading }: SignUpFormProps) {
+export function SignUpForm({
+  onSignUp,
+  onLogin,
+  onGoogleSignUp,
+  onFacebookSignUp,
+  isGoogleLoading,
+  isFacebookLoading,
+}: SignUpFormProps) {
   const { colors } = useAppTheme()
   const styles = createStyles(colors)
 
@@ -351,12 +359,22 @@ export function SignUpForm({ onSignUp, onLogin, onGoogleSignUp, onFacebookSignUp
 
       <View style={styles.socialButtons}>
         <Pressable
-          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && styles.socialButtonPressed]}
+          style={({ pressed }) => [
+            styles.socialButton,
+            pressed && !isLoading && !isFacebookLoading && styles.socialButtonPressed,
+            isFacebookLoading && styles.socialButtonPressed,
+          ]}
           onPress={handleFacebookSignUp}
-          disabled={isLoading}
+          disabled={isLoading || isFacebookLoading}
+          accessibilityLabel="Sign up with Facebook"
+          accessibilityRole="button"
         >
-          <Ionicons name="logo-facebook" size={22} color={colors.facebook} />
-          <Text style={styles.socialButtonText}>Facebook</Text>
+          {isFacebookLoading ? (
+            <ActivityIndicator size="small" color="#4285F4" />
+          ) : (
+            <Ionicons name="logo-facebook" size={22} color={colors.facebook} />
+          )}
+          <Text style={styles.socialButtonText}>{isFacebookLoading ? 'Signing in...' : 'Facebook'}</Text>
         </Pressable>
 
         <Pressable

@@ -5,6 +5,9 @@ import { StyleSheet } from "react-native";
 export type ViewProfileProps = {
   user: User;
   onLogout: () => void;
+  onRefresh?: () => Promise<void> | void;
+  refreshing?: boolean;
+  refreshOffset?: number;
 };
 
 export type Styles = ReturnType<typeof createStyles>;
