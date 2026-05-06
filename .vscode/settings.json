@@ -1,5 +1,5 @@
 {
-  "prettier.singleQuote": false,
+  // "prettier.singleQuote": false,
   "prettier.semi": true,
   "java.configuration.updateBuildConfiguration": "interactive",
   "editor.codeActionsOnSave": {
