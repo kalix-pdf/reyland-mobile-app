@@ -215,12 +215,18 @@ export function LoginForm({
 
       <View style={styles.socialButtons}>
         <Pressable
-          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && styles.socialButtonPressed]}
+          style={({ pressed }) => [styles.socialButton, pressed && !isLoading && !onLoadingOuth &&
+             styles.socialButtonPressed, onLoadingOuth && styles.socialButtonPressed]}
           onPress={handleFacebookLogin}
           disabled={isLoading}
-        >
+          accessibilityLabel="Sign-in with Google"
+          accessibilityRole="button"> 
+        {onLoadingOuth ? (
+          <ActivityIndicator size="small" color="#4285F4"/>
+        ) : (
           <Ionicons name="logo-facebook" size={22} color={colors.facebook} />
-          <Text style={styles.socialButtonText}>Facebook</Text>
+        )}
+          <Text style={styles.socialButtonText}>{onLoadingOuth ? 'Signing in...' : 'Facebook'}</Text>
         </Pressable>
 
         <Pressable
@@ -229,12 +235,11 @@ export function LoginForm({
           onPress={handleGoogleLogin}
           disabled={isLoading}
           accessibilityLabel="Sign-in with Google"
-          accessibilityRole="button"
-        >
+          accessibilityRole="button">
           {onLoadingOuth ? (
             <ActivityIndicator size="small" color="#4285F4"/>
           ) : (
-            <Image source={require("@/assets/images/google-logo.png")} style={styles.googleIcon} contentFit="contain" />
+            <Ionicons name="logo-google" size={22}/>
           )}
           <Text style={styles.socialButtonText}>{onLoadingOuth ? 'Signing in...' : 'Google'}</Text>
         </Pressable>

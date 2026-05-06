@@ -3,9 +3,9 @@ import { BACKEND_URL, REDIRECT_URI, AuthError, AuthResult } from './AuthResult'
 
 WebBrowser.maybeCompleteAuthSession()
 
-export async function signInWithGoogle(): Promise<AuthResult> {
+export async function signInWithFacebook(): Promise<AuthResult> {
   // Encode the redirect URI so the backend knows where to send the token back
-  const authUrl = `${BACKEND_URL}/api/auth/google?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
+  const authUrl = `${BACKEND_URL}/api/auth/facebook?redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
 
   const result = await WebBrowser.openAuthSessionAsync(authUrl, REDIRECT_URI)
 
@@ -31,6 +31,3 @@ export async function signInWithGoogle(): Promise<AuthResult> {
 
   return { token }
 }
-
-
-// export async function getUserInfo(): Promise<User>
