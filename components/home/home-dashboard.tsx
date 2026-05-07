@@ -34,7 +34,7 @@ export function HomeDashboard() {
   }, [])
 
   const handleLoginPress = () => {
-    router.push('/login')
+    router.push('/welcome')
   }
 
   const firstName = user?.name.split(' ')[0] ?? 'Guest'
