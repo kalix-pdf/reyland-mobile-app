@@ -1,23 +1,32 @@
-import { AppColors } from '@/constants/colors'
-import { useAppTheme } from '@/context/theme-context'
-import { Image } from 'expo-image'
-import { LinearGradient } from 'expo-linear-gradient'
-import React, { ReactNode } from 'react'
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { AppColors } from '@/constants/colors';
+import { useAppTheme } from '@/context/theme-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { ReactNode } from 'react';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type AuthScreenProps = {
-  heroTitle: string
-  children: ReactNode
-  layoutDensity?: 'default' | 'compact'
-  scrollEnabled?: boolean
-}
+  heroTitle: string;
+  children: ReactNode;
+  layoutDensity?: 'default' | 'compact';
+  scrollEnabled?: boolean;
+  heroContent?: ReactNode;
+  panelVariant?: 'sheet' | 'transparent';
+};
 
-export function AuthScreen({ heroTitle, children, layoutDensity = 'default', scrollEnabled = true }: AuthScreenProps) {
-  const { colors } = useAppTheme()
-  const insets = useSafeAreaInsets()
-  const isCompact = layoutDensity === 'compact'
-  const styles = createStyles(colors, isCompact)
+export function AuthScreen({
+  heroTitle,
+  children,
+  layoutDensity = 'default',
+  scrollEnabled = true,
+  heroContent,
+  panelVariant = 'sheet',
+}: AuthScreenProps) {
+  const { colors } = useAppTheme();
+  const insets = useSafeAreaInsets();
+  const isCompact = layoutDensity === 'compact';
+  const styles = createStyles(colors, isCompact, panelVariant);
+  const useCompactSheetLayout = panelVariant === 'sheet' && isCompact;
 
   return (
     <KeyboardAvoidingView style={styles.keyboardView} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -31,37 +40,53 @@ export function AuthScreen({ heroTitle, children, layoutDensity = 'default', scr
         scrollEnabled={scrollEnabled}
       >
         <View style={styles.screen}>
-          <View style={[styles.hero, { paddingTop: insets.top + (isCompact ? 12 : 18) }]}>
-            <Image
-              source={require('@/assets/images/background.jpg')}
-              style={styles.heroBackgroundImage}
-              contentFit="cover"
+          <View style={[styles.hero, { paddingTop: insets.top + (useCompactSheetLayout ? 12 : 18) }]}>
+            <LinearGradient
+              colors={[colors.accent, colors.accentDark, colors.primary]}
+              start={{ x: 0, y: 0.5 }}
+              end={{ x: 1, y: 0.5 }}
+              style={styles.heroBackground}
             />
 
             <LinearGradient
-              colors={['rgba(7, 16, 20, 0.93)', 'rgba(7, 16, 20, 0.69)', 'rgba(7, 16, 20, 0.90)']}
-              locations={[0, 0.5, 1]}
+              colors={['rgba(0, 23, 28, 0.14)', 'rgba(0, 23, 28, 0)', 'rgba(0, 23, 28, 0.28)']}
+              locations={[0, 0.4, 1]}
               style={styles.heroOverlay}
             />
 
-            <LinearGradient
-              colors={['rgba(79, 196, 122, 0.18)', 'rgba(0, 140, 79, 0)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.heroAccent}
+            <Image
+              source={require('@/assets/images/logo_transparent_without_text_bg.png')}
+              style={styles.heroBrandMarkPrimary}
+              resizeMode="contain"
+            />
+
+            <Image
+              source={require('@/assets/images/logo_transparent_without_text_bg.png')}
+              style={styles.heroBrandMarkSecondary}
+              resizeMode="contain"
             />
 
             <View style={styles.heroContent}>
-              <View style={styles.heroCopy}>
-                <View style={styles.heroRule} />
+              <View style={styles.heroTopRow}>
+                <View style={styles.heroCopy}>
+                  {heroContent ? (
+                    heroContent
+                  ) : (
+                    <>
+                      <View style={styles.heroRule} />
 
-                <View style={styles.brandPill}>
-                  <View style={styles.brandDot} />
-                  <Text style={styles.brandPillText}>REYLAND</Text>
+                      <View style={styles.brandPill}>
+                        <View style={styles.brandDot} />
+                        <Text style={styles.brandPillText}>REYLAND</Text>
+                      </View>
+
+                      <Text style={styles.heroTitle}>{heroTitle}</Text>
+                      <Text style={styles.heroSubtitle}>
+                        Find verified homes, lots, and investment-ready properties.
+                      </Text>
+                    </>
+                  )}
                 </View>
-
-                <Text style={styles.heroTitle}>{heroTitle}</Text>
-                <Text style={styles.heroSubtitle}>Find verified homes, lots, and investment-ready properties.</Text>
               </View>
             </View>
           </View>
@@ -70,14 +95,14 @@ export function AuthScreen({ heroTitle, children, layoutDensity = 'default', scr
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
-  )
+  );
 }
 
-const createStyles = (Colors: AppColors, isCompact: boolean) =>
+const createStyles = (Colors: AppColors, isCompact: boolean, panelVariant: 'sheet' | 'transparent') =>
   StyleSheet.create({
     keyboardView: {
       flex: 1,
-      backgroundColor: Colors.background,
+      backgroundColor: panelVariant === 'transparent' ? Colors.logoBackground : Colors.background,
     },
 
     scrollContent: {
@@ -86,38 +111,48 @@ const createStyles = (Colors: AppColors, isCompact: boolean) =>
 
     screen: {
       flex: 1,
-      backgroundColor: Colors.background,
+      backgroundColor: panelVariant === 'transparent' ? Colors.logoBackground : Colors.background,
     },
 
     hero: {
-      minHeight: isCompact ? 300 : 416,
+      minHeight: panelVariant === 'transparent' ? (isCompact ? 640 : 720) : isCompact ? 232 : 350,
       backgroundColor: Colors.logoBackground,
       paddingHorizontal: 24,
-      paddingBottom: isCompact ? 40 : 74,
+      paddingBottom: panelVariant === 'transparent' ? (isCompact ? 26 : 34) : isCompact ? 22 : 28,
       overflow: 'hidden',
       position: 'relative',
+      borderBottomLeftRadius: panelVariant === 'transparent' ? 30 : 0,
+      borderBottomRightRadius: panelVariant === 'transparent' ? 30 : 0,
+      marginHorizontal: panelVariant === 'transparent' ? 18 : 0,
+      marginTop: 0,
     },
 
-    heroBackgroundImage: {
-      position: 'absolute',
-      width: '141%',
-      height: '141%',
-      left: '-12%',
-      top: 0,
+    heroBackground: {
+      ...StyleSheet.absoluteFillObject,
     },
 
     heroOverlay: {
       ...StyleSheet.absoluteFillObject,
     },
 
-    heroAccent: {
+    heroBrandMarkPrimary: {
       position: 'absolute',
-      width: 220,
-      height: 220,
-      right: -88,
-      top: 24,
-      borderRadius: 110,
-      transform: [{ rotate: '16deg' }],
+      width: 360,
+      height: 360,
+      top: -42,
+      right: -128,
+      opacity: 0.12,
+      transform: [{ rotate: '2deg' }],
+    },
+
+    heroBrandMarkSecondary: {
+      position: 'absolute',
+      width: 248,
+      height: 248,
+      bottom: -92,
+      left: -108,
+      opacity: 0.08,
+      transform: [{ rotate: '-10deg' }],
     },
 
     heroContent: {
@@ -126,10 +161,17 @@ const createStyles = (Colors: AppColors, isCompact: boolean) =>
       zIndex: 2,
     },
 
+    heroTopRow: {
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 16,
+    },
+
     heroCopy: {
-      minHeight: isCompact ? 126 : 160,
-      justifyContent: 'flex-start',
-      gap: isCompact ? 10 : 14,
+      flex: 1,
+      justifyContent: panelVariant === 'transparent' ? 'center' : 'flex-start',
+      gap: isCompact ? 8 : 12,
       maxWidth: 312,
     },
 
@@ -171,14 +213,15 @@ const createStyles = (Colors: AppColors, isCompact: boolean) =>
 
     heroTitle: {
       color: Colors.white,
-      fontSize: isCompact ? 27 : 31,
-      lineHeight: isCompact ? 33 : 38,
+      fontSize: isCompact ? 30 : 34,
+      lineHeight: isCompact ? 34 : 38,
       fontWeight: '900',
-      letterSpacing: -0.7,
+      letterSpacing: -1,
+      maxWidth: 196,
     },
 
     heroSubtitle: {
-      maxWidth: 276,
+      maxWidth: 250,
       color: 'rgba(255, 255, 255, 0.72)',
       fontSize: isCompact ? 12 : 13,
       lineHeight: isCompact ? 18 : 20,
@@ -210,21 +253,21 @@ const createStyles = (Colors: AppColors, isCompact: boolean) =>
     },
 
     formPanel: {
-      flex: 1,
-      marginTop: -26,
-      backgroundColor: Colors.surface,
-      borderTopLeftRadius: 32,
-      borderTopRightRadius: 32,
-      paddingHorizontal: 24,
-      paddingTop: isCompact ? 18 : 28,
-      paddingBottom: isCompact ? 22 : 34,
+      flex: panelVariant === 'transparent' ? 0 : 1,
+      marginTop: panelVariant === 'transparent' ? -6 : -81,
+      backgroundColor: panelVariant === 'transparent' ? 'transparent' : Colors.surface,
+      borderTopLeftRadius: panelVariant === 'transparent' ? 0 : 34,
+      borderTopRightRadius: panelVariant === 'transparent' ? 0 : 34,
+      paddingHorizontal: panelVariant === 'transparent' ? 28 : 24,
+      paddingTop: panelVariant === 'transparent' ? 0 : isCompact ? 16 : 20,
+      paddingBottom: panelVariant === 'transparent' ? 0 : isCompact ? 16 : 22,
       shadowColor: Colors.black,
-      shadowOpacity: 0.1,
+      shadowOpacity: panelVariant === 'transparent' ? 0 : 0.1,
       shadowRadius: 24,
       shadowOffset: {
         width: 0,
         height: -10,
       },
-      elevation: 8,
+      elevation: panelVariant === 'transparent' ? 0 : 8,
     },
-  })
+  });

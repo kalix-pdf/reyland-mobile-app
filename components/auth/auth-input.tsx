@@ -7,9 +7,10 @@ type AuthInputProps = TextInputProps & {
   error?: string;
   icon: (color: string) => ReactNode;
   rightElement?: (color: string) => ReactNode;
+  label?: string;
 };
 
-export function AuthInput({ error, icon, rightElement, onFocus, onBlur, ...textInputProps }: AuthInputProps) {
+export function AuthInput({ error, icon, rightElement, label, onFocus, onBlur, ...textInputProps }: AuthInputProps) {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -20,6 +21,7 @@ export function AuthInput({ error, icon, rightElement, onFocus, onBlur, ...textI
 
   return (
     <View style={styles.container}>
+      {label ? <Text style={[styles.label, hasError && styles.labelError]}>{label}</Text> : null}
       <View
         style={[
           styles.inputWrapper,
@@ -54,28 +56,35 @@ export function AuthInput({ error, icon, rightElement, onFocus, onBlur, ...textI
 const createStyles = (Colors: AppColors) =>
   StyleSheet.create({
     container: {
-      gap: 12,
+      gap: 6,
+    },
+
+    label: {
+      color: Colors.accent,
+      fontSize: 13,
+      fontWeight: "800",
+    },
+
+    labelError: {
+      color: Colors.error,
     },
 
     inputWrapper: {
-      minHeight: 56,
+      minHeight: 48,
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: Colors.surfaceMuted,
-      borderWidth: 1.3,
+      backgroundColor: "transparent",
+      borderBottomWidth: 1,
       borderColor: Colors.border,
-      borderRadius: 28,
-      paddingHorizontal: 16,
+      paddingHorizontal: 0,
     },
 
     inputWrapperFocused: {
       borderColor: Colors.accent,
-      backgroundColor: Colors.surface,
     },
 
     inputWrapperError: {
       borderColor: Colors.error,
-      backgroundColor: Colors.errorBackground,
     },
 
     inputIcon: {
@@ -86,14 +95,13 @@ const createStyles = (Colors: AppColors) =>
       flex: 1,
       color: Colors.textPrimary,
       fontSize: 14,
-      paddingVertical: 14,
+      paddingVertical: 12,
     },
 
     fieldErrorText: {
       color: Colors.error,
       fontSize: 12,
       fontWeight: "700",
-      marginTop: -6,
-      marginLeft: 16,
+      marginTop: 2,
     },
   });

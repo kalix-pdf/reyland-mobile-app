@@ -1,30 +1,30 @@
-import { AuthButton } from '@/components/auth/auth-button'
-import { AuthInput } from '@/components/auth/auth-input'
-import { AuthMessage } from '@/components/auth/auth-message'
-import { AuthScreen } from '@/components/auth/auth-screen'
-import { AppColors } from '@/constants/colors'
-import { useAppTheme } from '@/context/theme-context'
-import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
-import { useState } from 'react'
-import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native'
+import { AuthButton } from '@/components/auth/auth-button';
+import { AuthInput } from '@/components/auth/auth-input';
+import { AuthMessage } from '@/components/auth/auth-message';
+import { AuthScreen } from '@/components/auth/auth-screen';
+import { AppColors } from '@/constants/colors';
+import { useAppTheme } from '@/context/theme-context';
+import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type LoginFormProps = {
-  onLogin: (email: string, password: string) => boolean | Promise<boolean>
-  onForgotPassword?: () => void
-  onGoogleLogin: () => void
-  onLoadingGoogleOuth: boolean
-  onLoadingFacebookOuth: boolean
-  onFacebookLogin?: () => void
-  onCreateAccount?: () => void
-}
+  onLogin: (email: string, password: string) => boolean | Promise<boolean>;
+  onForgotPassword?: () => void;
+  onGoogleLogin: () => void;
+  onLoadingGoogleOuth: boolean;
+  onLoadingFacebookOuth: boolean;
+  onFacebookLogin?: () => void;
+  onCreateAccount?: () => void;
+};
 
 const isValidEmail = (value: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
-}
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+};
 
 const isValidPassword = (value: string) => {
-  return value.length >= 6
-}
+  return value.length >= 6;
+};
 
 export function LoginForm({
   onLogin,
@@ -35,113 +35,104 @@ export function LoginForm({
   onFacebookLogin,
   onCreateAccount,
 }: LoginFormProps) {
-  const { colors } = useAppTheme()
-  const styles = createStyles(colors)
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
 
-  const [email, setEmail] = useState('jakepogi123@email.com')
-  const [password, setPassword] = useState('password123')
+  const [email, setEmail] = useState('jakepogi123@email.com');
+  const [password, setPassword] = useState('password123');
 
-  const [loginError, setLoginError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
+  const [loginError, setLoginError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  const [emailTouched, setEmailTouched] = useState(false)
-  const [passwordTouched, setPasswordTouched] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const trimmedEmail = email.trim()
+  const trimmedEmail = email.trim();
 
-  const shouldValidateEmail = submitted || emailTouched
-  const shouldValidatePassword = submitted || passwordTouched
+  const shouldValidateEmail = submitted || emailTouched;
+  const shouldValidatePassword = submitted || passwordTouched;
 
   const emailError =
     shouldValidateEmail && trimmedEmail.length === 0
       ? 'Email is required.'
       : shouldValidateEmail && !isValidEmail(trimmedEmail)
         ? 'Please enter a valid email address.'
-        : ''
+        : '';
 
   const passwordError =
     shouldValidatePassword && password.length === 0
       ? 'Password is required.'
       : shouldValidatePassword && !isValidPassword(password)
         ? 'Password must be at least 6 characters.'
-        : ''
+        : '';
 
   const handleLogin = async () => {
-    if (isLoading) return
+    if (isLoading) return;
 
-    setSubmitted(true)
-    setEmailTouched(true)
-    setPasswordTouched(true)
-    setLoginError('')
+    setSubmitted(true);
+    setEmailTouched(true);
+    setPasswordTouched(true);
+    setLoginError('');
 
-    if (!isValidEmail(trimmedEmail)) return
-    if (!isValidPassword(password)) return
+    if (!isValidEmail(trimmedEmail)) return;
+    if (!isValidPassword(password)) return;
 
     try {
-      setIsLoading(true)
+      setIsLoading(true);
 
-      const success = await onLogin(trimmedEmail, password)
+      const success = await onLogin(trimmedEmail, password);
 
       if (!success) {
-        setLoginError('Invalid email or password.')
+        setLoginError('Invalid email or password.');
       }
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleEmailChange = (value: string) => {
-    setEmail(value)
-    setLoginError('')
+    setEmail(value);
+    setLoginError('');
 
     if (submitted) {
-      setEmailTouched(true)
+      setEmailTouched(true);
     }
-  }
+  };
 
   const handlePasswordChange = (value: string) => {
-    setPassword(value)
-    setLoginError('')
+    setPassword(value);
+    setLoginError('');
 
     if (submitted) {
-      setPasswordTouched(true)
+      setPasswordTouched(true);
     }
-  }
+  };
 
   const handleForgotPassword = () => {
-    if (isLoading) return
-    onForgotPassword?.()
-  }
+    if (isLoading) return;
+    onForgotPassword?.();
+  };
 
   const handleCreateAccount = () => {
-    if (isLoading) return
-    onCreateAccount?.()
-  }
-
-  const handleGoogleLogin = () => {
-    if (isLoading) return
-    onGoogleLogin?.()
-  }
-
-  const handleFacebookLogin = () => {
-    if (isLoading) return
-    onFacebookLogin?.()
-  }
+    if (isLoading) return;
+    onCreateAccount?.();
+  };
 
   return (
-    <AuthScreen heroTitle="Log in to find your next property with Reyland.">
-      <Text style={styles.title}>Login</Text>
+    <AuthScreen heroTitle={`Welcome\nBack`}>
+      <Text style={styles.title}>Sign In</Text>
       <Text style={styles.subtitle}>
-        Welcome back. Log in to continue browsing verified listings and saved properties.
+        Sign in to continue browsing verified listings, saved properties, and your latest activity.
       </Text>
 
       <AuthMessage type="error" message={loginError} />
 
       <View style={styles.inputArea}>
         <AuthInput
+          label="Email"
           icon={(color) => <MaterialCommunityIcons name="email-outline" size={20} color={color} />}
           error={emailError}
           placeholder="Enter your email address"
@@ -149,7 +140,7 @@ export function LoginForm({
           onChangeText={handleEmailChange}
           onBlur={() => {
             if (email.trim().length > 0 || submitted) {
-              setEmailTouched(true)
+              setEmailTouched(true);
             }
           }}
           keyboardType="email-address"
@@ -161,6 +152,7 @@ export function LoginForm({
         />
 
         <AuthInput
+          label="Password"
           icon={(color) => <Feather name="lock" size={20} color={color} />}
           rightElement={(color) => (
             <Pressable
@@ -178,7 +170,7 @@ export function LoginForm({
           onChangeText={handlePasswordChange}
           onBlur={() => {
             if (password.length > 0 || submitted) {
-              setPasswordTouched(true)
+              setPasswordTouched(true);
             }
           }}
           secureTextEntry={!showPassword}
@@ -207,10 +199,16 @@ export function LoginForm({
       </View>
 
       <View style={styles.buttonWrap}>
-        <AuthButton title="Login" loadingTitle="Logging in..." loading={isLoading} onPress={handleLogin} />
+        <AuthButton
+          title="SIGN IN"
+          loadingTitle="Signing in..."
+          loading={isLoading}
+          onPress={handleLogin}
+          disabled={isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
+        />
       </View>
 
-      <View style={styles.dividerRow}>
+      {/* <View style={styles.dividerRow}>
         <View style={styles.divider} />
         <Text style={styles.dividerText}>Or Continue With</Text>
         <View style={styles.divider} />
@@ -224,7 +222,7 @@ export function LoginForm({
             onLoadingFacebookOuth && styles.socialButtonPressed,
           ]}
           onPress={handleFacebookLogin}
-          disabled={isLoading}
+          disabled={isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
           accessibilityLabel="Sign-in with Google"
           accessibilityRole="button"
         >
@@ -243,7 +241,7 @@ export function LoginForm({
             onLoadingGoogleOuth && styles.socialButtonPressed,
           ]}
           onPress={handleGoogleLogin}
-          disabled={isLoading}
+          disabled={isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
           accessibilityLabel="Sign-in with Google"
           accessibilityRole="button"
         >
@@ -254,7 +252,7 @@ export function LoginForm({
           )}
           <Text style={styles.socialButtonText}>{onLoadingGoogleOuth ? 'Signing in...' : 'Google'}</Text>
         </Pressable>
-      </View>
+      </View> */}
 
       <View style={styles.accountFooterRow}>
         <Text style={styles.accountText}>Don’t have an account?</Text>
@@ -264,7 +262,7 @@ export function LoginForm({
         </Pressable>
       </View>
     </AuthScreen>
-  )
+  );
 }
 
 const createStyles = (Colors: AppColors) =>
@@ -274,16 +272,17 @@ const createStyles = (Colors: AppColors) =>
       fontSize: 30,
       fontWeight: '900',
       textAlign: 'center',
-      marginBottom: 6,
+      marginBottom: 8,
     },
 
     subtitle: {
       color: Colors.textSecondary,
       fontSize: 13,
-      lineHeight: 19,
+      lineHeight: 21,
       textAlign: 'center',
       fontWeight: '600',
       marginBottom: 16,
+      minHeight: 42,
     },
 
     accountRow: {
@@ -297,7 +296,7 @@ const createStyles = (Colors: AppColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: 18,
+      marginTop: 22,
     },
 
     accountText: {
@@ -324,12 +323,13 @@ const createStyles = (Colors: AppColors) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginTop: 14,
-      marginBottom: 16,
+      marginTop: 6,
+      marginBottom: 14,
     },
 
     buttonWrap: {
-      marginTop: 0,
+      width: '100%',
+      marginTop: 4,
     },
 
     forgotLinkRow: {
@@ -382,7 +382,7 @@ const createStyles = (Colors: AppColors) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
-      marginTop: 18,
+      marginTop: 22,
       marginBottom: 18,
     },
 
@@ -431,4 +431,4 @@ const createStyles = (Colors: AppColors) =>
       fontSize: 14,
       fontWeight: '800',
     },
-  })
+  });

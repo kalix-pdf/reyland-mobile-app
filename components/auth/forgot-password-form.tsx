@@ -1,12 +1,12 @@
-import { AuthButton } from "@/components/auth/auth-button";
-import { AuthInput } from "@/components/auth/auth-input";
-import { AuthMessage } from "@/components/auth/auth-message";
-import { AuthScreen } from "@/components/auth/auth-screen";
-import { AppColors } from "@/constants/colors";
-import { useAppTheme } from "@/context/theme-context";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { AuthButton } from '@/components/auth/auth-button';
+import { AuthInput } from '@/components/auth/auth-input';
+import { AuthMessage } from '@/components/auth/auth-message';
+import { AuthScreen } from '@/components/auth/auth-screen';
+import { AppColors } from '@/constants/colors';
+import { useAppTheme } from '@/context/theme-context';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type ForgotPasswordFormProps = {
   onSubmit: (email: string) => boolean | Promise<boolean>;
@@ -21,31 +21,32 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const trimmedEmail = email.trim();
   const shouldValidateEmail = submitted || emailTouched;
+  const canSubmit = isValidEmail(trimmedEmail);
 
   const emailError =
     shouldValidateEmail && trimmedEmail.length === 0
-      ? "Email is required."
+      ? 'Email is required.'
       : shouldValidateEmail && !isValidEmail(trimmedEmail)
-        ? "Please enter a valid email address."
-        : "";
+        ? 'Please enter a valid email address.'
+        : '';
 
   const handleSubmit = async () => {
     if (isLoading) return;
 
     setSubmitted(true);
     setEmailTouched(true);
-    setError("");
-    setSuccessMessage("");
+    setError('');
+    setSuccessMessage('');
 
     if (!isValidEmail(trimmedEmail)) return;
 
@@ -55,11 +56,11 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
       const success = await onSubmit(trimmedEmail);
 
       if (!success) {
-        setError("We couldn’t send the reset link. Please try again.");
+        setError('We couldn’t send the reset link. Please try again.');
         return;
       }
 
-      setSuccessMessage("Password reset instructions have been sent to your email.");
+      setSuccessMessage('Password reset instructions have been sent to your email.');
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +68,8 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
-    setError("");
-    setSuccessMessage("");
+    setError('');
+    setSuccessMessage('');
 
     if (submitted) {
       setEmailTouched(true);
@@ -81,8 +82,8 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
   };
 
   return (
-    <AuthScreen heroTitle="Reset your password and get back to exploring Reyland properties.">
-      <Text style={styles.title}>Forgot Password</Text>
+    <AuthScreen heroTitle={`Forgot Your\nPassword?`}>
+      <Text style={styles.title}>Reset Password</Text>
 
       <Text style={styles.description}>
         Enter the email linked to your account and we’ll send you instructions to reset your password.
@@ -93,6 +94,7 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
 
       <View style={styles.inputArea}>
         <AuthInput
+          label="Email"
           icon={(color) => <MaterialCommunityIcons name="email-outline" size={20} color={color} />}
           error={emailError}
           placeholder="Enter your email address"
@@ -114,7 +116,13 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
       </View>
 
       <View style={styles.buttonWrap}>
-        <AuthButton title="Send Reset Link" loadingTitle="Sending link..." loading={isLoading} onPress={handleSubmit} />
+        <AuthButton
+          title="Send Reset Link"
+          loadingTitle="Sending link..."
+          loading={isLoading}
+          onPress={handleSubmit}
+          disabled={!canSubmit}
+        />
       </View>
 
       <View style={styles.supportCard}>
@@ -141,7 +149,6 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
         <Ionicons name="arrow-back" size={16} color={colors.accent} />
         <Text style={styles.backButtonText}>Back to Login</Text>
       </Pressable>
-
     </AuthScreen>
   );
 }
@@ -151,8 +158,8 @@ const createStyles = (Colors: AppColors) =>
     title: {
       color: Colors.textPrimary,
       fontSize: 30,
-      fontWeight: "900",
-      textAlign: "center",
+      fontWeight: '900',
+      textAlign: 'center',
       marginBottom: 8,
     },
 
@@ -160,29 +167,29 @@ const createStyles = (Colors: AppColors) =>
       color: Colors.textSecondary,
       fontSize: 13,
       lineHeight: 21,
-      textAlign: "center",
-      fontWeight: "600",
+      textAlign: 'center',
+      fontWeight: '600',
       marginBottom: 16,
       minHeight: 42,
     },
 
     accountRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       marginBottom: 22,
     },
 
     accountText: {
       color: Colors.textMuted,
       fontSize: 13,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     accountLink: {
       color: Colors.accent,
       fontSize: 13,
-      fontWeight: "900",
+      fontWeight: '900',
     },
 
     inputArea: {
@@ -190,13 +197,13 @@ const createStyles = (Colors: AppColors) =>
     },
 
     buttonWrap: {
-      marginTop: 22,
+      marginTop: 8,
     },
 
     supportCard: {
-      marginTop: 18,
-      flexDirection: "row",
-      alignItems: "flex-start",
+      marginTop: 16,
+      flexDirection: 'row',
+      alignItems: 'flex-start',
       gap: 12,
       backgroundColor: Colors.background,
       borderRadius: 20,
@@ -211,8 +218,8 @@ const createStyles = (Colors: AppColors) =>
       height: 34,
       borderRadius: 17,
       backgroundColor: Colors.tag,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
     },
 
     supportCopy: {
@@ -223,46 +230,46 @@ const createStyles = (Colors: AppColors) =>
     supportTitle: {
       color: Colors.textPrimary,
       fontSize: 13,
-      fontWeight: "800",
+      fontWeight: '800',
     },
 
     supportText: {
       color: Colors.textSecondary,
       fontSize: 12,
       lineHeight: 18,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     helpRow: {
       marginTop: 16,
-      alignSelf: "center",
-      flexDirection: "row",
-      alignItems: "center",
+      alignSelf: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
     },
 
     helpLabel: {
       color: Colors.textMuted,
       fontSize: 12,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     helpLink: {
       color: Colors.accent,
       fontSize: 12,
-      fontWeight: "900",
+      fontWeight: '900',
     },
 
     backButton: {
-      marginTop: 22,
-      alignSelf: "center",
-      flexDirection: "row",
-      alignItems: "center",
+      marginTop: 18,
+      alignSelf: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 6,
     },
 
     backButtonText: {
       color: Colors.accent,
       fontSize: 13,
-      fontWeight: "900",
+      fontWeight: '900',
     },
   });
