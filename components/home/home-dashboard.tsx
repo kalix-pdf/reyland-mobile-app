@@ -51,7 +51,7 @@ export function HomeDashboard() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.accent}
+            tintColor={Colors.accentDark}
             progressViewOffset={insets.top + 28}
           />
         }

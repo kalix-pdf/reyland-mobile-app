@@ -13,6 +13,15 @@ export default function SignUpScreen() {
   const [isLoadingFacebookOuth, setIsLoadingFacebookOuth] = useState(false)
   const { setUser } = useAuth()
 
+  const handleSignUp = async (name: string, email: string, password: string): Promise<boolean> => {
+    try {
+      // await api.signUp(name, email, password)
+      return true  
+    } catch {
+      return false 
+    }
+  }
+  
   const handleGoogleSignUp = async () => {
     if (isLoadingGoogleOuth) return
     setIsLoadingGoogleOuth(true)
@@ -55,13 +64,10 @@ export default function SignUpScreen() {
 
   return (
     <SignUpForm
-      onSignUp={async (name, email, password) => {
-        console.log('Sign up:', { name, email, password })
-        return true
-      }}
+      onSignUp={handleSignUp}
       onLogin={() => router.replace('/login')}
       onGoogleSignUp={handleGoogleSignUp}
-      onFacebookSignUp={() => console.log('Facebook sign up')}
+      onFacebookSignUp={handleFabookLogin}
       isGoogleLoading={isLoadingGoogleOuth}
       isFacebookLoading={isLoadingFacebookOuth}
     />
