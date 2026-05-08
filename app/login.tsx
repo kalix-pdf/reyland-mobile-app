@@ -57,13 +57,13 @@ export default function LoginScreen() {
   return (
     <LoginForm
       onLogin={async (email, password) => {
-        const success = await login(email, password);
+        const result = await login(email, password);
 
-        if (success) {
+        if (result.success) {
           router.replace('/(tabs)');
         }
 
-        return success;
+        return result;
       }}
       onGoogleLogin={handleGoogleLogin}
       onFacebookLogin={handleFabookLogin}

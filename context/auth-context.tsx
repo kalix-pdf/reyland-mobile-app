@@ -1,13 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUserInfo } from "@/services/fetchData/user.api";
-import { user_auth_api } from "@/services/auth/auth.api";
+import { loginUser } from "@/services/auth/auth-login";
+import { logoutUser } from "@/services/auth/auth-logout";
+import { establishAuthenticatedSession } from "@/services/auth/auth-session";
 import { User } from "@/types/user.types";
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+
+type LoginResult = {
+  success: boolean;
+  message?: string;
+};
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 };
@@ -15,7 +21,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: false,
-  login: async () => false,
+  login: async () => ({ success: false }),
   logout: async () => {},
   setUser: () => {}
 });
@@ -24,24 +30,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     setIsLoading(true);
     try {
-      const { token } = await user_auth_api.login(email, password);
-      const userInfo = await getUserInfo(token);
-
-      if (!userInfo.uuid) {
-        return false;
-      }
-
-      await AsyncStorage.setItem('token', token);
-      setUser({
-        ...userInfo,
-        accessToken: userInfo.accessToken || token,
-      });
-      return true;
-    } catch {
-      return false;
+      const { token, refreshToken } = await loginUser(email, password);
+      const success = await establishAuthenticatedSession(token, setUser, refreshToken);
+      return {
+        success,
+        message: success ? undefined : 'Unable to load your account. Please try again.',
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : 'Unable to sign in right now.',
+      };
     } finally {
       setIsLoading(false);
     }
@@ -50,11 +52,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      await AsyncStorage.removeItem('token');
-      await AsyncStorage.clear();
-      setUser(null);
+      const token = await AsyncStorage.getItem('token');
+
+      if (token) {
+        await logoutUser(token);
+      }
     } finally {
+      await AsyncStorage.multiRemove(['token', 'refreshToken']);
+      setUser(null);
       setIsLoading(false);
     }
   }, []);

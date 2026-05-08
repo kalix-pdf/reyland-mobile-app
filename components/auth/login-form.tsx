@@ -9,21 +9,16 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type LoginFormProps = {
-  onLogin: (email: string, password: string) => boolean | Promise<boolean>;
+  onLogin: (
+    email: string,
+    password: string,
+  ) => { success: boolean; message?: string } | Promise<{ success: boolean; message?: string }>;
   onForgotPassword?: () => void;
   onGoogleLogin: () => void;
   onLoadingGoogleOuth: boolean;
   onLoadingFacebookOuth: boolean;
   onFacebookLogin?: () => void;
   onCreateAccount?: () => void;
-};
-
-const isValidEmail = (value: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-};
-
-const isValidPassword = (value: string) => {
-  return value.length >= 6;
 };
 
 export function LoginForm({
@@ -38,8 +33,8 @@ export function LoginForm({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const [email, setEmail] = useState('jakepogi123@email.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const [loginError, setLoginError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -55,19 +50,11 @@ export function LoginForm({
   const shouldValidateEmail = submitted || emailTouched;
   const shouldValidatePassword = submitted || passwordTouched;
 
-  const emailError =
-    shouldValidateEmail && trimmedEmail.length === 0
-      ? 'Email is required.'
-      : shouldValidateEmail && !isValidEmail(trimmedEmail)
-        ? 'Please enter a valid email address.'
-        : '';
+  const emailError = shouldValidateEmail && trimmedEmail.length === 0 ? 'Email is required.' : '';
 
-  const passwordError =
-    shouldValidatePassword && password.length === 0
-      ? 'Password is required.'
-      : shouldValidatePassword && !isValidPassword(password)
-        ? 'Password must be at least 6 characters.'
-        : '';
+  const passwordError = shouldValidatePassword && password.length === 0 ? 'Password is required.' : '';
+
+  const canSubmit = trimmedEmail.length > 0 && password.length > 0;
 
   const handleLogin = async () => {
     if (isLoading) return;
@@ -77,15 +64,16 @@ export function LoginForm({
     setPasswordTouched(true);
     setLoginError('');
 
-    if (!isValidEmail(trimmedEmail)) return;
-    if (!isValidPassword(password)) return;
+    if (trimmedEmail.length === 0) return;
+    if (password.length === 0) return;
 
     try {
       setIsLoading(true);
 
-      const success = await onLogin(trimmedEmail, password);
+      const result = await onLogin(trimmedEmail, password);
 
-      if (!success) {
+      if (!result.success) {
+        // setLoginError(result.message || 'Invalid email or password.');
         setLoginError('Invalid email or password.');
       }
     } finally {
@@ -204,7 +192,7 @@ export function LoginForm({
           loadingTitle="Signing in..."
           loading={isLoading}
           onPress={handleLogin}
-          disabled={isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
+          disabled={!canSubmit || isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
         />
       </View>
 
