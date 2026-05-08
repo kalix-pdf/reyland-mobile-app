@@ -4,6 +4,7 @@ import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { AppColors } from '@/constants/colors';
 import { useAppTheme } from '@/context/theme-context';
+import { createAuthFormStyles } from '@/styles/global.css';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -85,14 +86,14 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
     <AuthScreen heroTitle={`Forgot Your\nPassword?`}>
       <Text style={styles.title}>Reset Password</Text>
 
-      <Text style={styles.description}>
+      <Text style={styles.subtitleDefault}>
         Enter the email linked to your account and we’ll send you instructions to reset your password.
       </Text>
 
       <AuthMessage type="error" message={error} />
       <AuthMessage type="success" message={successMessage} />
 
-      <View style={styles.inputArea}>
+      <View style={styles.inputAreaDefault}>
         <AuthInput
           label="Email"
           icon={(color) => <MaterialCommunityIcons name="email-outline" size={20} color={color} />}
@@ -155,46 +156,7 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
 
 const createStyles = (Colors: AppColors) =>
   StyleSheet.create({
-    title: {
-      color: Colors.textPrimary,
-      fontSize: 30,
-      fontWeight: '900',
-      textAlign: 'center',
-      marginBottom: 8,
-    },
-
-    description: {
-      color: Colors.textSecondary,
-      fontSize: 13,
-      lineHeight: 21,
-      textAlign: 'center',
-      fontWeight: '600',
-      marginBottom: 16,
-      minHeight: 42,
-    },
-
-    accountRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 22,
-    },
-
-    accountText: {
-      color: Colors.textMuted,
-      fontSize: 13,
-      fontWeight: '600',
-    },
-
-    accountLink: {
-      color: Colors.accent,
-      fontSize: 13,
-      fontWeight: '900',
-    },
-
-    inputArea: {
-      gap: 12,
-    },
+    ...createAuthFormStyles(Colors),
 
     buttonWrap: {
       marginTop: 8,

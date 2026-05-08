@@ -4,6 +4,7 @@ import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { AppColors } from '@/constants/colors';
 import { useAppTheme } from '@/context/theme-context';
+import { createAuthFormStyles } from '@/styles/global.css';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -233,7 +234,7 @@ export function SignUpForm({
   return (
     <AuthScreen heroTitle={`Create Your\nAccount`}>
       <Text style={styles.title}>Create Account</Text>
-      <Text style={styles.subtitle}>
+      <Text style={styles.subtitleCompact}>
         Create your profile to save listings, track favorites, and continue across devices.
       </Text>
 
@@ -242,7 +243,7 @@ export function SignUpForm({
 
       {!hasCompletedSignUp ? (
         <>
-          <View style={styles.inputArea}>
+          <View style={styles.inputAreaTight}>
             <AuthInput
               label="Full Name"
               icon={(color) => <Feather name="user" size={20} color={color} />}
@@ -395,7 +396,7 @@ export function SignUpForm({
         </View>
       )}
 
-      <View style={styles.buttonWrap}>
+      <View style={styles.buttonWrapTop6}>
         <AuthButton
           title={hasCompletedSignUp ? 'CONTINUE TO SIGN IN' : 'SIGN UP'}
           loadingTitle={hasCompletedSignUp ? 'Opening sign in...' : 'Creating account...'}
@@ -425,91 +426,7 @@ export function SignUpForm({
 //par lipat mo to par sa iisang file, lahat ng css ng components
 const createStyles = (Colors: AppColors) =>
   StyleSheet.create({
-    title: {
-      color: Colors.textPrimary,
-      fontSize: 30,
-      fontWeight: '900',
-      textAlign: 'center',
-      marginBottom: 6,
-    },
-
-    subtitle: {
-      color: Colors.textSecondary,
-      fontSize: 13,
-      lineHeight: 18,
-      textAlign: 'center',
-      fontWeight: '600',
-      marginBottom: 16,
-      minHeight: 40,
-    },
-
-    accountRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 16,
-    },
-
-    accountFooterRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 20,
-    },
-
-    accountText: {
-      color: Colors.textMuted,
-      fontSize: 13,
-      fontWeight: '600',
-    },
-
-    accountLink: {
-      color: Colors.accent,
-      fontSize: 13,
-      fontWeight: '900',
-    },
-
-    inputArea: {
-      gap: 10,
-    },
-
-    eyeButton: {
-      paddingLeft: 10,
-    },
-
-    passwordHintRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginTop: -4,
-      marginBottom: 0,
-      marginLeft: 16,
-    },
-
-    passwordHintText: {
-      color: Colors.textMuted,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-
-    passwordHintTextSuccess: {
-      color: Colors.success,
-    },
-
-    matchRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginTop: -4,
-      marginBottom: 0,
-      marginLeft: 16,
-    },
-
-    matchText: {
-      color: Colors.success,
-      fontSize: 12,
-      fontWeight: '700',
-    },
+    ...createAuthFormStyles(Colors),
 
     successPanel: {
       marginTop: 8,
@@ -563,56 +480,6 @@ const createStyles = (Colors: AppColors) =>
       textAlign: 'left',
       paddingHorizontal: 14,
       paddingBottom: 8,
-    },
-
-    termsRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: 8,
-      marginTop: 8,
-      marginBottom: 4,
-    },
-
-    checkbox: {
-      width: 16,
-      height: 16,
-      borderRadius: 4,
-      borderWidth: 1.4,
-      borderColor: Colors.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 2,
-    },
-
-    checkboxChecked: {
-      backgroundColor: Colors.accent,
-      borderColor: Colors.accent,
-    },
-
-    termsText: {
-      flex: 1,
-      color: Colors.textSecondary,
-      fontSize: 12,
-      lineHeight: 18,
-      fontWeight: '600',
-    },
-
-    termsLink: {
-      color: Colors.accent,
-      fontWeight: '900',
-    },
-
-    termsErrorText: {
-      color: Colors.error,
-      fontSize: 12,
-      fontWeight: '700',
-      marginBottom: 8,
-      marginLeft: 24,
-    },
-
-    buttonWrap: {
-      width: '100%',
-      marginTop: 6,
     },
 
     dividerRow: {

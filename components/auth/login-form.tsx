@@ -4,6 +4,7 @@ import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { AppColors } from '@/constants/colors';
 import { useAppTheme } from '@/context/theme-context';
+import { createAuthFormStyles } from '@/styles/global.css';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -112,13 +113,13 @@ export function LoginForm({
   return (
     <AuthScreen heroTitle={`Welcome\nBack`}>
       <Text style={styles.title}>Sign In</Text>
-      <Text style={styles.subtitle}>
+      <Text style={styles.subtitleDefault}>
         Sign in to continue browsing verified listings, saved properties, and your latest activity.
       </Text>
 
       <AuthMessage type="error" message={loginError} />
 
-      <View style={styles.inputArea}>
+      <View style={styles.inputAreaDefault}>
         <AuthInput
           label="Email"
           icon={(color) => <MaterialCommunityIcons name="email-outline" size={20} color={color} />}
@@ -186,7 +187,7 @@ export function LoginForm({
         </Pressable>
       </View>
 
-      <View style={styles.buttonWrap}>
+      <View style={styles.buttonWrapTop4}>
         <AuthButton
           title="SIGN IN"
           loadingTitle="Signing in..."
@@ -242,7 +243,7 @@ export function LoginForm({
         </Pressable>
       </View> */}
 
-      <View style={styles.accountFooterRow}>
+      <View style={styles.accountFooterRowSpacious}>
         <Text style={styles.accountText}>Don’t have an account?</Text>
 
         <Pressable onPress={handleCreateAccount} hitSlop={8}>
@@ -255,69 +256,13 @@ export function LoginForm({
 
 const createStyles = (Colors: AppColors) =>
   StyleSheet.create({
-    title: {
-      color: Colors.textPrimary,
-      fontSize: 30,
-      fontWeight: '900',
-      textAlign: 'center',
-      marginBottom: 8,
-    },
-
-    subtitle: {
-      color: Colors.textSecondary,
-      fontSize: 13,
-      lineHeight: 21,
-      textAlign: 'center',
-      fontWeight: '600',
-      marginBottom: 16,
-      minHeight: 42,
-    },
-
-    accountRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 22,
-    },
-
-    accountFooterRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 22,
-    },
-
-    accountText: {
-      color: Colors.textMuted,
-      fontSize: 13,
-      fontWeight: '600',
-    },
-
-    accountLink: {
-      color: Colors.accent,
-      fontSize: 13,
-      fontWeight: '900',
-    },
-
-    inputArea: {
-      gap: 12,
-    },
-
-    eyeButton: {
-      paddingLeft: 10,
-    },
-
+    ...createAuthFormStyles(Colors),
     optionsRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       marginTop: 6,
       marginBottom: 14,
-    },
-
-    buttonWrap: {
-      width: '100%',
-      marginTop: 4,
     },
 
     forgotLinkRow: {
@@ -348,22 +293,6 @@ const createStyles = (Colors: AppColors) =>
       color: Colors.textSecondary,
       fontSize: 12,
       fontWeight: '600',
-    },
-
-    checkbox: {
-      width: 16,
-      height: 16,
-      borderRadius: 4,
-      borderWidth: 1.4,
-      borderColor: Colors.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 2,
-    },
-
-    checkboxChecked: {
-      backgroundColor: Colors.accent,
-      borderColor: Colors.accent,
     },
 
     dividerRow: {

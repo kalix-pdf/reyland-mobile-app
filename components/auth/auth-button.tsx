@@ -1,7 +1,7 @@
-import { AppColors } from "@/constants/colors";
 import { useAppTheme } from "@/context/theme-context";
+import { createAuthComponentStyles } from "@/styles/global.css";
 import { LinearGradient } from "expo-linear-gradient";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 type AuthButtonProps = {
   title: string;
@@ -19,7 +19,7 @@ export function AuthButton({
   onPress,
 }: AuthButtonProps) {
   const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const styles = createAuthComponentStyles(colors);
 
   const isDisabled = disabled || loading;
 
@@ -40,7 +40,7 @@ export function AuthButton({
         style={styles.buttonFill}
       >
         {loading ? (
-          <View style={styles.loadingRow}>
+          <View style={styles.buttonLoadingRow}>
             <ActivityIndicator color={colors.white} size="small" />
             <Text style={styles.buttonText}>{loadingTitle}</Text>
           </View>
@@ -51,48 +51,3 @@ export function AuthButton({
     </Pressable>
   );
 }
-
-const createStyles = (Colors: AppColors) =>
-  StyleSheet.create({
-    button: {
-      borderRadius: 999,
-      overflow: "hidden",
-      minHeight: 52,
-      shadowColor: Colors.primary,
-      shadowOpacity: 0.14,
-      shadowRadius: 14,
-      shadowOffset: {
-        width: 0,
-        height: 8,
-      },
-      elevation: 4,
-    },
-
-    buttonFill: {
-      minHeight: 52,
-      borderRadius: 999,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-
-    buttonDisabled: {
-      opacity: 0.75,
-    },
-
-    buttonPressed: {
-      opacity: 0.9,
-      transform: [{ scale: 0.985 }],
-    },
-
-    buttonText: {
-      color: Colors.white,
-      fontSize: 15,
-      fontWeight: "900",
-    },
-
-    loadingRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 10,
-    },
-  });
