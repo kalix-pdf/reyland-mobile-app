@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/auth-context';
 import { AuthError } from '@/services/auth/AuthResult';
-import { AuthApiError, user_auth_api } from '@/services/auth/auth.api';
+import { registerUser } from '@/services/auth/auth-register';
+import { AuthApiError } from '@/services/auth/auth-shared';
 import { completeOAuthSignIn } from '@/services/auth/complete-oauth-sign-in';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -20,7 +21,7 @@ export default function SignUpScreen() {
     password: string,
   ): Promise<{ success: boolean; message?: string }> => {
     try {
-      const result = await user_auth_api.sign_up(name, email, password);
+      const result = await registerUser(name, email, password);
 
       return {
         success: true,

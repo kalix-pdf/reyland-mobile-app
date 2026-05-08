@@ -4,26 +4,22 @@ import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { AppColors } from '@/constants/colors';
 import { useAppTheme } from '@/context/theme-context';
+import { createAuthFormStyles } from '@/styles/global.css';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type LoginFormProps = {
-  onLogin: (email: string, password: string) => boolean | Promise<boolean>;
+  onLogin: (
+    email: string,
+    password: string,
+  ) => { success: boolean; message?: string } | Promise<{ success: boolean; message?: string }>;
   onForgotPassword?: () => void;
   onGoogleLogin: () => void;
   onLoadingGoogleOuth: boolean;
   onLoadingFacebookOuth: boolean;
   onFacebookLogin?: () => void;
   onCreateAccount?: () => void;
-};
-
-const isValidEmail = (value: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-};
-
-const isValidPassword = (value: string) => {
-  return value.length >= 6;
 };
 
 export function LoginForm({
@@ -38,8 +34,8 @@ export function LoginForm({
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
-  const [email, setEmail] = useState('jakepogi123@email.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const [loginError, setLoginError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -55,19 +51,11 @@ export function LoginForm({
   const shouldValidateEmail = submitted || emailTouched;
   const shouldValidatePassword = submitted || passwordTouched;
 
-  const emailError =
-    shouldValidateEmail && trimmedEmail.length === 0
-      ? 'Email is required.'
-      : shouldValidateEmail && !isValidEmail(trimmedEmail)
-        ? 'Please enter a valid email address.'
-        : '';
+  const emailError = shouldValidateEmail && trimmedEmail.length === 0 ? 'Email is required.' : '';
 
-  const passwordError =
-    shouldValidatePassword && password.length === 0
-      ? 'Password is required.'
-      : shouldValidatePassword && !isValidPassword(password)
-        ? 'Password must be at least 6 characters.'
-        : '';
+  const passwordError = shouldValidatePassword && password.length === 0 ? 'Password is required.' : '';
+
+  const canSubmit = trimmedEmail.length > 0 && password.length > 0;
 
   const handleLogin = async () => {
     if (isLoading) return;
@@ -77,15 +65,16 @@ export function LoginForm({
     setPasswordTouched(true);
     setLoginError('');
 
-    if (!isValidEmail(trimmedEmail)) return;
-    if (!isValidPassword(password)) return;
+    if (trimmedEmail.length === 0) return;
+    if (password.length === 0) return;
 
     try {
       setIsLoading(true);
 
-      const success = await onLogin(trimmedEmail, password);
+      const result = await onLogin(trimmedEmail, password);
 
-      if (!success) {
+      if (!result.success) {
+        // setLoginError(result.message || 'Invalid email or password.');
         setLoginError('Invalid email or password.');
       }
     } finally {
@@ -124,13 +113,13 @@ export function LoginForm({
   return (
     <AuthScreen heroTitle={`Welcome\nBack`}>
       <Text style={styles.title}>Sign In</Text>
-      <Text style={styles.subtitle}>
+      <Text style={styles.subtitleDefault}>
         Sign in to continue browsing verified listings, saved properties, and your latest activity.
       </Text>
 
       <AuthMessage type="error" message={loginError} />
 
-      <View style={styles.inputArea}>
+      <View style={styles.inputAreaDefault}>
         <AuthInput
           label="Email"
           icon={(color) => <MaterialCommunityIcons name="email-outline" size={20} color={color} />}
@@ -198,13 +187,13 @@ export function LoginForm({
         </Pressable>
       </View>
 
-      <View style={styles.buttonWrap}>
+      <View style={styles.buttonWrapTop4}>
         <AuthButton
           title="SIGN IN"
           loadingTitle="Signing in..."
           loading={isLoading}
           onPress={handleLogin}
-          disabled={isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
+          disabled={!canSubmit || isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
         />
       </View>
 
@@ -254,7 +243,7 @@ export function LoginForm({
         </Pressable>
       </View> */}
 
-      <View style={styles.accountFooterRow}>
+      <View style={styles.accountFooterRowSpacious}>
         <Text style={styles.accountText}>Don’t have an account?</Text>
 
         <Pressable onPress={handleCreateAccount} hitSlop={8}>
@@ -267,69 +256,13 @@ export function LoginForm({
 
 const createStyles = (Colors: AppColors) =>
   StyleSheet.create({
-    title: {
-      color: Colors.textPrimary,
-      fontSize: 30,
-      fontWeight: '900',
-      textAlign: 'center',
-      marginBottom: 8,
-    },
-
-    subtitle: {
-      color: Colors.textSecondary,
-      fontSize: 13,
-      lineHeight: 21,
-      textAlign: 'center',
-      fontWeight: '600',
-      marginBottom: 16,
-      minHeight: 42,
-    },
-
-    accountRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 22,
-    },
-
-    accountFooterRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 22,
-    },
-
-    accountText: {
-      color: Colors.textMuted,
-      fontSize: 13,
-      fontWeight: '600',
-    },
-
-    accountLink: {
-      color: Colors.accent,
-      fontSize: 13,
-      fontWeight: '900',
-    },
-
-    inputArea: {
-      gap: 12,
-    },
-
-    eyeButton: {
-      paddingLeft: 10,
-    },
-
+    ...createAuthFormStyles(Colors),
     optionsRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       marginTop: 6,
       marginBottom: 14,
-    },
-
-    buttonWrap: {
-      width: '100%',
-      marginTop: 4,
     },
 
     forgotLinkRow: {
@@ -360,22 +293,6 @@ const createStyles = (Colors: AppColors) =>
       color: Colors.textSecondary,
       fontSize: 12,
       fontWeight: '600',
-    },
-
-    checkbox: {
-      width: 16,
-      height: 16,
-      borderRadius: 4,
-      borderWidth: 1.4,
-      borderColor: Colors.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 2,
-    },
-
-    checkboxChecked: {
-      backgroundColor: Colors.accent,
-      borderColor: Colors.accent,
     },
 
     dividerRow: {
