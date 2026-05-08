@@ -111,14 +111,14 @@ export function SignUpForm({
         : '';
 
   const termsError = shouldValidateTerms && !acceptTerms ? 'Please accept the terms to continue.' : '';
-  const shouldEnableScroll =
-    Boolean(signUpSuccess) ||
-    Boolean(signUpError) ||
-    Boolean(nameError) ||
-    Boolean(emailError) ||
-    Boolean(passwordError) ||
-    Boolean(confirmPasswordError) ||
-    Boolean(termsError);
+  // const shouldEnableScroll =
+  //   Boolean(signUpSuccess) ||
+  //   Boolean(signUpError) ||
+  //   Boolean(nameError) ||
+  //   Boolean(emailError) ||
+  //   Boolean(passwordError) ||
+  //   Boolean(confirmPasswordError) ||
+  //   Boolean(termsError);
 
   const handleSignUp = async () => {
     if (isLoading) return;
@@ -203,7 +203,7 @@ export function SignUpForm({
   };
 
   return (
-    <AuthScreen heroTitle={`Create Your\nAccount`} scrollEnabled={shouldEnableScroll}>
+    <AuthScreen heroTitle={`Create Your\nAccount`}>
       <Text style={styles.title}>Create Account</Text>
       <Text style={styles.subtitle}>
         Create your profile to save listings, track favorites, and continue across devices.
@@ -373,6 +373,7 @@ export function SignUpForm({
   );
 }
 
+//par lipat mo to par sa iisang file, lahat ng css ng components
 const createStyles = (Colors: AppColors) =>
   StyleSheet.create({
     title: {
@@ -380,17 +381,17 @@ const createStyles = (Colors: AppColors) =>
       fontSize: 30,
       fontWeight: '900',
       textAlign: 'center',
-      marginBottom: 8,
+      marginBottom: 6,
     },
 
     subtitle: {
       color: Colors.textSecondary,
       fontSize: 13,
-      lineHeight: 21,
+      lineHeight: 18,
       textAlign: 'center',
       fontWeight: '600',
       marginBottom: 16,
-      minHeight: 42,
+      minHeight: 40,
     },
 
     accountRow: {

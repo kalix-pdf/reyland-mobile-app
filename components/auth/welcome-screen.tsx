@@ -29,7 +29,7 @@ export function WelcomeScreen({
   const styles = createStyles(colors);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
       <LinearGradient
         colors={[colors.accent, colors.accentDark, colors.primary]}
         start={{ x: 0, y: 0.5 }}
@@ -39,7 +39,7 @@ export function WelcomeScreen({
         <View style={styles.glowTopRight} />
         <View style={styles.glowBottomLeft} />
 
-        <View style={styles.content}>
+        <View style={[styles.content, { paddingBottom: 36 + insets.bottom }]}>
           <View style={styles.brandBlock}>
             <Image source={require('@/assets/images/logo_transparent.png')} style={styles.logo} contentFit="contain" />
             {/* <Text style={styles.title}>Welcome Back</Text> */}
@@ -103,9 +103,9 @@ const createStyles = (Colors: AppColors) =>
 
     screen: {
       flex: 1,
-      overflow: 'hidden',
+      // overflow: 'hidden',
       paddingHorizontal: 32,
-      paddingBottom: 18,
+      // paddingBottom: 18,
     },
 
     glowTopRight: {
@@ -133,7 +133,6 @@ const createStyles = (Colors: AppColors) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingTop: 96,
-      paddingBottom: 36,
     },
 
     brandBlock: {

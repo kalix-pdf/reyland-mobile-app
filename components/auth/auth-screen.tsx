@@ -18,7 +18,7 @@ export function AuthScreen({
   heroTitle,
   children,
   layoutDensity = 'default',
-  scrollEnabled = true,
+  scrollEnabled = false,
   heroContent,
   panelVariant = 'sheet',
 }: AuthScreenProps) {
@@ -40,7 +40,7 @@ export function AuthScreen({
         scrollEnabled={scrollEnabled}
       >
         <View style={styles.screen}>
-          <View style={[styles.hero, { paddingTop: insets.top + (useCompactSheetLayout ? 12 : 18) }]}>
+          <View style={[styles.hero, { paddingTop: insets.top + (useCompactSheetLayout ? 10 : 12) }]}>
             <LinearGradient
               colors={[colors.accent, colors.accentDark, colors.primary]}
               start={{ x: 0, y: 0.5 }}
@@ -75,10 +75,10 @@ export function AuthScreen({
                     <>
                       <View style={styles.heroRule} />
 
-                      <View style={styles.brandPill}>
+                      {/* <View style={styles.brandPill}>
                         <View style={styles.brandDot} />
                         <Text style={styles.brandPillText}>REYLAND</Text>
-                      </View>
+                      </View> */}
 
                       <Text style={styles.heroTitle}>{heroTitle}</Text>
                       <Text style={styles.heroSubtitle}>
@@ -111,11 +111,11 @@ const createStyles = (Colors: AppColors, isCompact: boolean, panelVariant: 'shee
 
     screen: {
       flex: 1,
-      backgroundColor: panelVariant === 'transparent' ? Colors.logoBackground : Colors.background,
+      // backgroundColor: panelVariant === 'transparent' ? Colors.logoBackground : Colors.background,
     },
 
     hero: {
-      minHeight: panelVariant === 'transparent' ? (isCompact ? 640 : 720) : isCompact ? 232 : 350,
+      // minHeight: panelVariant === 'transparent' ? (isCompact ? 640 : 720) : isCompact ? 232 : 350,
       backgroundColor: Colors.logoBackground,
       paddingHorizontal: 24,
       paddingBottom: panelVariant === 'transparent' ? (isCompact ? 26 : 34) : isCompact ? 22 : 28,
@@ -148,7 +148,7 @@ const createStyles = (Colors: AppColors, isCompact: boolean, panelVariant: 'shee
     heroBrandMarkSecondary: {
       position: 'absolute',
       width: 248,
-      height: 248,
+      // height: 248,
       bottom: -92,
       left: -108,
       opacity: 0.08,
@@ -226,6 +226,7 @@ const createStyles = (Colors: AppColors, isCompact: boolean, panelVariant: 'shee
       fontSize: isCompact ? 12 : 13,
       lineHeight: isCompact ? 18 : 20,
       fontWeight: '600',
+      minHeight: 100
     },
 
     heroDecorCircleOne: {

@@ -16,6 +16,7 @@ export async function signInWithGoogle(): Promise<AuthResult> {
   if (result.type !== 'success') {
     throw new AuthError('Unexpected auth session result', 'NETWORK')
   }
+  // console.log(result);
 
   let token: string | null = null
   try {

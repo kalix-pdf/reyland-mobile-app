@@ -69,7 +69,7 @@ export default function LoginScreen() {
       onFacebookLogin={handleFabookLogin}
       onLoadingFacebookOuth={isLoadingFacebookOuth}
       onLoadingGoogleOuth={isLoadingGoogleOuth}
-      onCreateAccount={() => router.push('/sign-up')}
+      onCreateAccount={() => router.replace('/sign-up')}
       onForgotPassword={() => router.push('/forgot-password')}
     />
   );
