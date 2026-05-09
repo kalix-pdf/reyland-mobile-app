@@ -1,9 +1,9 @@
-import { AuthProvider } from "@/context/auth-context";
-import { AppThemeProvider, useAppTheme } from "@/context/theme-context";
-import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { View } from "react-native";
+import { AuthProvider } from '@/context/auth-context';
+import { AppThemeProvider, useAppTheme } from '@/context/theme-context';
+import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { View } from 'react-native';
 
 function RootNavigator() {
   const { colors, isDarkMode } = useAppTheme();
@@ -40,7 +40,7 @@ function RootNavigator() {
           <Stack.Screen name="property/[id]" />
         </Stack>
 
-        <StatusBar style={isDarkMode ? "light" : "dark"} backgroundColor="transparent" translucent />
+        <StatusBar style={isDarkMode ? 'light' : 'dark'} backgroundColor="transparent" translucent />
       </ThemeProvider>
     </View>
   );

@@ -2,12 +2,11 @@ import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput } from '@/components/auth/auth-input';
 import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
-import { AppColors } from '@/constants/colors';
 import { useAppTheme } from '@/context/theme-context';
-import { createAuthFormStyles } from '@/styles/global.css';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import { createForgotPasswordFormStyles } from '../../styles/auth.styles';
 
 type ForgotPasswordFormProps = {
   onSubmit: (email: string) => boolean | Promise<boolean>;
@@ -20,7 +19,7 @@ const isValidEmail = (value: string) => {
 
 export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProps) {
   const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const styles = createForgotPasswordFormStyles(colors);
 
   const [email, setEmail] = useState('');
   const [emailTouched, setEmailTouched] = useState(false);
@@ -62,6 +61,8 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
       }
 
       setSuccessMessage('Password reset instructions have been sent to your email.');
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'We couldn’t send the reset link. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -153,85 +154,3 @@ export function ForgotPasswordForm({ onSubmit, onLogin }: ForgotPasswordFormProp
     </AuthScreen>
   );
 }
-
-const createStyles = (Colors: AppColors) =>
-  StyleSheet.create({
-    ...createAuthFormStyles(Colors),
-
-    buttonWrap: {
-      marginTop: 8,
-    },
-
-    supportCard: {
-      marginTop: 16,
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: 12,
-      backgroundColor: Colors.background,
-      borderRadius: 20,
-      borderWidth: 1,
-      borderColor: Colors.border,
-      paddingHorizontal: 14,
-      paddingVertical: 14,
-    },
-
-    supportIconWrap: {
-      width: 34,
-      height: 34,
-      borderRadius: 17,
-      backgroundColor: Colors.tag,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-
-    supportCopy: {
-      flex: 1,
-      gap: 3,
-    },
-
-    supportTitle: {
-      color: Colors.textPrimary,
-      fontSize: 13,
-      fontWeight: '800',
-    },
-
-    supportText: {
-      color: Colors.textSecondary,
-      fontSize: 12,
-      lineHeight: 18,
-      fontWeight: '600',
-    },
-
-    helpRow: {
-      marginTop: 16,
-      alignSelf: 'center',
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-
-    helpLabel: {
-      color: Colors.textMuted,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-
-    helpLink: {
-      color: Colors.accent,
-      fontSize: 12,
-      fontWeight: '900',
-    },
-
-    backButton: {
-      marginTop: 18,
-      alignSelf: 'center',
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-    },
-
-    backButtonText: {
-      color: Colors.accent,
-      fontSize: 13,
-      fontWeight: '900',
-    },
-  });

@@ -1,7 +1,7 @@
-import { useAppTheme } from "@/context/theme-context";
-import { createAuthComponentStyles } from "@/styles/global.css";
-import { ReactNode, useState } from "react";
-import { Text, TextInput, TextInputProps, View } from "react-native";
+import { useAppTheme } from '@/context/theme-context';
+import { ReactNode, useState } from 'react';
+import { Text, TextInput, TextInputProps, View } from 'react-native';
+import { createAuthComponentStyles } from '../../styles/auth.styles';
 
 type AuthInputProps = TextInputProps & {
   error?: string;

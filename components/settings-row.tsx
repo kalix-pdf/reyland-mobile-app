@@ -1,6 +1,6 @@
-import { Colors } from "@/constants/colors";
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Colors } from '@/constants/colors';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
   icon: string;
@@ -30,30 +30,30 @@ export default function SettingsRow({ icon, label, value, onPress, showArrow = t
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: 14,
     paddingHorizontal: 16,
     backgroundColor: Colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
-  left: { flexDirection: "row", alignItems: "center" },
+  left: { flexDirection: 'row', alignItems: 'center' },
   iconWrap: {
     width: 36,
     height: 36,
     borderRadius: 10,
     backgroundColor: Colors.tag,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
   },
-  dangerIconWrap: { backgroundColor: "#FEE2E2" },
+  dangerIconWrap: { backgroundColor: '#FEE2E2' },
   icon: { fontSize: 18 },
-  label: { fontSize: 15, color: Colors.textPrimary, fontWeight: "500" },
+  label: { fontSize: 15, color: Colors.textPrimary, fontWeight: '500' },
   dangerLabel: { color: Colors.accent },
-  right: { flexDirection: "row", alignItems: "center" },
+  right: { flexDirection: 'row', alignItems: 'center' },
   value: { fontSize: 14, color: Colors.textMuted, marginRight: 6 },
   arrow: { fontSize: 22, color: Colors.textMuted, lineHeight: 24 },
 });

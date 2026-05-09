@@ -2,12 +2,11 @@ import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput } from '@/components/auth/auth-input';
 import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
-import { AppColors } from '@/constants/colors';
 import { useAppTheme } from '@/context/theme-context';
-import { createAuthFormStyles } from '@/styles/global.css';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import { createLoginFormStyles } from '../../styles/auth.styles';
 
 type LoginFormProps = {
   onLogin: (
@@ -32,7 +31,7 @@ export function LoginForm({
   onCreateAccount,
 }: LoginFormProps) {
   const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const styles = createLoginFormStyles(colors);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -253,99 +252,3 @@ export function LoginForm({
     </AuthScreen>
   );
 }
-
-const createStyles = (Colors: AppColors) =>
-  StyleSheet.create({
-    ...createAuthFormStyles(Colors),
-    optionsRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginTop: 6,
-      marginBottom: 14,
-    },
-
-    forgotLinkRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginLeft: 12,
-    },
-
-    forgotLinkLabel: {
-      color: Colors.textMuted,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-
-    forgotLinkText: {
-      color: Colors.accent,
-      fontSize: 12,
-      fontWeight: '900',
-    },
-
-    rememberRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 7,
-    },
-
-    rememberText: {
-      color: Colors.textSecondary,
-      fontSize: 12,
-      fontWeight: '600',
-    },
-
-    dividerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      marginTop: 22,
-      marginBottom: 18,
-    },
-
-    divider: {
-      flex: 1,
-      height: 1,
-      backgroundColor: Colors.border,
-    },
-
-    dividerText: {
-      color: Colors.textMuted,
-      fontSize: 13,
-      fontWeight: '700',
-    },
-
-    socialButtons: {
-      flexDirection: 'row',
-      gap: 12,
-    },
-
-    socialButton: {
-      flex: 1,
-      minHeight: 52,
-      borderRadius: 26,
-      backgroundColor: Colors.surfaceMuted,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      borderWidth: 1,
-      borderColor: Colors.border,
-    },
-
-    socialButtonPressed: {
-      opacity: 0.82,
-      transform: [{ scale: 0.985 }],
-    },
-
-    googleIcon: {
-      width: 20,
-      height: 20,
-    },
-
-    socialButtonText: {
-      color: Colors.textPrimary,
-      fontSize: 14,
-      fontWeight: '800',
-    },
-  });

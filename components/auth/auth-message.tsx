@@ -1,10 +1,10 @@
-import { useAppTheme } from "@/context/theme-context";
-import { createAuthComponentStyles } from "@/styles/global.css";
-import { Ionicons } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { useAppTheme } from '@/context/theme-context';
+import { Ionicons } from '@expo/vector-icons';
+import { Text, View } from 'react-native';
+import { createAuthComponentStyles } from '../../styles/auth.styles';
 
 type AuthMessageProps = {
-  type: "error" | "success";
+  type: 'error' | 'success';
   message?: string;
 };
 
@@ -14,12 +14,12 @@ export function AuthMessage({ type, message }: AuthMessageProps) {
 
   if (!message) return null;
 
-  const isError = type === "error";
+  const isError = type === 'error';
 
   return (
     <View style={[styles.messageBox, isError ? styles.messageErrorBox : styles.messageSuccessBox]}>
       <Ionicons
-        name={isError ? "alert-circle-outline" : "checkmark-circle-outline"}
+        name={isError ? 'alert-circle-outline' : 'checkmark-circle-outline'}
         size={18}
         color={isError ? colors.error : colors.success}
       />

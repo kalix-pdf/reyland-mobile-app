@@ -1,11 +1,11 @@
-import { Href, useRouter } from "expo-router";
-import React from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../constants/colors";
-import { Property } from "../data/properties";
+import { Ionicons } from '@expo/vector-icons';
+import { Href, useRouter } from 'expo-router';
+import React from 'react';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Colors } from '../constants/colors';
+import { Property } from '../data/properties';
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 type Props = {
   property: Property;
@@ -18,19 +18,19 @@ function PropertyCard({ property }: Props) {
     if (price >= 1_000_000) {
       return `₱${(price / 1_000_000).toFixed(1)}M`;
     }
-    return `₱${price.toLocaleString()}${type === "For Rent" ? "/mo" : ""}`;
+    return `₱${price.toLocaleString()}${type === 'For Rent' ? '/mo' : ''}`;
   };
 
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => router.push({ pathname: "/property/[id]", params: { id: property.id } } as unknown as Href)}
+      onPress={() => router.push({ pathname: '/property/[id]', params: { id: property.id } } as unknown as Href)}
       activeOpacity={0.92}
     >
       <Image source={{ uri: property.image[0].image_url }} style={styles.image} />
 
-      <View style={[styles.badge, property.type === "For Rent" ? styles.rentBadge : styles.saleBadge]}>
-        <Text style={[styles.badgeText, property.type === "For Rent" ? styles.rentBadgeText : styles.saleBadgeText]}>
+      <View style={[styles.badge, property.type === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
+        <Text style={[styles.badgeText, property.type === 'For Rent' ? styles.rentBadgeText : styles.saleBadgeText]}>
           {property.type}
         </Text>
       </View>
@@ -83,15 +83,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 14,
     elevation: 4,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   image: {
-    width: "100%",
+    width: '100%',
     height: 200,
     backgroundColor: Colors.border,
   },
   badge: {
-    position: "absolute",
+    position: 'absolute',
     top: 14,
     left: 14,
     paddingHorizontal: 12,
@@ -100,25 +100,25 @@ const styles = StyleSheet.create({
   },
   rentBadge: { backgroundColor: Colors.rentBadge },
   saleBadge: { backgroundColor: Colors.saleBadge },
-  badgeText: { fontSize: 11, fontWeight: "900", letterSpacing: 0.3 },
+  badgeText: { fontSize: 11, fontWeight: '900', letterSpacing: 0.3 },
   rentBadgeText: { color: Colors.rentBadgeText },
   saleBadgeText: { color: Colors.saleBadgeText },
   content: { padding: 18 },
   price: {
     fontSize: 22,
-    fontWeight: "900",
+    fontWeight: '900',
     color: Colors.accent,
     marginBottom: 4,
   },
   title: {
     fontSize: 18,
-    fontWeight: "900",
+    fontWeight: '900',
     color: Colors.textPrimary,
     marginBottom: 8,
   },
   addressRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
     marginBottom: 14,
   },
@@ -126,18 +126,18 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     color: Colors.textSecondary,
-    fontWeight: "600",
+    fontWeight: '600',
   },
   specs: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
-  spec: { flexDirection: "row", alignItems: "center", flex: 1 },
+  spec: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   specIcon: { marginRight: 5 },
-  specText: { fontSize: 12, color: Colors.textSecondary, fontWeight: "600" },
+  specText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '600' },
   specDivider: {
     width: 1,
     height: 16,
