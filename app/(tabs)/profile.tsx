@@ -1,22 +1,24 @@
-import { ViewProfile } from "@/components/profile/profile-view";
-import { Colors } from "@/constants/colors";
-import { useAuth } from "@/context/auth-context";
-import { getUserInfo } from "@/services/fetchData/user.api";
-import { useRefreshControl } from "@/hooks/use-refresh-control";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import { useCallback, useEffect, useRef } from "react";
-import { ActivityIndicator, StyleSheet, Text } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { ViewProfile } from '@/components/profile/profile-view';
+import { Colors } from '@/constants/colors';
+import { useAuth } from '@/context/auth-context';
+import { useRefreshControl } from '@/hooks/use-refresh-control';
+import { getUserInfo } from '@/services/fetchData/user.api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
+import { useCallback, useEffect, useRef } from 'react';
+import { ActivityIndicator, Text } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { createProfileScreenStyles } from '../../styles/profile.styles';
 
 export default function ProfileScreen() {
+  const styles = createProfileScreenStyles(Colors);
   const { user, isLoading, logout, setUser } = useAuth();
   const isLoggingOut = useRef(false);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!isLoading && !user && !isLoggingOut.current) {
-      router.replace("/login");
+      router.replace('/login');
     }
   }, [user, isLoading]);
 
@@ -26,15 +28,15 @@ export default function ProfileScreen() {
 
     try {
       await logout();
-      router.replace("/login");
+      router.replace('/login');
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
       isLoggingOut.current = false;
     }
   }, [logout]);
 
   const handleRefresh = useCallback(async () => {
-    const token = await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem('token');
 
     if (!token) {
       return;
@@ -53,7 +55,7 @@ export default function ProfileScreen() {
     return (
       <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color={Colors.accent} />
-        <Text style={styles.loadingText}>{isLoggingOut.current ? "Signing out..." : "Loading profile..."}</Text>
+        <Text style={styles.loadingText}>{isLoggingOut.current ? 'Signing out...' : 'Loading profile...'}</Text>
       </SafeAreaView>
     );
   }
@@ -70,17 +72,3 @@ export default function ProfileScreen() {
     />
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 12,
-    backgroundColor: Colors.background,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: Colors.textSecondary,
-  },
-});

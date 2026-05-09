@@ -2,12 +2,11 @@ import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput } from '@/components/auth/auth-input';
 import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
-import { AppColors } from '@/constants/colors';
 import { useAppTheme } from '@/context/theme-context';
-import { createAuthFormStyles } from '@/styles/global.css';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import { createSignUpFormStyles } from '../../styles/auth.styles';
 
 type SignUpFormProps = {
   onSignUp: (
@@ -43,7 +42,7 @@ export function SignUpForm({
   isFacebookLoading,
 }: SignUpFormProps) {
   const { colors } = useAppTheme();
-  const styles = createStyles(colors);
+  const styles = createSignUpFormStyles(colors);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -387,24 +386,23 @@ export function SignUpForm({
         <View style={styles.successPanel}>
           <View style={styles.successKicker}>
             <View style={styles.successKickerBar} />
-            <Text style={styles.successKickerText}>Account Created</Text>
+            <Text style={styles.successKickerText}>Verify Your Email</Text>
           </View>
-          <Text style={styles.successTitle}>Account Ready</Text>
+          <Text style={styles.successTitle}>Check Your Inbox</Text>
           <Text style={styles.successSubtitle}>
-            Your account was created successfully. Continue to sign in and start exploring Reyland.
+            Your account has been created. Open the confirmation email we sent you to verify your address and finish
+            setting up access.
           </Text>
         </View>
       )}
 
       <View style={styles.buttonWrapTop6}>
         <AuthButton
-          title={hasCompletedSignUp ? 'CONTINUE TO SIGN IN' : 'SIGN UP'}
+          title={hasCompletedSignUp ? 'BACK TO SIGN IN' : 'SIGN UP'}
           loadingTitle={hasCompletedSignUp ? 'Opening sign in...' : 'Creating account...'}
           loading={isLoading}
           disabled={
-            hasCompletedSignUp
-              ? false
-              : Boolean(signUpSuccess) || !canSubmit || isGoogleLoading || isFacebookLoading
+            hasCompletedSignUp ? false : Boolean(signUpSuccess) || !canSubmit || isGoogleLoading || isFacebookLoading
           }
           onPress={hasCompletedSignUp ? handleLogin : handleSignUp}
         />
@@ -422,117 +420,3 @@ export function SignUpForm({
     </AuthScreen>
   );
 }
-
-//par lipat mo to par sa iisang file, lahat ng css ng components
-const createStyles = (Colors: AppColors) =>
-  StyleSheet.create({
-    ...createAuthFormStyles(Colors),
-
-    successPanel: {
-      marginTop: 8,
-      marginBottom: 4,
-      paddingHorizontal: 4,
-      paddingVertical: 8,
-      alignItems: 'flex-start',
-      borderRadius: 24,
-      borderWidth: 1,
-      borderColor: Colors.border,
-      backgroundColor: Colors.surface,
-    },
-
-    successKicker: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-      marginBottom: 14,
-      paddingHorizontal: 14,
-      paddingTop: 8,
-    },
-
-    successKickerBar: {
-      width: 28,
-      height: 3,
-      borderRadius: 999,
-      backgroundColor: Colors.success,
-    },
-
-    successKickerText: {
-      color: Colors.success,
-      fontSize: 11,
-      fontWeight: '900',
-      letterSpacing: 1.1,
-      textTransform: 'uppercase',
-    },
-
-    successTitle: {
-      color: Colors.textPrimary,
-      fontSize: 24,
-      fontWeight: '900',
-      marginBottom: 8,
-      paddingHorizontal: 14,
-    },
-
-    successSubtitle: {
-      color: Colors.textSecondary,
-      fontSize: 13,
-      lineHeight: 20,
-      fontWeight: '600',
-      textAlign: 'left',
-      paddingHorizontal: 14,
-      paddingBottom: 8,
-    },
-
-    dividerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-      marginTop: 22,
-      marginBottom: 14,
-    },
-
-    divider: {
-      flex: 1,
-      height: 1,
-      backgroundColor: Colors.border,
-    },
-
-    dividerText: {
-      color: Colors.textMuted,
-      fontSize: 13,
-      fontWeight: '700',
-    },
-
-    socialButtons: {
-      flexDirection: 'row',
-      gap: 12,
-    },
-
-    socialButton: {
-      flex: 1,
-      minHeight: 52,
-      borderRadius: 26,
-      backgroundColor: Colors.surfaceMuted,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      borderWidth: 1,
-      borderColor: Colors.border,
-    },
-
-    socialButtonPressed: {
-      opacity: 0.82,
-      transform: [{ scale: 0.985 }],
-    },
-
-    googleIcon: {
-      width: 20,
-      height: 20,
-    },
-
-    socialButtonText: {
-      color: Colors.textPrimary,
-      fontSize: 14,
-      fontWeight: '800',
-    },
-  });

@@ -1,12 +1,19 @@
-import { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
 
-import { useAuth } from "@/context/auth-context";
-import { completeOAuthSignIn } from "@/services/auth/complete-oauth-sign-in";
+import { Colors } from '@/constants/colors';
+import { useAuth } from '@/context/auth-context';
+import { completeOAuthSignIn } from '@/services/auth/complete-oauth-sign-in';
+import { createAuthCallbackStyles } from '../../styles/navigation.styles';
 
 export default function AuthCallbackScreen() {
-  const { access_token } = useLocalSearchParams<{ access_token?: string }>();
+  const styles = createAuthCallbackStyles(Colors);
+  const { access_token, refresh_token, flow } = useLocalSearchParams<{
+    access_token?: string;
+    refresh_token?: string;
+    flow?: string;
+  }>();
   const { setUser } = useAuth();
   const router = useRouter();
 
@@ -14,22 +21,35 @@ export default function AuthCallbackScreen() {
     let isActive = true;
 
     async function finishSignIn() {
-      const token = typeof access_token === "string" ? access_token : "";
+      const token = typeof access_token === 'string' ? access_token : '';
+      const refreshToken = typeof refresh_token === 'string' ? refresh_token : undefined;
+      const authFlow = typeof flow === 'string' ? flow : '';
 
       if (!token) {
-        router.replace("/login");
+        router.replace('/login');
+        return;
+      }
+
+      if (authFlow === 'password-reset') {
+        router.replace({
+          pathname: '/reset-password',
+          params: {
+            access_token: token,
+            ...(refreshToken ? { refresh_token: refreshToken } : {}),
+          },
+        });
         return;
       }
 
       try {
-        const completed = await completeOAuthSignIn(token, setUser);
+        const completed = await completeOAuthSignIn(token, setUser, refreshToken);
 
         if (!completed && isActive) {
-          router.replace("/login");
+          router.replace('/login');
         }
       } catch {
         if (isActive) {
-          router.replace("/login");
+          router.replace('/login');
         }
       }
     }
@@ -39,26 +59,12 @@ export default function AuthCallbackScreen() {
     return () => {
       isActive = false;
     };
-  }, [access_token, router, setUser]);
+  }, [access_token, flow, refresh_token, router, setUser]);
 
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" />
-      <Text style={styles.text}>Completing sign in...</Text>
+      <Text style={styles.text}>{flow === 'password-reset' ? 'Opening password reset...' : 'Completing sign in...'}</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    padding: 24,
-  },
-  text: {
-    fontSize: 16,
-    color: "#4B5563",
-  },
-});

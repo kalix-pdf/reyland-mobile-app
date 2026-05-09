@@ -1,5 +1,5 @@
 import { AppColors } from '@/constants/colors';
-import { createThemedStyles, fontSizes, lineHeights } from './global.css';
+import { createThemedStyles, fontSizes, lineHeights } from './foundations';
 
 export const createTypographyStyles = createThemedStyles((Colors: AppColors) => ({
   authTitle: {

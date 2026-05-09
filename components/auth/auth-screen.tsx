@@ -1,9 +1,9 @@
 import { useAppTheme } from '@/context/theme-context';
-import { createAuthScreenStyles } from '@/styles/global.css';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { ReactNode } from 'react';
-import { Image, KeyboardAvoidingView, Platform, Text, View, ScrollView } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { createAuthScreenStyles } from '../../styles/auth.styles';
 
 type AuthScreenProps = {
   heroTitle: string;

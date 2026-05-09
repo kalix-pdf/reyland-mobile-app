@@ -1,7 +1,7 @@
-import { useAppTheme } from "@/context/theme-context";
-import { createAuthComponentStyles } from "@/styles/global.css";
-import { LinearGradient } from "expo-linear-gradient";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useAppTheme } from '@/context/theme-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { createAuthComponentStyles } from '../../styles/auth.styles';
 
 type AuthButtonProps = {
   title: string;
@@ -13,7 +13,7 @@ type AuthButtonProps = {
 
 export function AuthButton({
   title,
-  loadingTitle = "Loading...",
+  loadingTitle = 'Loading...',
   loading = false,
   disabled = false,
   onPress,

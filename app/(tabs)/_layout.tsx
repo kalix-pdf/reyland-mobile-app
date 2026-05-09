@@ -1,37 +1,39 @@
-import { Colors } from "@/constants/colors";
-import { useAuth } from "@/context/auth-context";
-import { Ionicons } from "@expo/vector-icons";
-import { Redirect, Tabs } from "expo-router";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Colors } from '@/constants/colors';
+import { useAuth } from '@/context/auth-context';
+import { Ionicons } from '@expo/vector-icons';
+import { Redirect, Tabs } from 'expo-router';
+import { Text, View } from 'react-native';
+import { createTabLayoutStyles } from '../../styles/navigation.styles';
 
 const TAB_SCREENS = [
   {
-    name: "index",
-    title: "Home",
-    icon: "home-outline",
-    activeIcon: "home",
+    name: 'index',
+    title: 'Home',
+    icon: 'home-outline',
+    activeIcon: 'home',
   },
   {
-    name: "discover",
-    title: "Discover",
-    icon: "compass-outline",
-    activeIcon: "compass",
+    name: 'discover',
+    title: 'Discover',
+    icon: 'compass-outline',
+    activeIcon: 'compass',
   },
   {
-    name: "investor",
-    title: "Investor",
-    icon: "business-outline",
-    activeIcon: "business",
+    name: 'investor',
+    title: 'Investor',
+    icon: 'business-outline',
+    activeIcon: 'business',
   },
   {
-    name: "profile",
-    title: "Profile",
-    icon: "person-outline",
-    activeIcon: "person",
+    name: 'profile',
+    title: 'Profile',
+    icon: 'person-outline',
+    activeIcon: 'person',
   },
 ] as const;
 
 export default function TabLayout() {
+  const styles = createTabLayoutStyles(Colors);
   const { user } = useAuth();
 
   if (!user) {
@@ -79,43 +81,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  tabBar: {
-    height: Platform.OS === "ios" ? 92 : 78,
-    paddingTop: 10,
-    paddingBottom: Platform.OS === "ios" ? 24 : 12,
-    paddingHorizontal: 14,
-
-    backgroundColor: Colors.surface,
-    borderTopWidth: 0,
-
-    shadowColor: Colors.primary,
-    shadowOpacity: 0.12,
-    shadowRadius: 22,
-    shadowOffset: {
-      width: 0,
-      height: -8,
-    },
-    elevation: 10,
-  },
-
-  tabBarItem: {
-    borderRadius: 22,
-    paddingTop: 2,
-  },
-
-  tabBarLabel: {
-    marginTop: 4,
-  },
-
-  tabLabelText: {
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.1,
-  },
-
-  tabLabelTextActive: {
-    fontWeight: "900",
-  },
-});
