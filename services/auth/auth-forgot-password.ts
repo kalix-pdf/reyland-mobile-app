@@ -9,6 +9,7 @@ type ForgotPasswordPayload = {
 
 type UpdatePasswordPayload = {
   accessToken: string;
+  refreshToken: string;
   password: string;
 };
 
@@ -30,8 +31,12 @@ export async function requestPasswordReset(email: string) {
   return true;
 }
 
-export async function updatePassword(accessToken: string, password: string) {
-  const payload: UpdatePasswordPayload = { accessToken, password };
+export async function updatePassword(accessToken: string, refreshToken: string, password: string) {
+  const payload: UpdatePasswordPayload = {
+    accessToken,
+    refreshToken,
+    password,
+  };
 
   const response = await fetch(`${authApiBaseUrl}${UPDATE_PASSWORD_ENDPOINT}`, {
     method: 'POST',
