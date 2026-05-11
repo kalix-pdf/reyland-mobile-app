@@ -72,6 +72,9 @@ export function ResetPasswordForm({ onSubmit, onBackToLogin }: ResetPasswordForm
       }
 
       setSuccessMessage(result.message || 'Password updated. You can continue into your account.');
+      setTimeout(() => {
+        onBackToLogin();
+      }, 1500);
     } finally {
       setIsLoading(false);
     }
