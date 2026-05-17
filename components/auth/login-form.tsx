@@ -14,20 +14,20 @@ type LoginFormProps = {
     password: string,
   ) => { success: boolean; message?: string } | Promise<{ success: boolean; message?: string }>;
   onForgotPassword?: () => void;
-  onGoogleLogin: () => void;
-  onLoadingGoogleOuth: boolean;
-  onLoadingFacebookOuth: boolean;
-  onFacebookLogin?: () => void;
+  // onGoogleLogin: () => void;
+  // onLoadingGoogleOuth: boolean;
+  // onLoadingFacebookOuth: boolean;
+  // onFacebookLogin?: () => void;
   onCreateAccount?: () => void;
 };
 
 export function LoginForm({
   onLogin,
   onForgotPassword,
-  onGoogleLogin,
-  onLoadingGoogleOuth,
-  onLoadingFacebookOuth,
-  onFacebookLogin,
+  // onGoogleLogin,
+  // onLoadingGoogleOuth,
+  // onLoadingFacebookOuth,
+  // onFacebookLogin,
   onCreateAccount,
 }: LoginFormProps) {
   const { colors } = useAppTheme();
@@ -73,8 +73,7 @@ export function LoginForm({
       const result = await onLogin(trimmedEmail, password);
 
       if (!result.success) {
-        // setLoginError(result.message || 'Invalid email or password.');
-        setLoginError('Invalid email or password.');
+        setLoginError(result.message ?? 'Invalid Credentials');
       }
     } finally {
       setIsLoading(false);
@@ -192,7 +191,7 @@ export function LoginForm({
           loadingTitle="Signing in..."
           loading={isLoading}
           onPress={handleLogin}
-          disabled={!canSubmit || isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
+          disabled={!canSubmit || isLoading}
         />
       </View>
 

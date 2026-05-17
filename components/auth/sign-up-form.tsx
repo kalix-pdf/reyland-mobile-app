@@ -15,10 +15,10 @@ type SignUpFormProps = {
     password: string,
   ) => { success: boolean; message?: string } | Promise<{ success: boolean; message?: string }>;
   onLogin?: () => void;
-  onGoogleSignUp?: () => void;
-  onFacebookSignUp?: () => void;
-  isGoogleLoading?: boolean;
-  isFacebookLoading?: boolean;
+  // onGoogleSignUp?: () => void;
+  // onFacebookSignUp?: () => void;
+  // isGoogleLoading?: boolean;
+  // isFacebookLoading?: boolean;
 };
 
 const isValidName = (value: string) => {
@@ -36,10 +36,7 @@ const isValidPassword = (value: string) => {
 export function SignUpForm({
   onSignUp,
   onLogin,
-  onGoogleSignUp,
-  onFacebookSignUp,
-  isGoogleLoading,
-  isFacebookLoading,
+ 
 }: SignUpFormProps) {
   const { colors } = useAppTheme();
   const styles = createSignUpFormStyles(colors);
@@ -384,10 +381,6 @@ export function SignUpForm({
         </>
       ) : (
         <View style={styles.successPanel}>
-          <View style={styles.successKicker}>
-            <View style={styles.successKickerBar} />
-            <Text style={styles.successKickerText}>Verify Your Email</Text>
-          </View>
           <Text style={styles.successTitle}>Check Your Inbox</Text>
           <Text style={styles.successSubtitle}>
             Your account has been created. Open the confirmation email we sent you to verify your address and finish
@@ -402,7 +395,7 @@ export function SignUpForm({
           loadingTitle={hasCompletedSignUp ? 'Opening sign in...' : 'Creating account...'}
           loading={isLoading}
           disabled={
-            hasCompletedSignUp ? false : Boolean(signUpSuccess) || !canSubmit || isGoogleLoading || isFacebookLoading
+            hasCompletedSignUp ? false : Boolean(signUpSuccess) || !canSubmit
           }
           onPress={hasCompletedSignUp ? handleLogin : handleSignUp}
         />

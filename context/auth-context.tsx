@@ -57,7 +57,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (token) {
         await logoutUser(token);
       }
-    } finally {
+    } catch (error) {
+      alert('Something Went Wrong During Logout. Please try again.');
+    } 
+    finally {
       await AsyncStorage.multiRemove(['token', 'refreshToken']);
       setUser(null);
       setIsLoading(false);
