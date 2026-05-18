@@ -45,5 +45,6 @@ export type User = {
   phone: string;
   memberSince: string;
   role: number;
+  status: number;
 };
 

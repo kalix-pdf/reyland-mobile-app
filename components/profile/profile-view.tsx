@@ -197,7 +197,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             </View>
           </View>
 
-          {user.role !== 0 && (
+          {user.status !== 0 && (
             <>
               <View style={styles.statsCard}>
                 <StatItem styles={styles} value="12" label="Saved" />
