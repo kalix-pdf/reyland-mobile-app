@@ -2,7 +2,7 @@ import { ViewProfile } from '@/components/profile/profile-view';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
-import { getUserInfo } from '@/services/fetchData/user.api';
+import { getUserInfo } from '@/services/fetchData/user-info.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef } from 'react';

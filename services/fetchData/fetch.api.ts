@@ -1,11 +1,9 @@
 
 //generic reusable function for all fetching API Data
-export const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+import { apiClient } from '@/lib/axios';
+import { AxiosRequestConfig } from 'axios';
 
-export const fetchData = async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
-    const response = await fetch(endpoint, options);
-
-    if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
-
-    return response.json() as Promise<T>;
-}
+export const fetchData = async <T>(endpoint: string, options?: AxiosRequestConfig): Promise<T> => {
+  const response = await apiClient.get<T>(endpoint, options);
+  return response.data;
+};

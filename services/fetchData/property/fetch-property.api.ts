@@ -1,4 +1,4 @@
-import { fetchData, API_URL } from "../fetch.api";
+import { apiClient } from "@/lib/axios";
 import { Property } from "@/types/property.types";
 
 interface FetchPropertiesResponse {
@@ -11,11 +11,11 @@ interface FetchPropertiesResponse {
 // fetch all function should be limit to 4-5 API fetch calls to avoid overloading 
 
 export async function fetchPropertyInfo(): Promise<Property[]> {
-    const response = await fetchData<FetchPropertiesResponse>(`${API_URL}/admin/fetch/properties`);
-    
-    if (!response.success) {
-        throw new Error('Failed to fetch properties');
-    }
-    
-    return response.data;
+  const response = await apiClient.get<FetchPropertiesResponse>('/admin/properties/fetch/properties');
+
+  if (!response.data.success) {
+    throw new Error('Failed to fetch properties');
+  }
+
+  return response.data.data;
 }

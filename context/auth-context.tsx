@@ -3,7 +3,8 @@ import { loginUser } from "@/services/auth/auth-login";
 import { logoutUser } from "@/services/auth/auth-logout";
 import { establishAuthenticatedSession } from "@/services/auth/auth-session";
 import { User } from "@/types/user.types";
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { authEvents } from "@/lib/auth-events";
 
 type LoginResult = {
   success: boolean;
@@ -28,7 +29,37 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  //persistent login session restoration
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        if (token && refreshToken) {
+          await establishAuthenticatedSession(token, setUser, refreshToken);
+        }
+      } catch (err) {
+        await AsyncStorage.multiRemove(['token', 'refreshToken']);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    restoreSession();
+  }, []);
+
+  //Listen for forced logout from axios interceptor
+  useEffect(() => {
+    const handleExpired = async () => {
+      await AsyncStorage.multiRemove(['token', 'refreshToken']);
+      setUser(null);
+    };
+
+    authEvents.on('SESSION_EXPIRED', handleExpired);
+    return () => { authEvents.off('SESSION_EXPIRED', handleExpired); };
+  }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     setIsLoading(true);
