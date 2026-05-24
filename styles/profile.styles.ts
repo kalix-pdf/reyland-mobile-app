@@ -1,16 +1,6 @@
 import { AppColors } from '@/constants/colors';
 import { StyleSheet } from 'react-native';
-
 import { createThemedStyles } from './foundations';
-import {
-  sharedAvatarImageFill,
-  sharedBrandDotBase,
-  sharedBrandPillBase,
-  sharedBrandPillTextBase,
-  sharedHeaderActionPressed,
-  sharedHeroDecorCircleOne,
-  sharedHeroDecorCircleTwo,
-} from './shared-primitives';
 
 export const createProfileScreenStyles = createThemedStyles((Colors: AppColors) =>
   StyleSheet.create({
@@ -30,292 +20,156 @@ export const createProfileScreenStyles = createThemedStyles((Colors: AppColors) 
 
 export const createProfileViewStyles = createThemedStyles((Colors: AppColors) =>
   StyleSheet.create({
+    // Root
     safe: {
       flex: 1,
       backgroundColor: Colors.background,
     },
-    scrollContent: {
-      paddingBottom: 28,
-    },
-    hero: {
-      minHeight: 231,
-      backgroundColor: Colors.primary,
-      paddingHorizontal: 24,
-      paddingTop: 24,
-      overflow: 'hidden',
-    },
-    heroDecorCircleOne: {
-      ...sharedHeroDecorCircleOne,
-      borderColor: 'rgba(255,255,255,0.18)',
-    },
-    heroDecorCircleTwo: {
-      ...sharedHeroDecorCircleTwo,
-      borderColor: 'rgba(255,255,255,0.12)',
-      bottom: -92,
-    },
-    heroHeader: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      justifyContent: 'space-between',
-    },
-    brandPill: {
-      ...sharedBrandPillBase,
-      borderColor: 'rgba(255,255,255,0.14)',
-      backgroundColor: 'rgba(255,255,255,0.06)',
-      marginBottom: 12,
-    },
-    brandDot: {
-      ...sharedBrandDotBase,
-      backgroundColor: Colors.logoGreenLight,
-    },
-    brandPillText: {
-      ...sharedBrandPillTextBase,
-      color: Colors.white,
-    },
-    heroKicker: {
-      color: 'rgba(255,255,255,0.82)',
-      fontSize: 13,
-      fontWeight: '800',
-      marginBottom: 8,
-      textTransform: 'uppercase',
-      letterSpacing: 0.8,
-    },
-    heroTitle: {
-      color: '#FFFFFF',
-      fontSize: 32,
-      fontWeight: '900',
-      letterSpacing: -0.8,
-    },
-    heroSubtitle: {
-      marginTop: 10,
-      maxWidth: 290,
-      color: 'rgba(255,255,255,0.72)',
-      fontSize: 13,
-      lineHeight: 20,
-      fontWeight: '600',
-    },
-    headerIconButton: {
-      width: 44,
-      height: 44,
-      borderRadius: 22,
-      backgroundColor: Colors.primaryLight,
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderWidth: 1.5,
-      borderColor: 'rgba(255,255,255,0.2)',
-    },
-    headerIconButtonPressed: sharedHeaderActionPressed,
-    contentPanel: {
-      backgroundColor: Colors.background,
-      borderTopLeftRadius: 34,
-      borderTopRightRadius: 34,
-      paddingTop: 18,
-      marginTop: -30,
-    },
-    profileCard: {
-      backgroundColor: Colors.surface,
-      marginHorizontal: 20,
-      borderRadius: 28,
+
+    // Fixed header
+    header: {
       paddingHorizontal: 20,
-      paddingTop: 24,
-      paddingBottom: 18,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: Colors.border,
-      shadowColor: Colors.primary,
-      shadowOpacity: 0.08,
-      shadowRadius: 18,
-      shadowOffset: {
-        width: 0,
-        height: 10,
-      },
-      elevation: 4,
+      paddingVertical: 16,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: Colors.border,
+      backgroundColor: Colors.background,
+      marginBottom: 6
     },
-    avatarWrap: {
-      position: 'relative',
-      marginBottom: 12,
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: Colors.textPrimary,
+      letterSpacing: -0.5,
+      textAlign: 'center',
+    },
+
+    // Scroll
+    scrollContent: {
+      paddingBottom: 40,
+    },
+
+    heroBrandMarkPrimary: {
+        position: 'absolute' as const,
+        width: 440,
+        height: 440,
+        top: -30,
+        right: -128,
+        opacity: 0.12,
+        transform: [{ rotate: '1deg' }],
+      },
+
+    // Profile card (top strip)
+    profileCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 14,
+      paddingHorizontal: 20,
+      paddingVertical: 20,
+      marginTop: 10
     },
     avatar: {
-      width: 82,
-      height: 82,
-      borderRadius: 41,
+      width: 75,
+      height: 75,
+      borderRadius: 35,
       backgroundColor: Colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 3,
-      borderColor: Colors.surface,
       overflow: 'hidden',
     },
     avatarImage: {
-      ...sharedAvatarImageFill,
-      borderRadius: 41,
+      width: '100%',
+      height: '100%',
     },
     avatarText: {
       color: '#FFFFFF',
-      fontWeight: '900',
-      fontSize: 25,
-      letterSpacing: -0.4,
+      fontWeight: '600',
+      fontSize: 20,
     },
-    onlineDot: {
-      width: 17,
-      height: 17,
-      borderRadius: 8.5,
-      backgroundColor: Colors.success,
-      position: 'absolute',
-      right: 4,
-      bottom: 5,
-      borderWidth: 3,
-      borderColor: Colors.surface,
+    profileInfo: {
+      flex: 1,
+      gap: 2,
     },
-    name: {
-      fontSize: 22,
-      fontWeight: '900',
-      color: Colors.textPrimary,
-      letterSpacing: -0.4,
-    },
-    type: {
-      fontSize: 15,
-      color: Colors.textMuted,
-    },
-    memberSince: {
-      fontSize: 12,
-      color: Colors.textSecondary,
+    profileName: {
+      fontSize: 20,
       fontWeight: '700',
-      marginTop: 4,
+      color: Colors.textPrimary,
+      letterSpacing: -0.2,
     },
+    profileEmail: {
+      fontSize: 14,
+      color: Colors.textSecondary,
+    },
+    profilePhone: {
+      fontSize: 14,
+      color: Colors.textSecondary,
+    },
+    profileChevron: {
+      paddingLeft: 4,
+    },
+
+    // Badge
     badge: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 5,
-      backgroundColor: Colors.tag,
-      paddingHorizontal: 12,
-      paddingVertical: 7,
-      borderRadius: 999,
-      marginTop: 12,
+      gap: 4,
+      marginTop: 4,
     },
     badgeText: {
-      color: Colors.tagText,
-      fontSize: 12,
-      fontWeight: '900',
-    },
-    statsCard: {
-      width: '100%',
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: Colors.background,
-      borderRadius: 22,
-      borderWidth: 1,
-      borderColor: Colors.border,
-      paddingVertical: 16,
-      marginTop: 18,
-    },
-    statItem: {
-      flex: 1,
-      alignItems: 'center',
-    },
-    statValue: {
-      color: Colors.accent,
-      fontSize: 21,
-      fontWeight: '900',
-    },
-    statLabel: {
-      color: Colors.textMuted,
-      fontSize: 12,
+      fontSize: 16,
       fontWeight: '700',
-      marginTop: 2,
     },
-    statDivider: {
-      width: 1,
-      height: 32,
-      backgroundColor: Colors.border,
+    pendingText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: Colors.error,
     },
-    sectionBlock: {
-      marginTop: 24,
-    },
-    sectionTitle: {
-      color: Colors.textPrimary,
-      fontSize: 20,
-      fontWeight: '900',
-      letterSpacing: -0.4,
-      paddingHorizontal: 22,
-      marginBottom: 10,
-    },
-    sectionCard: {
-      backgroundColor: Colors.surface,
-      marginHorizontal: 20,
-      borderRadius: 24,
-      overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: Colors.border,
-      shadowColor: Colors.primary,
-      shadowOpacity: 0.04,
-      shadowRadius: 12,
-      shadowOffset: {
-        width: 0,
-        height: 6,
-      },
-      elevation: 2,
-    },
-    settingRow: {
-      minHeight: 62,
-      paddingHorizontal: 16,
-      paddingVertical: 12,
+
+    // Row
+    row: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      borderBottomWidth: 1,
-      borderBottomColor: Colors.border,
+      paddingHorizontal: 20,
+      paddingVertical: 15,
+      gap: 14,
     },
-    settingRowLast: {
+    rowLast: {
       borderBottomWidth: 0,
     },
-    settingRowPressed: {
-      backgroundColor: Colors.background,
+    rowPressed: {
+      opacity: 0.5,
     },
-    settingLeft: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingRight: 12,
-    },
-    settingIconWrap: {
-      width: 38,
-      height: 38,
-      borderRadius: 14,
-      backgroundColor: Colors.tag,
+    rowIconWrap: {
+      width: 34,
+      height: 34,
+      borderRadius: 10,
+      // backgroundColor: Colors.tag,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: 12,
     },
-    settingIconWrapDanger: {
+    rowIconWrapDanger: {
       backgroundColor: Colors.errorBackground,
     },
-    settingLabel: {
-      color: Colors.textPrimary,
+    rowLabel: {
+      flex: 1,
       fontSize: 15,
-      fontWeight: '700',
+      fontWeight: '500',
+      color: Colors.textPrimary,
     },
-    settingRight: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-    },
-    settingValue: {
-      color: Colors.textMuted,
-      fontSize: 13,
-      fontWeight: '700',
-    },
-    dangerText: {
+    rowLabelDanger: {
       color: Colors.error,
-      fontWeight: '800',
     },
+    rowValue: {
+      fontSize: 13,
+      color: Colors.textMuted,
+    },
+
+    // Version
     version: {
       textAlign: 'center',
       color: Colors.textMuted,
       fontSize: 12,
-      fontWeight: '700',
-      marginTop: 24,
-      marginBottom: 8,
+      fontWeight: '600',
+      marginTop: 32,
     },
   }),
 );

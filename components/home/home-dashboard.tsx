@@ -148,7 +148,7 @@ export function HomeDashboard() {
       const data = await fetchPropertyInfo();
       setProperties(Array.isArray(data) ? data : []);
     } catch {
-      setError('Failed to load properties. Pull down to retry.');
+      setError('Failed to load properties. Server failed to load, pull down to retry.');
     } finally {
       setLoading(false);
     }
