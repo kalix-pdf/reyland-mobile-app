@@ -11,6 +11,10 @@ export const createProfileScreenStyles = createThemedStyles((Colors: AppColors) 
       gap: 12,
       backgroundColor: Colors.background,
     },
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.background,
+    },
     loadingText: {
       fontSize: 14,
       color: Colors.textSecondary,

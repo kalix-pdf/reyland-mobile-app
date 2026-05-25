@@ -236,9 +236,9 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       flex: 1,
       lineHeight: 20,
     },
-    content: {
-      paddingBottom: 32,
-    },
+    // content: {
+      // paddingBottom: 32,
+    // },
     hero: {
       minHeight: 300,
       marginHorizontal: 18,
@@ -594,226 +594,149 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
   }),
 );
 
-export const createPropertiesScreenStyles = createThemedStyles((Colors: AppColors) =>
+export const createPropertiesScreenStyles = (Colors: AppColors) =>
   StyleSheet.create({
-    safe: {
+    // Root
+    root: {
       flex: 1,
       backgroundColor: Colors.background,
     },
-    list: {
-      paddingBottom: 28,
-    },
-    hero: {
-      minHeight: 228,
-      backgroundColor: Colors.primary,
-      paddingHorizontal: 22,
-      paddingTop: 22,
-      paddingBottom: 42,
-      overflow: 'hidden',
-    },
-    heroDecorCircleOne: {
-      ...sharedHeroDecorCircleOne,
-      borderColor: 'rgba(255,255,255,0.18)',
-    },
-    heroDecorCircleTwo: {
-      ...sharedHeroDecorCircleTwo,
-      borderColor: 'rgba(255,255,255,0.12)',
-      bottom: -80,
-    },
+ 
+    // ── Fixed Header ────────────────────────────────────────────────────────
     header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
+      backgroundColor: Colors.surface,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: Colors.border,
+      paddingHorizontal: 16,
+      paddingBottom: 12,
     },
-    headerTextGroup: {
-      flex: 1,
-      paddingRight: 18,
-    },
-    brandPill: {
-      ...sharedBrandPillBase,
-      borderColor: 'rgba(255,255,255,0.14)',
-      backgroundColor: 'rgba(255,255,255,0.06)',
+    headerTitle: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+      letterSpacing: -0.3,
       marginBottom: 12,
     },
-    brandDot: {
-      ...sharedBrandDotBase,
-      backgroundColor: Colors.logoGreenLight,
-    },
-    brandPillText: {
-      ...sharedBrandPillTextBase,
-      color: Colors.white,
-    },
-    greeting: {
-      fontSize: 13,
-      color: 'rgba(255,255,255,0.82)',
-      fontWeight: '800',
-      textTransform: 'uppercase',
-      letterSpacing: 0.8,
-      marginBottom: 8,
-    },
-    headline: {
-      fontSize: 31,
-      lineHeight: 38,
-      fontWeight: '900',
-      color: '#FFFFFF',
-      letterSpacing: -0.9,
-      maxWidth: 300,
-    },
-    subtitle: {
-      marginTop: 10,
-      fontSize: 14,
-      lineHeight: 21,
-      color: 'rgba(255,255,255,0.82)',
-      maxWidth: 320,
-    },
-    avatar: {
-      ...sharedSmallAvatarBase,
-      backgroundColor: Colors.primaryLight,
-      borderColor: 'rgba(255,255,255,0.24)',
-    },
-    avatarText: {
-      color: '#FFFFFF',
-      fontWeight: '900',
-      fontSize: 15,
-    },
-    loginPill: {
-      ...sharedLoginPillBase,
-      backgroundColor: Colors.primary,
-      borderColor: 'rgba(255,255,255,0.35)',
-    },
-    loginPillText: sharedLoginPillText,
-    headerActionPressed: sharedHeaderActionPressed,
-    contentPanel: {
-      marginTop: -33,
-      backgroundColor: Colors.surface,
-      borderTopLeftRadius: 34,
-      borderTopRightRadius: 34,
-      paddingTop: 22,
-      paddingHorizontal: 20,
-      paddingBottom: 16,
-      shadowColor: Colors.primary,
-      shadowOpacity: 0.08,
-      shadowRadius: 18,
-      shadowOffset: {
-        width: 0,
-        height: -8,
-      },
-      elevation: 6,
-    },
-    searchWrap: {
-      minHeight: 56,
+ 
+    // Search bar
+    searchRow: {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: Colors.background,
-      borderRadius: 28,
-      borderWidth: 1.4,
+      borderRadius: 10,
+      borderWidth: 1,
       borderColor: Colors.border,
-      paddingHorizontal: 16,
+      paddingHorizontal: 12,
+      height: 44,
     },
-    searchWrapFocused: {
-      backgroundColor: Colors.surface,
+    searchRowFocused: {
       borderColor: Colors.accent,
-    },
-    searchIcon: {
-      marginRight: 10,
     },
     searchInput: {
       flex: 1,
       fontSize: 14,
       color: Colors.textPrimary,
-      paddingVertical: 14,
+      marginLeft: 8,
     },
+ 
+    // Filter chips
     filters: {
       flexDirection: 'row',
-      gap: 10,
-      marginTop: 16,
+      gap: 8,
+      marginTop: 10,
     },
-    filterBtn: {
-      paddingHorizontal: 18,
-      paddingVertical: 10,
-      borderRadius: 999,
-      backgroundColor: Colors.background,
-      borderWidth: 1.3,
+    chip: {
+      paddingHorizontal: 14,
+      paddingVertical: 6,
+      borderRadius: 6,
+      borderWidth: 1,
       borderColor: Colors.border,
+      backgroundColor: Colors.background,
     },
-    filterBtnActive: {
+    chipActive: {
       backgroundColor: Colors.accent,
       borderColor: Colors.accent,
     },
-    filterBtnPressed: sharedPressedScale,
-    filterText: {
+    chipText: {
       fontSize: 13,
+      fontWeight: '600',
       color: Colors.textSecondary,
-      fontWeight: '800',
     },
-    filterTextActive: {
-      color: '#FFFFFF',
+    chipTextActive: {
+      color: '#fff',
     },
-    sectionHeader: {
-      marginTop: 24,
+ 
+    // ── List ────────────────────────────────────────────────────────────────
+    list: {
+      paddingBottom: 24,
+    },
+ 
+    // Sub-header row (count + sort)
+    subHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-    },
-    sectionTitle: {
-      fontSize: 20,
-      fontWeight: '900',
-      color: Colors.textPrimary,
-      letterSpacing: -0.4,
+      paddingHorizontal: 16,
+      paddingTop: 16,
+      paddingBottom: 8,
     },
     resultCount: {
       fontSize: 13,
       color: Colors.textMuted,
-      fontWeight: '600',
-      marginTop: 3,
+      fontWeight: '500',
     },
-    sortPill: {
+    sortBtn: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 5,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 999,
-      backgroundColor: Colors.tag,
+      gap: 4,
     },
-    sortPillPressed: sharedPressedScale,
     sortText: {
+      fontSize: 13,
+      fontWeight: '600',
       color: Colors.accent,
-      fontSize: 12,
-      fontWeight: '900',
     },
+ 
+    // Error banner
+    errorBanner: {
+      marginHorizontal: 16,
+      marginBottom: 8,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      backgroundColor: '#FEF2F2',
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: '#FECACA',
+    },
+    errorText: {
+      fontSize: 13,
+      color: '#DC2626',
+    },
+
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.background,
+    },
+ 
+    // Empty state
     empty: {
       alignItems: 'center',
-      paddingTop: 70,
+      paddingTop: 64,
       paddingHorizontal: 32,
     },
-    emptyIconWrap: {
-      width: 78,
-      height: 78,
-      borderRadius: 39,
-      backgroundColor: Colors.tag,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 16,
-    },
     emptyTitle: {
-      fontSize: 18,
-      fontWeight: '900',
+      fontSize: 16,
+      fontWeight: '700',
       color: Colors.textPrimary,
-      marginBottom: 6,
+      marginTop: 12,
+      marginBottom: 4,
     },
     emptyText: {
       fontSize: 14,
-      lineHeight: 21,
+      lineHeight: 20,
       color: Colors.textMuted,
       textAlign: 'center',
     },
-    avatarImage: {
-      ...sharedAvatarImageFill,
-      borderRadius: 41,
-    },
-  }),
-);
+  });
 
 export const createInvestorDashboardStyles = createThemedStyles((Colors: AppColors) =>
   StyleSheet.create({

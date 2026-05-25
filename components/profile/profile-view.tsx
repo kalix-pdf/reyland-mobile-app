@@ -141,7 +141,7 @@ export function ViewProfile({
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
 
       {/* Fixed header */}
       <View style={styles.header}>
