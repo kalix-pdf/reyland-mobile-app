@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
-import { fetchPropertyInfo } from '@/services/fetchData/property/fetch-property.api';
+import { fetchFeaturedProperties } from '@/services/fetchData/property/fetch-property.api';
 import { Property } from '@/types/property.types';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -69,7 +69,7 @@ export function HomeDashboard() {
           setRefreshing(false);
         }, 5000);
   
-        const data = await fetchPropertyInfo();
+        const data = await fetchFeaturedProperties();
         setProperties(Array.isArray(data) ? data : []);
       } catch {
         setError('Failed to load properties. Pull down to retry.');

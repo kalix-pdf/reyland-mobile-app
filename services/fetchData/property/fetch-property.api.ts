@@ -19,3 +19,13 @@ export async function fetchPropertyInfo(): Promise<Property[]> {
 
   return response.data.data;
 }
+
+export async function fetchFeaturedProperties(): Promise<Property[]> {
+  const response = await apiClient.get<FetchPropertiesResponse>('/admin/properties/fetch/featured-properties');
+
+  if (!response.data.success) {
+    throw new Error('Failed to fetch featured properties');
+  }
+
+  return response.data.data;
+}
