@@ -173,3 +173,122 @@ export const createProfileViewStyles = createThemedStyles((Colors: AppColors) =>
     },
   }),
 );
+
+export const createPersonalInformationStyles = createThemedStyles((Colors: AppColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.background,
+    },
+    header: {
+      minHeight: 58,
+      paddingHorizontal: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: Colors.border,
+      backgroundColor: Colors.background,
+    },
+    headerButton: {
+      width: 42,
+      height: 42,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.5,
+    },
+    headerTitle: {
+      flex: 1,
+      textAlign: 'center',
+      fontSize: 16,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+    },
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingTop: 18,
+      paddingBottom: 40,
+    },
+    profileSummary: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    avatar: {
+      width: 104,
+      height: 104,
+      borderRadius: 52,
+      backgroundColor: Colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: Colors.surface,
+    },
+    avatarImage: {
+      width: '100%',
+      height: '100%',
+    },
+    avatarText: {
+      color: Colors.white,
+      fontSize: 28,
+      fontWeight: '700',
+    },
+    changePhotoButton: {
+      minHeight: 28,
+      paddingHorizontal: 10,
+      borderRadius: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 5,
+      backgroundColor: Colors.tag,
+      marginBottom: 18,
+    },
+    changePhotoText: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: Colors.accent,
+    },
+    displayName: {
+      fontSize: 20,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      marginBottom: 8,
+    },
+    displayEmail: {
+      fontSize: 14,
+      color: Colors.textSecondary,
+      textAlign: 'center',
+    },
+    infoPanel: {
+      width: '100%',
+    },
+    fieldRow: {
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: Colors.border,
+    },
+    fieldRowLast: {
+      borderBottomWidth: 0,
+    },
+    fieldContent: {
+      gap: 5,
+    },
+    fieldLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: Colors.textMuted,
+    },
+    fieldValue: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+      lineHeight: 20,
+    },
+  }),
+);
