@@ -3,9 +3,9 @@ import { Href, useRouter } from 'expo-router';
 import React from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors } from '../constants/colors';
-import { Property } from '../data/properties';
+import { Property } from '../types/property.types';
 
-const { width } = Dimensions.get('window');
+// const { width } = Dimensions.get('window');
 
 type Props = {
   property: Property;
@@ -27,40 +27,40 @@ function PropertyCard({ property }: Props) {
       onPress={() => router.push({ pathname: '/property/[id]', params: { id: property.id } } as unknown as Href)}
       activeOpacity={0.92}
     >
-      <Image source={{ uri: property.image[0].image_url }} style={styles.image} />
+      <Image source={{ uri: property.image_url }} style={styles.image} />
 
-      <View style={[styles.badge, property.type === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
-        <Text style={[styles.badgeText, property.type === 'For Rent' ? styles.rentBadgeText : styles.saleBadgeText]}>
-          {property.type}
+      <View style={[styles.badge, property.category === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
+        <Text style={[styles.badgeText, property.category === 'For Rent' ? styles.rentBadgeText : styles.saleBadgeText]}>
+          {property.category}
         </Text>
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.price}>{formatPrice(property.price, property.type)}</Text>
+        <Text style={styles.price}>{formatPrice(property.price, property.category)}</Text>
         <Text style={styles.title} numberOfLines={1}>
           {property.title}
         </Text>
         <View style={styles.addressRow}>
           <Ionicons name="location-outline" size={14} color={Colors.accent} />
           <Text style={styles.address} numberOfLines={1}>
-            {property.address}
+            {property.location}
           </Text>
         </View>
 
         <View style={styles.specs}>
           <View style={styles.spec}>
             <Ionicons name="bed-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{property.bedrooms} Beds</Text>
+            <Text style={styles.specText}>{property.units} Units</Text>
           </View>
           <View style={styles.specDivider} />
-          <View style={styles.spec}>
+          {/* <View style={styles.spec}>
             <Ionicons name="water-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{property.bathrooms} Baths</Text>
-          </View>
+            <Text style={styles.specText}>{property.status} </Text>
+          </View> */}
           <View style={styles.specDivider} />
           <View style={styles.spec}>
             <Ionicons name="resize-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{property.sqft} sqm</Text>
+            <Text style={styles.specText}>{property.area} sqm</Text>
           </View>
         </View>
       </View>

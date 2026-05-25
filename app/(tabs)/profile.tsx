@@ -3,9 +3,9 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { getUserInfo } from '@/services/fetchData/user-info.api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ErrorScreen } from '@/components/helper/error-project';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createProfileScreenStyles } from '../../styles/profile.styles';
@@ -15,6 +15,8 @@ export default function ProfileScreen() {
   const { user, isLoading, logout, setUser } = useAuth();
   const isLoggingOut = useRef(false);
   const insets = useSafeAreaInsets();
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [error, setError]           = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && !user && !isLoggingOut.current) {
@@ -36,16 +38,27 @@ export default function ProfileScreen() {
   }, [logout]);
 
   const handleRefresh = useCallback(async () => {
-    const token = await AsyncStorage.getItem('token');
+    try {
+      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+  
+      errorTimerRef.current = setTimeout(() => {
+        setError('Failed to load profile. Pull down to retry.');
+      }, 5000);
+      
+      const refreshedUser = await getUserInfo();
 
-    if (!token) {
-      return;
-    }
+      clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = null;
+  
+      if (refreshedUser.uuid) {
+        setUser(refreshedUser);
+        setError(null);
+      }
 
-    const refreshedUser = await getUserInfo(token);
-
-    if (refreshedUser.uuid) {
-      setUser(refreshedUser);
+    } catch (error) {
+      clearTimeout(errorTimerRef.current!);
+      errorTimerRef.current = null;
+      setError('Failed to load profile. Pull down to retry.');
     }
   }, [setUser]);
 
@@ -59,6 +72,8 @@ export default function ProfileScreen() {
       </SafeAreaView>
     );
   }
+
+  if (error) return <ErrorScreen message={error} onRetry={() => { setError(null); handleRefresh(); }} />
 
   if (!user) return null;
 

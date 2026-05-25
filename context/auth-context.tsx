@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "@/services/auth/auth-login";
 import { logoutUser } from "@/services/auth/auth-logout";
-import { establishAuthenticatedSession } from "@/services/auth/auth-session";
+import { clearCachedUser, establishAuthenticatedSession, getCachedUser } from "@/services/auth/auth-session";
 import { User } from "@/types/user.types";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { authEvents } from "@/lib/auth-events";
@@ -36,12 +36,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const restoreSession = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
-        const refreshToken = await AsyncStorage.getItem('refreshToken');
-        if (token && refreshToken) {
-          await establishAuthenticatedSession(token, setUser, refreshToken);
+        if (!token) return; 
+
+        const cachedUser = await getCachedUser();
+        if (cachedUser) {
+          setUser(cachedUser); 
         }
+
+        // try {
+        //   const refreshToken = await AsyncStorage.getItem('refreshToken');
+        //   await establishAuthenticatedSession(token, setUser, refreshToken ?? undefined);
+        // } catch (networkError) {
+        //   // Offline or server error — cached user is already set, stay logged in
+        //   // Optional: set a flag like setIsOnline(false) for UI indicators
+        //   console.warn('Session re-validation failed, using cached user:', networkError);
+        // }
+
       } catch (err) {
         await AsyncStorage.multiRemove(['token', 'refreshToken']);
+        await clearCachedUser();
       } finally {
         setIsLoading(false);
       }
@@ -84,15 +97,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
-
       if (token) {
         await logoutUser(token);
       }
     } catch (error) {
       alert('Something Went Wrong During Logout. Please try again.');
-    } 
-    finally {
+    } finally {
       await AsyncStorage.multiRemove(['token', 'refreshToken']);
+      await clearCachedUser(); 
       setUser(null);
       setIsLoading(false);
     }

@@ -115,7 +115,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       {/* Fixed header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Account</Text>

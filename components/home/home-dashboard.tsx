@@ -1,14 +1,11 @@
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
-import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { fetchPropertyInfo } from '@/services/fetchData/property/fetch-property.api';
 import { Property } from '@/types/property.types';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Animated,
   ImageBackground,
   Pressable,
   RefreshControl,
@@ -18,6 +15,9 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
+import { ProjectCard } from '../helper/project-card';
+import { DashboardSkeleton, QuickActionsSkeleton, LocationsSkeleton, SpotlightSkeleton, ProjectCardsSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
+import { ErrorScreen } from '../helper/error-project';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -27,92 +27,6 @@ const QUICK_ACTIONS = [
 ] as const;
 
 const styles = createHomeDashboardStyles(Colors);
-
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
-
-function SkeletonBox({ width, height, borderRadius = 8, style }: {
-  width: number | string; height: number; borderRadius?: number; style?: object;
-}) {
-  const opacity = useRef(new Animated.Value(0.4)).current;
-
-  useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1,   duration: 750, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.4, duration: 750, useNativeDriver: true }),
-      ]),
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, [opacity]);
-
-  return (
-    <Animated.View
-      style={[{ width, height, borderRadius, backgroundColor: '#E5E7EB', opacity }, style]}
-    />
-  );
-}
-
-function DashboardSkeleton({ paddingTop }: { paddingTop: number }) {
-  return (
-    <View style={{ paddingTop }}>
-      <SkeletonBox width="100%" height={320} borderRadius={0} />
-
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16, gap: 8 }}>
-        {[...Array(4)].map((_, i) => (
-          <View key={i} style={{ alignItems: 'center', gap: 6 }}>
-            <SkeletonBox width={48} height={48} borderRadius={12} />
-            <SkeletonBox width={40} height={10} />
-          </View>
-        ))}
-      </View>
-
-      {/* Cards */}
-      <View style={{ paddingHorizontal: 16, gap: 8 }}>
-        <SkeletonBox width={160} height={14} />
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          {[...Array(3)].map((_, i) => (
-            <SkeletonBox key={i} width={180} height={220} borderRadius={16} />
-          ))}
-        </View>
-      </View>
-    </View>
-  );
-}
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-const ProjectCard = React.memo(({ property }: { property: Property }) => (
-  <Pressable
-    style={({ pressed }) => [styles.projectCard, pressed && styles.pressed]}
-    onPress={() => router.push({ pathname: '/property/[id]', params: { id: property.id } })}
-  >
-    <Image
-      source={{ uri: property.image_url }}
-      style={styles.projectImage}
-      contentFit="cover"
-      cachePolicy="memory-disk"
-      priority="normal"
-      transition={200}
-    />
-    <View style={styles.projectContent}>
-      <View style={styles.projectBadge}>
-        <Text style={styles.projectBadgeText}>{property.category}</Text>
-      </View>
-      <Text style={styles.projectName} numberOfLines={1}>{property.title}</Text>
-      <View style={styles.locationRow}>
-        <Ionicons name="location-outline" size={14} color={Colors.accent} />
-        <Text style={styles.locationText} numberOfLines={1}>{property.location}</Text>
-      </View>
-      <View style={styles.projectFooter}>
-        <Text style={styles.projectMeta}>{property.area} SQM • {property.units} Units</Text>
-        <View style={styles.reservePill}>
-          <Text style={styles.reservePillText}>Reserve</Text>
-        </View>
-      </View>
-    </View>
-  </Pressable>
-));
 
 const LocationChip = React.memo(({ location }: { location: string }) => {
   const initials = location
@@ -136,30 +50,46 @@ const LocationChip = React.memo(({ location }: { location: string }) => {
 export function HomeDashboard() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
-
   const [properties, setProperties] = useState<Property[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState<string | null>(null);
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const fetchProperties = useCallback(async (isRefreshing = false) => {
+      try {
+        isRefreshing ? setRefreshing(true) : setLoading(true);
+        setError(null);
+  
+        if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+  
+        errorTimerRef.current = setTimeout(() => {
+          setError('Failed to load properties. Pull down to retry.');
+          setLoading(false);
+          setRefreshing(false);
+        }, 5000);
+  
+        const data = await fetchPropertyInfo();
+        setProperties(Array.isArray(data) ? data : []);
+      } catch {
+        setError('Failed to load properties. Pull down to retry.');
+      } finally {
+        clearTimeout(errorTimerRef.current!);
+        errorTimerRef.current = null;
+        isRefreshing ? setRefreshing(false) : setLoading(false);
+      }
+    }, []);
 
-  const fetchProperties = useCallback(async () => {
-    try {
-      setError(null);
-      const data = await fetchPropertyInfo();
-      setProperties(Array.isArray(data) ? data : []);
-    } catch {
-      setError('Failed to load properties. Server failed to load, pull down to retry.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+   useEffect(() => {
+      fetchProperties();
+      return () => {
+        if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+      };
+    }, [fetchProperties]);
 
-  useEffect(() => {
-    fetchProperties();
-  }, [fetchProperties]);
-
-  // ── Refresh control wired to re-fetch ──────────────────────────────────────
-  const { refreshing, onRefresh } = useRefreshControl(fetchProperties);
+  const handleRefresh = useCallback(() => {
+      fetchProperties(true); 
+    }, [fetchProperties]);
 
   const featuredProperties = useMemo(() => properties.slice(0, 4), [properties]);
 
@@ -195,35 +125,29 @@ export function HomeDashboard() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
+      <SafeAreaView style={styles.safe} edges={['left', 'right']}>
         <DashboardSkeleton paddingTop={insets.top + 18} />
       </SafeAreaView>
     );
   }
 
+  if (error) return <ErrorScreen message={error} onRetry={fetchProperties} />
+
   return (
-    <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView
         contentInsetAdjustmentBehavior="never"
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 18 }]}
+        contentContainerStyle={ { paddingTop: insets.top + 18 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={onRefresh}
+            onRefresh={handleRefresh}
             tintColor={Colors.accentDark}
             progressViewOffset={insets.top + 28}
           />
         }
       >
-        {error ? (
-          // Error state: full-screen within scroll so pull-to-retry still works
-          <View style={[styles.errorBanner, { marginTop: 40 }]}>
-            <Ionicons name="alert-circle-outline" size={20} color="#DC2626" />
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        ) : (
-          <>
             {/* ── Hero ────────────────────────────────────────────────────── */}
             <ImageBackground
               source={{ uri: heroImage }}
@@ -254,12 +178,7 @@ export function HomeDashboard() {
 
                 {user ? (
                   <Pressable style={({ pressed }) => [styles.avatar, pressed && styles.headerActionPressed]}>
-                    <Image
-                      source={{ uri: user.avatar }}
-                      style={styles.avatarImage}
-                      contentFit="cover"
-                      cachePolicy="memory-disk"
-                    />
+                    <Text style={styles.loginPillText}>{user.name}</Text>
                   </Pressable>
                 ) : (
                   <Pressable
@@ -274,20 +193,22 @@ export function HomeDashboard() {
             </ImageBackground>
 
             {/* ── Quick Actions ────────────────────────────────────────────── */}
-            <View style={styles.quickActionsRow}>
-              {QUICK_ACTIONS.map((action) => (
-                <Pressable
-                  key={action.key}
-                  style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
-                  onPress={handleDiscoverPress}
-                >
-                  <View style={styles.quickActionIconBox}>
-                    <Ionicons name={action.icon} size={22} color={Colors.accent} />
-                  </View>
-                  <Text style={styles.quickActionLabel}>{action.label}</Text>
-                </Pressable>
-              ))}
-            </View>
+            <WithRefreshSkeleton refreshing={refreshing} skeleton={<QuickActionsSkeleton />}>
+              <View style={styles.quickActionsRow}>
+                {QUICK_ACTIONS.map((action) => (
+                  <Pressable
+                    key={action.key}
+                    style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
+                    onPress={handleDiscoverPress}
+                  >
+                    <View style={styles.quickActionIconBox}>
+                      <Ionicons name={action.icon} size={22} color={Colors.accent} />
+                    </View>
+                    <Text style={styles.quickActionLabel}>{action.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </WithRefreshSkeleton>
 
             {/* ── Ongoing Projects ─────────────────────────────────────────── */}
             <View style={styles.section}>
@@ -297,18 +218,19 @@ export function HomeDashboard() {
                   <Text style={styles.sectionSubtitle}>Handpicked developments across key locations</Text>
                 </View>
               </View>
-              <ScrollView
-                horizontal
-                contentInsetAdjustmentBehavior="never"
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.projectRow}
-                // Decelerates smoothly on Android
-                decelerationRate="fast"
-              >
-                {featuredProperties.map((property) => (
-                  <ProjectCard key={property.id} property={property} />
-                ))}
-              </ScrollView>
+              <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton />}>
+                <ScrollView
+                  horizontal
+                  contentInsetAdjustmentBehavior="never"
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.projectRow}
+                  decelerationRate="fast"
+                >
+                  {featuredProperties.map((property) => (
+                    <ProjectCard key={property.id} property={property} />
+                  ))}
+                </ScrollView>
+              </WithRefreshSkeleton>
             </View>
 
             {/* ── Project Locations ────────────────────────────────────────── */}
@@ -325,46 +247,51 @@ export function HomeDashboard() {
                   <Text style={styles.linkText}>Explore</Text>
                 </Pressable>
               </View>
-              <ScrollView
-                horizontal
-                contentInsetAdjustmentBehavior="never"
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.locationList}
-              >
-                {locations.map((location) => (
-                  <LocationChip key={location} location={location} />
-                ))}
-              </ScrollView>
+              <WithRefreshSkeleton refreshing={refreshing} skeleton={<LocationsSkeleton />} >
+                <ScrollView
+                  horizontal
+                  contentInsetAdjustmentBehavior="never"
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.locationList}
+                >
+                  {locations.map((location) => (
+                    <LocationChip key={location} location={location} />
+                  ))}
+                </ScrollView>
+              </WithRefreshSkeleton>
             </View>
 
             {/* ── Spotlight ────────────────────────────────────────────────── */}
-            {spotlightProperty && (
-              <Pressable
-                style={({ pressed }) => [styles.spotlightCard, pressed && styles.pressed]}
-                onPress={handleSpotlightPress}
-              >
-                <ImageBackground
-                  source={{ uri: spotlightProperty.image_url }}
-                  style={styles.spotlightBackground}
-                  imageStyle={styles.spotlightImage}
+            <WithRefreshSkeleton
+              refreshing={refreshing}
+              skeleton={<SpotlightSkeleton />}
+            >
+              {spotlightProperty ? (
+                <Pressable
+                  style={({ pressed }) => [styles.spotlightCard, pressed && styles.pressed]}
+                  onPress={handleSpotlightPress}
                 >
-                  <View style={styles.spotlightOverlay} />
-                  <View style={styles.spotlightContent}>
-                    <View style={styles.spotlightTextWrap}>
-                      <Text style={styles.spotlightTitle}>Buy properties for your future</Text>
-                      <Text style={styles.spotlightText}>
-                        Start with curated listings in high-potential locations and move from discovery to reservation faster.
-                      </Text>
+                  <ImageBackground
+                    source={{ uri: spotlightProperty.image_url }}
+                    style={styles.spotlightBackground}
+                    imageStyle={styles.spotlightImage}
+                  >
+                    <View style={styles.spotlightOverlay} />
+                    <View style={styles.spotlightContent}>
+                      <View style={styles.spotlightTextWrap}>
+                        <Text style={styles.spotlightTitle}>Buy properties for your future</Text>
+                        <Text style={styles.spotlightText}>
+                          Start with curated listings in high-potential locations and move from discovery to reservation faster.
+                        </Text>
+                      </View>
+                      <View style={styles.spotlightButton}>
+                        <Text style={styles.spotlightButtonText}>See Featured Property</Text>
+                      </View>
                     </View>
-                    <View style={styles.spotlightButton}>
-                      <Text style={styles.spotlightButtonText}>See Featured Property</Text>
-                    </View>
-                  </View>
-                </ImageBackground>
-              </Pressable>
-            )}
-          </>
-        )}
+                  </ImageBackground>
+                </Pressable>
+              ) : null}
+            </WithRefreshSkeleton>
       </ScrollView>
     </SafeAreaView>
   );

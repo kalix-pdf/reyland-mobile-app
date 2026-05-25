@@ -3,7 +3,7 @@ export interface Property {
   title: string;
   short_description: string;
   location: string;
-  status: number;
+  status: 0 | 1 | 2;
   category: string;
   units: number;
   area: number;
