@@ -38,6 +38,10 @@ function RootNavigator() {
           <Stack.Screen name="forgot-password" />
           <Stack.Screen name="investor-signup" />
           <Stack.Screen name="personal-information" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="change-full-name" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="change-email" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="change-phone" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="change-password" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="property/[id]" />
         </Stack>
 
