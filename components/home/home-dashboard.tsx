@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { fetchFeaturedProperties } from '@/services/fetchData/property/fetch-property.api';
@@ -15,9 +16,9 @@ import {
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
-import { ProjectCard } from '../helper/project-card';
-import { DashboardSkeleton, QuickActionsSkeleton, LocationsSkeleton, SpotlightSkeleton, ProjectCardsSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
 import { ErrorScreen } from '../helper/error-project';
+import { ProjectCard } from '../helper/project-card';
+import { DashboardSkeleton, LocationsSkeleton, ProjectCardsSkeleton, QuickActionsSkeleton, SpotlightSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -101,8 +102,8 @@ export function HomeDashboard() {
     ).slice(0, 6),
   [properties]);
 
-  const firstName        = useMemo(() => user?.name.split(' ')[0] ?? 'Guest', [user?.name]);
-  const heroImage        = featuredProperties[0]?.image_url;
+  const firstName = useMemo(() => user?.name?.split(' ')[0] ?? 'Guest', [user?.name]);
+  const heroImage = featuredProperties[0]?.image_url;
   const spotlightProperty = featuredProperties[0];
 
   const handleLoginPress   = useCallback(() => router.push('/welcome'), []);

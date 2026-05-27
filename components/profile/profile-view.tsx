@@ -1,17 +1,9 @@
 import { useAppTheme } from '@/context/theme-context';
 import { ViewProfileProps } from '@/types/user.types';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { ReactNode, useState } from 'react';
-import {
-  Alert,
-  Image,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Switch,
-  Text,
-  View,
-} from 'react-native';
+import { router } from 'expo-router';
+import React, { ReactNode } from 'react';
+import { Alert, Image, Pressable, RefreshControl, ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createProfileViewStyles } from '../../styles/profile.styles';
 
@@ -54,24 +46,16 @@ function Row({
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.row,
-        isLast && styles.rowLast,
-        pressed && styles.rowPressed,
-      ]}
+      style={({ pressed }) => [styles.row, isLast && styles.rowLast, pressed && styles.rowPressed]}
     >
-      <View style={[styles.rowIconWrap, danger && styles.rowIconWrapDanger]}>
-        {icon}
-      </View>
+      <View style={[styles.rowIconWrap, danger && styles.rowIconWrapDanger]}>{icon}</View>
 
       <Text style={[styles.rowLabel, danger && styles.rowLabelDanger]}>{label}</Text>
 
       {right ?? (
         <>
           {value ? <Text style={styles.rowValue}>{value}</Text> : null}
-          {showArrow && !danger ? (
-            <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-          ) : null}
+          {showArrow && !danger ? <Ionicons name="chevron-forward" size={16} color={colors.textMuted} /> : null}
         </>
       )}
     </Pressable>
@@ -108,13 +92,7 @@ function ToggleRow({ styles, colors, icon, label, value, isLast = false, onValue
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export function ViewProfile({
-  user,
-  onLogout,
-  onRefresh,
-  refreshing = false,
-  refreshOffset = 0,
-}: ViewProfileProps) {
+export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, refreshOffset = 0 }: ViewProfileProps) {
   const { colors, isDarkMode, toggleDarkMode } = useAppTheme();
   const styles = createProfileViewStyles(colors);
 
@@ -130,19 +108,14 @@ export function ViewProfile({
   };
 
   const handleDeleteAccount = () => {
-    Alert.alert(
-      'Delete Account',
-      'This action is irreversible. Are you sure you want to delete your account?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive' },
-      ],
-    );
+    Alert.alert('Delete Account', 'This action is irreversible. Are you sure you want to delete your account?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive' },
+    ]);
   };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-
       {/* Fixed header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Account</Text>
@@ -184,12 +157,8 @@ export function ViewProfile({
           {/* Info */}
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{user.name}</Text>
-            {user.email ? (
-              <Text style={styles.profileEmail}>{user.email}</Text>
-            ) : null}
-            {user.phone ? (
-              <Text style={styles.profilePhone}>{user.phone}</Text>
-            ) : null}
+            {user.email ? <Text style={styles.profileEmail}>{user.email}</Text> : null}
+            {user.phone ? <Text style={styles.profilePhone}>{user.phone}</Text> : null}
 
             <View style={styles.badge}>
               {isVerified ? (
@@ -202,7 +171,6 @@ export function ViewProfile({
               )}
             </View>
           </View>
-         
         </Pressable>
 
         {user.status !== 0 && (
@@ -212,7 +180,7 @@ export function ViewProfile({
               colors={colors}
               icon={<Feather name="user" size={17} color={colors.accent} />}
               label="Personal Information"
-              onPress={() => Alert.alert('Edit Profile')}
+              onPress={() => router.push('/personal-information')}
             />
 
             <Row
@@ -223,7 +191,7 @@ export function ViewProfile({
               onPress={() => Alert.alert('Affiliate')}
               isLast
             />
-            
+
             <Row
               styles={styles}
               colors={colors}
@@ -290,16 +258,16 @@ export function ViewProfile({
         )}
 
         {/* Account Actions */}
-          <Row
-            styles={styles}
-            colors={colors}
-            icon={<Feather name="log-out" size={17} color={colors.error} />}
-            label="Log Out"
-            onPress={handleLogout}
-            danger
-            showArrow={false}
-          />
-          {/* <Row
+        <Row
+          styles={styles}
+          colors={colors}
+          icon={<Feather name="log-out" size={17} color={colors.error} />}
+          label="Log Out"
+          onPress={handleLogout}
+          danger
+          showArrow={false}
+        />
+        {/* <Row
             styles={styles}
             colors={colors}
             icon={<Feather name="trash-2" size={17} color={colors.error} />}

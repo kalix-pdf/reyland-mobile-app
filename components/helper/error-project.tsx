@@ -18,7 +18,7 @@ export function ErrorScreen({ message, onRetry }: Props) {
         <View style={styles.iconCircle}>
           <Ionicons name="cloud-offline-outline" size={32} color="#A32D2D" />
         </View>
-        <Text style={styles.title}>Couldn't connect to the internet :(</Text>
+        <Text style={styles.title}>Couldn&apos;t connect to the internet :(</Text>
         <Text style={styles.subtitle}>
           Check your connection and try again. The data will appear here once it loads.
         </Text>

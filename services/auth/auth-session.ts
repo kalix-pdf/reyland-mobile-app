@@ -1,6 +1,6 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserInfo } from '@/services/fetchData/user-info.api';
 import { User } from '@/types/user.types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const USER_CACHE_KEY = 'cached_user';
 
@@ -33,7 +33,7 @@ export async function establishAuthenticatedSession(
     await AsyncStorage.setItem('refreshToken', refreshToken);
   }
 
-  const userInfo = await getUserInfo();
+  const userInfo = await getUserInfo(token);
 
   if (!userInfo.uuid) {
     await AsyncStorage.multiRemove(['token', 'refreshToken']);
