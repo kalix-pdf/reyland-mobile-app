@@ -426,3 +426,130 @@ export const createChangePersonalInfoStyles = createThemedStyles((Colors: AppCol
     },
   }),
 )
+
+export const createChangePasswordStyles = createThemedStyles((Colors: AppColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.surface,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    header: {
+      minHeight: 56,
+      paddingHorizontal: 12,
+      justifyContent: 'center',
+    },
+    backButton: {
+      width: 44,
+      height: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.5,
+    },
+    scroll: {
+      flex: 1,
+    },
+    content: {
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 24,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '600',
+      color: Colors.textPrimary,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: Colors.textSecondary,
+      marginBottom: 22,
+    },
+    inputArea: {
+      gap: 2,
+    },
+    currentValueSection: {
+      marginBottom: 22,
+      gap: 8,
+    },
+    currentValueLabel: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+    },
+    currentValueBox: {
+      minHeight: 52,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surfaceMuted,
+      paddingHorizontal: 14,
+      justifyContent: 'center',
+    },
+    currentValue: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+      textTransform: 'uppercase',
+    },
+    eyeButton: {
+      width: 34,
+      height: 34,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 4,
+    },
+    passwordChecklist: {
+      marginTop: 10,
+      padding: 14,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surfaceMuted,
+      gap: 6,
+    },
+    passwordChecklistTitle: {
+      fontSize: 13,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+      marginBottom: 2,
+    },
+    passwordChecklistItem: {
+      fontSize: 13,
+      lineHeight: 18,
+      color: Colors.textSecondary,
+    },
+    footer: {
+      paddingHorizontal: 20,
+      paddingBottom: 26,
+      paddingTop: 12,
+      backgroundColor: Colors.surface,
+    },
+    saveButton: {
+      minHeight: 56,
+      borderRadius: 21,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.accent,
+      marginBottom: 6,
+    },
+    saveButtonDisabled: {
+      opacity: 0.75,
+    },
+    saveButtonLoadingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    saveButtonText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: Colors.white,
+    },
+  }),
+)

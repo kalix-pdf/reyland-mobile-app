@@ -1,16 +1,23 @@
-import { ChangePersonalInfoView } from '@/components/profile/change-personal-info-view';
+import { ChangePasswordView } from '@/components/profile/change-password-view';
+import { changePassword } from '@/services/auth/auth-change-password';
 
 export default function ChangePasswordScreen() {
   return (
-    <ChangePersonalInfoView
-      title="Change Password"
-      currentLabel="Current Password"
-      currentValue=""
-      currentInput={{ key: 'currentPassword', placeholder: 'Current password', secure: true }}
-      inputs={[
-        { key: 'password', placeholder: 'New password', secure: true },
-        { key: 'confirmPassword', placeholder: 'Confirmed password', secure: true },
-      ]}
+    <ChangePasswordView
+      onSubmit={async (currentPassword, password) => {
+        try {
+          const message = await changePassword(currentPassword, password);
+          return {
+            success: true,
+            message,
+          };
+        } catch (error) {
+          return {
+            success: false,
+            message: error instanceof Error ? error.message : 'Unable to change your password right now.',
+          };
+        }
+      }}
     />
   );
 }

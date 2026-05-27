@@ -1,9 +1,15 @@
 import axios from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { refreshSession } from '@/services/auth/auth-refresh';
 import { authEvents } from '@/lib/auth-events';
 
 export const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+
+export type ApiRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
+  skipAuthRefresh?: boolean;
+};
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -36,12 +42,13 @@ const flushQueue = (error: unknown, token: string | null = null) => {
 apiClient.interceptors.response.use(
   (response) => response, 
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config as ApiRequestConfig | undefined;
 
     const is401 = error.response?.status === 401;
-    const alreadyRetried = originalRequest._retry;
+    const alreadyRetried = originalRequest?._retry;
+    const shouldSkipAuthRefresh = originalRequest?.skipAuthRefresh;
 
-    if (!is401 || alreadyRetried) {
+    if (!is401 || alreadyRetried || shouldSkipAuthRefresh || !originalRequest) {
       return Promise.reject(error);
     }
 

@@ -25,6 +25,16 @@ export default function AuthCallbackScreen() {
       const refreshToken = typeof refresh_token === 'string' ? refresh_token : undefined;
       const authFlow = typeof flow === 'string' ? flow : '';
 
+      if (authFlow === 'email-change-confirmed') {
+        router.replace('/(tabs)/profile');
+        return;
+      }
+
+      if (authFlow === 'email-confirmed') {
+        router.replace('/login');
+        return;
+      }
+
       if (!token) {
         router.replace('/login');
         return;
@@ -64,7 +74,13 @@ export default function AuthCallbackScreen() {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" />
-      <Text style={styles.text}>{flow === 'password-reset' ? 'Opening password reset...' : 'Completing sign in...'}</Text>
+      <Text style={styles.text}>
+        {flow === 'password-reset'
+          ? 'Opening password reset...'
+          : flow === 'email-change-confirmed' || flow === 'email-confirmed'
+            ? 'Email link accepted...'
+            : 'Completing sign in...'}
+      </Text>
     </View>
   );
 }

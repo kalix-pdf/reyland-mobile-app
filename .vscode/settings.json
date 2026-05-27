@@ -8,4 +8,7 @@
   //   "source.sortMembers": "explicit",
   // }
   "prettier.enable": false,
+  "[json]": {
+    "editor.formatOnSave": false
+  }
 }
