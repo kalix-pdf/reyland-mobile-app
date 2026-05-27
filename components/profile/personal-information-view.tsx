@@ -6,40 +6,25 @@ import React from 'react'
 import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { createPersonalInformationStyles } from '../../styles/profile.styles'
+import { getInitials } from './get-initials'
 
 type PersonalInformationViewProps = {
   user: User
 }
 
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
-}
-
-function InformationField({
-  label,
-  value,
-  actionLabel,
-  onPress,
-  editable = true,
-  isLast = false,
-}: {
+function InformationField({ label, value, onPress, editable = true}: {
   label: string
   value: string
-  actionLabel?: string
+  // actionLabel?: string
   onPress?: () => void
   editable?: boolean
-  isLast?: boolean
+  // isLast?: boolean
 }) {
   const { colors } = useAppTheme()
   const styles = createPersonalInformationStyles(colors)
 
   return (
-    <View style={[styles.fieldRow, isLast && styles.fieldRowLast]}>
+    <View style={[styles.fieldRow]}>
       <View style={styles.fieldContent}>
         <Text style={styles.fieldLabel}>{label}</Text>
         <Text style={styles.fieldValue}>{value || 'Not provided'}</Text>
@@ -50,7 +35,7 @@ function InformationField({
           style={({ pressed }) => [styles.editAction, pressed && styles.buttonPressed]}
           hitSlop={8}
         >
-          <Text style={styles.editActionText}>{actionLabel ?? `Change ${label}`}</Text>
+          <Text style={styles.editActionText}>{`Change ${label}`}</Text>
           <Feather name="edit" size={14} color={colors.accent} />
         </Pressable>
       ) : null}
@@ -115,19 +100,13 @@ export function PersonalInformationView({ user }: PersonalInformationViewProps) 
         <View style={styles.infoPanel}>
           <InformationField label="Full Name" value={user.name} onPress={() => router.push('/change-full-name')} />
           <InformationField label="Email" value={user.email} onPress={() => router.push('/change-email')} />
-          <InformationField
-            label="Phone Number"
-            value={phoneNumber}
-            actionLabel="Change Phone"
-            onPress={() => router.push('/change-phone')}
-          />
-          <InformationField label="Role" value="Investor" editable={false} />
+          <InformationField label="Phone Number" value={phoneNumber} onPress={() => router.push('/change-phone')}/>
+          <InformationField label="Role" value={user.role == 0 ? 'Buyer' : 'Investor'} editable={false} />
           <InformationField
             label="Password"
             value="••••••••"
-            actionLabel="Change Password"
             onPress={() => router.push('/change-password')}
-            isLast
+            // isLast
           />
         </View>
 

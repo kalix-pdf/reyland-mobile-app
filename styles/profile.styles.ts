@@ -248,7 +248,7 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
       alignItems: 'center',
       justifyContent: 'center',
       gap: 5,
-      backgroundColor: Colors.tag,
+      backgroundColor: Colors.surfaceMuted,
       marginBottom: 18,
     },
     changePhotoText: {
@@ -278,12 +278,12 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
       alignItems: 'center',
       gap: 12,
       paddingVertical: 14,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: Colors.border,
+      // borderBottomWidth: StyleSheet.hairlineWidth,
+      // borderBottomColor: Colors.border,
     },
-    fieldRowLast: {
-      borderBottomWidth: 0,
-    },
+    // fieldRowLast: {
+    //   // borderBottomWidth: 0,
+    // },
     fieldContent: {
       flex: 1,
       gap: 5,
@@ -308,12 +308,12 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
       alignItems: 'center',
       justifyContent: 'center',
       gap: 6,
-      backgroundColor: Colors.tag,
+      backgroundColor: Colors.surfaceMuted,
     },
     editActionText: {
       flexShrink: 1,
       fontSize: 12,
-      fontWeight: '800',
+      fontWeight: '600',
       color: Colors.accent,
     },
     deleteButton: {

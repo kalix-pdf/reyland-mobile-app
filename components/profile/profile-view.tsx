@@ -6,16 +6,7 @@ import React, { ReactNode } from 'react';
 import { Alert, Image, Pressable, RefreshControl, ScrollView, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createProfileViewStyles } from '../../styles/profile.styles';
-
-function getInitials(name: string) {
-  return name
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
+import { getInitials } from './get-initials';
 // ─── Row ────────────────────────────────────────────────────────────────────
 
 type RowProps = {

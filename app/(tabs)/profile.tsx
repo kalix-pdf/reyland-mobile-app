@@ -20,7 +20,7 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (!isLoading && !user && !isLoggingOut.current) {
-      router.replace('/login');
+      router.replace('/welcome');
     }
   }, [user, isLoading]);
 
@@ -30,7 +30,7 @@ export default function ProfileScreen() {
 
     try {
       await logout();
-      router.replace('/login');
+      router.replace('/welcome');
     } catch (error) {
       console.error('Logout failed:', error);
       isLoggingOut.current = false;

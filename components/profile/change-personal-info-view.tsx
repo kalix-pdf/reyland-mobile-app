@@ -258,9 +258,7 @@ export function ChangePersonalInfoView({
               />
             ) : null}
           </View>
-        </ScrollView>
-
-        <View style={styles.footer}>
+          <View style={styles.footer}>
           <Pressable
             style={({ pressed }) => [
               styles.saveButton,
@@ -280,6 +278,9 @@ export function ChangePersonalInfoView({
             )}
           </Pressable>
         </View>
+        </ScrollView>
+
+        
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

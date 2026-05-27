@@ -5,6 +5,7 @@ import { Property } from '@/types/property.types';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
@@ -41,21 +42,28 @@ export function PropertiesScreen() {
   const [error, setError] = useState<string | null>(null);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  //pagination cursor based
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+
   const fetchProperties = useCallback(async (isRefreshing = false) => {
     try {
       isRefreshing ? setRefreshing(true) : setLoading(true);
       setError(null);
 
       if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
-
       errorTimerRef.current = setTimeout(() => {
         setError('Failed to load properties. Pull down to retry.');
         setLoading(false);
         setRefreshing(false);
       }, 5000);
 
-      const data = await fetchPropertyInfo();
+      const { data, nextCursor: cursor, hasMore: more } = await fetchPropertyInfo();
+
       setProperties(Array.isArray(data) ? data : []);
+      setNextCursor(cursor);
+      setHasMore(more);
     } catch {
       setError('Failed to load properties. Pull down to retry.');
     } finally {
@@ -64,6 +72,24 @@ export function PropertiesScreen() {
       isRefreshing ? setRefreshing(false) : setLoading(false);
     }
   }, []);
+
+  const fetchMoreProperties = useCallback(async () => {
+    if (!hasMore || loadingMore || !nextCursor || loading) return;
+
+    try {
+      setLoadingMore(true);
+
+      const { data, nextCursor: cursor, hasMore: more } = await fetchPropertyInfo(nextCursor);
+
+      setProperties((prev) => [...prev, ...(Array.isArray(data) ? data : [])]);
+      setNextCursor(cursor);
+      setHasMore(more);
+    } catch {
+      // silent fail — user can scroll back up and down to retry
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [hasMore, loadingMore, nextCursor, loading]);
 
   useEffect(() => {
     fetchProperties();
@@ -156,6 +182,14 @@ export function PropertiesScreen() {
         renderItem={({ item }) => <PropertyCard property={item} />}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        onEndReached={fetchMoreProperties}
+        onEndReachedThreshold={0}
+        ListFooterComponent={
+          loadingMore ? (
+            <ActivityIndicator size={"small"}
+            style={{ marginVertical: 25 }}/>
+          ) : null
+        }
         ListHeaderComponent={
           <>
             {error && (
