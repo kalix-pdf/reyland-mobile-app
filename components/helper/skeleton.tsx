@@ -1,7 +1,7 @@
-import { Animated, Pressable, View, Text, StatusBar } from "react-native";
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 import React, { useEffect, useRef } from 'react';
+import { Animated, StatusBar, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 
 interface RefreshSkeletonProps {
@@ -14,15 +14,23 @@ export function WithRefreshSkeleton({ refreshing, skeleton, children }: RefreshS
   return <>{refreshing ? skeleton : children}</>;
 }
 
-export function SkeletonBox({ width, height, borderRadius = 8, style }: {
-  width: number | string; height: number; borderRadius?: number; style?: object;
+export function SkeletonBox({
+  width,
+  height,
+  borderRadius = 8,
+  style,
+}: {
+  width: number | string;
+  height: number;
+  borderRadius?: number;
+  style?: object;
 }) {
   const opacity = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
     const pulse = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 1,   duration: 750, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration: 750, useNativeDriver: true }),
         Animated.timing(opacity, { toValue: 0.4, duration: 750, useNativeDriver: true }),
       ]),
     );
@@ -30,11 +38,7 @@ export function SkeletonBox({ width, height, borderRadius = 8, style }: {
     return () => pulse.stop();
   }, [opacity]);
 
-  return (
-    <Animated.View
-      style={[{ width, height, borderRadius, backgroundColor: '#E5E7EB', opacity }, style]}
-    />
-  );
+  return <Animated.View style={[{ width, height, borderRadius, backgroundColor: '#E5E7EB', opacity }, style]} />;
 }
 
 // __ DASHBOARD SKELETON COMPONENT __
@@ -106,7 +110,6 @@ export function ProjectCardsSkeleton() {
     </View>
   );
 }
-
 
 // __ PROJECT CARD COMPONENT __
 function PropertyCardSkeleton() {

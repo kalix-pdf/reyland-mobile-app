@@ -1,5 +1,7 @@
 import PropertyCard from '@/components/property-card';
 import { Colors } from '@/constants/colors';
+import { fetchPropertyInfo } from '@/services/fetchData/property/fetch-property.api';
+import { Property } from '@/types/property.types';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -11,12 +13,10 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { PropertiesSkeletonScreen } from '../helper/skeleton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
-import { fetchPropertyInfo } from '@/services/fetchData/property/fetch-property.api';
-import { Property } from '@/types/property.types';
 import { ErrorScreen } from '../helper/error-project';
+import { PropertiesSkeletonScreen } from '../helper/skeleton';
 
 const FILTERS = ['All', 'On Going', 'Completed', 'Sold'] as const
 type Filter = (typeof FILTERS)[number];

@@ -1,6 +1,6 @@
-import { AppColors } from '@/constants/colors';
-import { StyleSheet } from 'react-native';
-import { createThemedStyles } from './foundations';
+import { AppColors } from '@/constants/colors'
+import { StyleSheet } from 'react-native'
+import { createThemedStyles } from './foundations'
 
 export const createProfileScreenStyles = createThemedStyles((Colors: AppColors) =>
   StyleSheet.create({
@@ -20,7 +20,7 @@ export const createProfileScreenStyles = createThemedStyles((Colors: AppColors) 
       color: Colors.textSecondary,
     },
   }),
-);
+)
 
 export const createProfileViewStyles = createThemedStyles((Colors: AppColors) =>
   StyleSheet.create({
@@ -37,7 +37,7 @@ export const createProfileViewStyles = createThemedStyles((Colors: AppColors) =>
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: Colors.border,
       backgroundColor: Colors.background,
-      marginBottom: 6
+      marginBottom: 6,
     },
     headerTitle: {
       fontSize: 18,
@@ -53,14 +53,14 @@ export const createProfileViewStyles = createThemedStyles((Colors: AppColors) =>
     },
 
     heroBrandMarkPrimary: {
-        position: 'absolute' as const,
-        width: 440,
-        height: 440,
-        top: -30,
-        right: -128,
-        opacity: 0.12,
-        transform: [{ rotate: '1deg' }],
-      },
+      position: 'absolute' as const,
+      width: 440,
+      height: 440,
+      top: -30,
+      right: -128,
+      opacity: 0.12,
+      transform: [{ rotate: '1deg' }],
+    },
 
     // Profile card (top strip)
     profileCard: {
@@ -69,7 +69,7 @@ export const createProfileViewStyles = createThemedStyles((Colors: AppColors) =>
       gap: 14,
       paddingHorizontal: 20,
       paddingVertical: 20,
-      marginTop: 10
+      marginTop: 10,
     },
     avatar: {
       width: 75,
@@ -176,4 +176,380 @@ export const createProfileViewStyles = createThemedStyles((Colors: AppColors) =>
       marginTop: 32,
     },
   }),
-);
+)
+
+export const createPersonalInformationStyles = createThemedStyles((Colors: AppColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.background,
+    },
+    header: {
+      minHeight: 58,
+      paddingHorizontal: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: Colors.border,
+      backgroundColor: Colors.background,
+    },
+    headerButton: {
+      width: 42,
+      height: 42,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.5,
+    },
+    headerTitle: {
+      flex: 1,
+      textAlign: 'center',
+      fontSize: 16,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+    },
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingTop: 18,
+      paddingBottom: 40,
+    },
+    profileSummary: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    avatar: {
+      width: 104,
+      height: 104,
+      borderRadius: 52,
+      backgroundColor: Colors.primary,
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: Colors.surface,
+    },
+    avatarImage: {
+      width: '100%',
+      height: '100%',
+    },
+    avatarText: {
+      color: Colors.white,
+      fontSize: 28,
+      fontWeight: '700',
+    },
+    changePhotoButton: {
+      minHeight: 28,
+      paddingHorizontal: 10,
+      borderRadius: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 5,
+      backgroundColor: Colors.tag,
+      marginBottom: 18,
+    },
+    changePhotoText: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: Colors.accent,
+    },
+    displayName: {
+      fontSize: 20,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      marginBottom: 8,
+    },
+    displayEmail: {
+      fontSize: 14,
+      color: Colors.textSecondary,
+      textAlign: 'center',
+    },
+    infoPanel: {
+      width: '100%',
+    },
+    fieldRow: {
+      minHeight: 66,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 14,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: Colors.border,
+    },
+    fieldRowLast: {
+      borderBottomWidth: 0,
+    },
+    fieldContent: {
+      flex: 1,
+      gap: 5,
+    },
+    fieldLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: Colors.textMuted,
+    },
+    fieldValue: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+      lineHeight: 20,
+    },
+    editAction: {
+      minHeight: 32,
+      maxWidth: 150,
+      paddingHorizontal: 10,
+      borderRadius: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      backgroundColor: Colors.tag,
+    },
+    editActionText: {
+      flexShrink: 1,
+      fontSize: 12,
+      fontWeight: '800',
+      color: Colors.accent,
+    },
+    deleteButton: {
+      minHeight: 54,
+      marginTop: 24,
+      borderRadius: 21,
+      borderWidth: 1,
+      borderColor: Colors.errorBorder,
+      backgroundColor: Colors.errorBackground,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+    },
+    deleteButtonText: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: Colors.error,
+    },
+  }),
+)
+
+export const createChangePersonalInfoStyles = createThemedStyles((Colors: AppColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.surface,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    header: {
+      minHeight: 56,
+      paddingHorizontal: 12,
+      justifyContent: 'center',
+    },
+    backButton: {
+      width: 44,
+      height: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.5,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 20,
+      paddingTop: 12,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '500',
+      color: Colors.textPrimary,
+      marginBottom: 28,
+    },
+    fieldGroup: {
+      marginBottom: 24,
+      gap: 8,
+    },
+    label: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: Colors.textPrimary,
+    },
+    currentValueBox: {
+      minHeight: 58,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surface,
+      paddingHorizontal: 16,
+      justifyContent: 'center',
+    },
+    currentValue: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+      textTransform: 'uppercase',
+    },
+    input: {
+      minHeight: 58,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surface,
+      paddingHorizontal: 16,
+      fontSize: 14,
+      color: Colors.textPrimary,
+      marginBottom: 8,
+    },
+    footer: {
+      paddingHorizontal: 20,
+      paddingBottom: 26,
+      paddingTop: 12,
+      backgroundColor: Colors.surface,
+    },
+    nextButton: {
+      minHeight: 56,
+      borderRadius: 21,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.accent,
+      marginBottom: 6,
+    },
+    nextButtonText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: Colors.white,
+    },
+  }),
+)
+
+export const createChangePasswordStyles = createThemedStyles((Colors: AppColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.surface,
+    },
+    keyboardView: {
+      flex: 1,
+    },
+    header: {
+      minHeight: 56,
+      paddingHorizontal: 12,
+      justifyContent: 'center',
+    },
+    backButton: {
+      width: 44,
+      height: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    buttonPressed: {
+      opacity: 0.5,
+    },
+    scroll: {
+      flex: 1,
+    },
+    content: {
+      paddingHorizontal: 20,
+      paddingTop: 12,
+      paddingBottom: 24,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '600',
+      color: Colors.textPrimary,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: Colors.textSecondary,
+      marginBottom: 22,
+    },
+    inputArea: {
+      gap: 2,
+    },
+    currentValueSection: {
+      marginBottom: 22,
+      gap: 8,
+    },
+    currentValueLabel: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+    },
+    currentValueBox: {
+      minHeight: 52,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surfaceMuted,
+      paddingHorizontal: 14,
+      justifyContent: 'center',
+    },
+    currentValue: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: Colors.textPrimary,
+      textTransform: 'uppercase',
+    },
+    eyeButton: {
+      width: 34,
+      height: 34,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginRight: 4,
+    },
+    passwordChecklist: {
+      marginTop: 10,
+      padding: 14,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surfaceMuted,
+      gap: 6,
+    },
+    passwordChecklistTitle: {
+      fontSize: 13,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+      marginBottom: 2,
+    },
+    passwordChecklistItem: {
+      fontSize: 13,
+      lineHeight: 18,
+      color: Colors.textSecondary,
+    },
+    footer: {
+      paddingHorizontal: 20,
+      paddingBottom: 26,
+      paddingTop: 12,
+      backgroundColor: Colors.surface,
+    },
+    saveButton: {
+      minHeight: 56,
+      borderRadius: 21,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.accent,
+      marginBottom: 6,
+    },
+    saveButtonDisabled: {
+      opacity: 0.75,
+    },
+    saveButtonLoadingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    saveButtonText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: Colors.white,
+    },
+  }),
+)
