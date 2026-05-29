@@ -2,7 +2,6 @@ export interface Property {
   id: number;
   title: string;
   short_description: string;
-  location: string;
   status: 0 | 1 | 2;
   category: string;
   units: number;
@@ -13,4 +12,10 @@ export interface Property {
   price: number;
   installment: number;
   created_at?: string;
+  project_id?: number | null;
+  project?: {
+    id: number;
+    project_name: string;
+    location: string | null;
+  } | null;
 }

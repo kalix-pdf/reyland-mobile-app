@@ -10,6 +10,7 @@ import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
 const styles = createHomeDashboardStyles(Colors);
 
 // ─── Sub-components for home dashboard ───────────────────────────────────────────────────────────
+// eslint-disable-next-line react/display-name
 export const ProjectCard = React.memo(({ property }: { property: Property }) => (
   <Pressable
     style={({ pressed }) => [styles.projectCard, pressed && styles.pressed]}
@@ -33,7 +34,7 @@ export const ProjectCard = React.memo(({ property }: { property: Property }) => 
       <View style={styles.locationRow}>
         <Ionicons name="location-outline" size={14} color={Colors.accent} />
         <Text style={styles.locationText} numberOfLines={1}>
-          {property.location}
+          {property.project?.location ?? 'Location unavailable'}
         </Text>
       </View>
       <View style={styles.projectFooter}>

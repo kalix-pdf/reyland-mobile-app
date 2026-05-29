@@ -27,7 +27,7 @@ function InformationField({ label, value, onPress, editable = true}: {
     <View style={[styles.fieldRow]}>
       <View style={styles.fieldContent}>
         <Text style={styles.fieldLabel}>{label}</Text>
-        <Text style={styles.fieldValue}>{value || 'Not provided'}</Text>
+        <Text style={styles.fieldValue}>{value }</Text>
       </View>
       {editable ? (
         <Pressable
@@ -47,7 +47,9 @@ export function PersonalInformationView({ user }: PersonalInformationViewProps) 
   const { colors } = useAppTheme()
   const styles = createPersonalInformationStyles(colors)
   const initials = getInitials(user.name)
-  const phoneNumber = user.phone || 'Not provided'
+  const phone = user.phone?.trim()
+  const hasPhone = Boolean(phone && phone !== 'null' && phone !== 'undefined')
+  const phoneNumber = hasPhone ? phone! : 'Not provided'
 
   const handleDeleteAccount = () => {
     Alert.alert('Delete Account', 'This action is irreversible. Are you sure you want to delete your account?', [

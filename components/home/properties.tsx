@@ -102,6 +102,7 @@ export function PropertiesScreen() {
     const normalizedSearch = search.trim().toLowerCase();
 
     return properties.filter((property) => {
+      const location = property.project?.location ?? '';
       const matchesFilter =
         activeFilter === 'All' ||
         property.status === STATUS_MAP[activeFilter];
@@ -109,7 +110,7 @@ export function PropertiesScreen() {
       const matchesSearch =
         normalizedSearch.length === 0 ||
         property.title.toLowerCase().includes(normalizedSearch) ||
-        property.location.toLowerCase().includes(normalizedSearch);
+        location.toLowerCase().includes(normalizedSearch);
 
       return matchesFilter && matchesSearch;
     });
