@@ -13,6 +13,7 @@ export const DUMMY_USERS: User[] = [
     avatar: "https://i.pravatar.cc/150?img=14",
     phone: "+63 912 345 6789",
     memberSince: "January 2024",
+    status: 1,
   },
   {
     // BUYER USER
@@ -25,5 +26,6 @@ export const DUMMY_USERS: User[] = [
     avatar: "https://i.pravatar.cc/150?img=12",
     phone: "+63 912 345 6789",
     memberSince: "January 2024",
+    status: 1,
   }
 ];

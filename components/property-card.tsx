@@ -13,6 +13,7 @@ type Props = {
 
 function PropertyCard({ property }: Props) {
   const router = useRouter();
+  const location = property.project?.location?.trim() || 'Location unavailable';
 
   const formatPrice = (price: number, type: string) => {
     if (price >= 1_000_000) {
@@ -43,7 +44,7 @@ function PropertyCard({ property }: Props) {
         <View style={styles.addressRow}>
           <Ionicons name="location-outline" size={14} color={Colors.accent} />
           <Text style={styles.address} numberOfLines={1}>
-            {property.location}
+            {location}
           </Text>
         </View>
 

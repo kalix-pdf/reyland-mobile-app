@@ -5,17 +5,18 @@ import { updatePhoneNumber } from '../services/user/update-phone.api';
 
 export default function ChangePhoneScreen() {
   const { setUser, user } = useAuth();
+  const hasPhone = Boolean(user?.phone?.trim()) && user?.phone !== 'null';
 
   return (
     <ChangePersonalInfoView
-      title="Change Phone Number"
+      title={hasPhone ? "Change Phone Number" : "Add Phone Number"}
       currentLabel="Current Phone Number"
-      currentValue={user?.phone ?? ''}
+      currentValue={hasPhone ? user?.phone ?? '' : ''}
       inputs={[
         { key: 'phone', placeholder: 'Phone number', keyboardType: 'phone-pad' },
         { key: 'confirmPhone', placeholder: 'Confirm phone number', keyboardType: 'phone-pad' },
       ]}
-      submitLabel="Save Phone Number"
+      submitLabel={hasPhone ? "Save Phone Number" : "Add Phone Number"}
       loadingLabel="Saving phone number..."
       subtitle="Enter your new phone number and confirm your password before saving."
       onSubmit={async ({ phone, password }) => {

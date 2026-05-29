@@ -62,7 +62,9 @@ export function PersonalInformationView({ user }: PersonalInformationViewProps) 
   const { colors } = useAppTheme()
   const styles = createPersonalInformationStyles(colors)
   const initials = getInitials(user.name)
-  const phoneNumber = user.phone || 'Not provided'
+  const phone = user.phone?.trim()
+  const hasPhone = Boolean(phone && phone !== 'null' && phone !== 'undefined')
+  const phoneNumber = hasPhone ? phone! : 'Not provided'
 
   const handleDeleteAccount = () => {
     Alert.alert('Delete Account', 'This action is irreversible. Are you sure you want to delete your account?', [
@@ -118,7 +120,7 @@ export function PersonalInformationView({ user }: PersonalInformationViewProps) 
           <InformationField
             label="Phone Number"
             value={phoneNumber}
-            actionLabel="Change Phone"
+            actionLabel={hasPhone ? 'Change Phone' : 'Add Phone'}
             onPress={() => router.push('/change-phone')}
           />
           <InformationField label="Role" value="Investor" editable={false} />
