@@ -42,7 +42,7 @@ function InformationField({
     <View style={[styles.fieldRow, isLast && styles.fieldRowLast]}>
       <View style={styles.fieldContent}>
         <Text style={styles.fieldLabel}>{label}</Text>
-        <Text style={styles.fieldValue}>{value || 'Not provided'}</Text>
+        <Text style={styles.fieldValue}>{value }</Text>
       </View>
       {editable ? (
         <Pressable

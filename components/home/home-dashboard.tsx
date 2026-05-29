@@ -94,13 +94,15 @@ export function HomeDashboard() {
 
   const featuredProperties = useMemo(() => properties.slice(0, 4), [properties]);
 
-  const locations = useMemo(() =>
-    Array.from(
-      new Set(
-        properties.map((p) => p.location.split(',')[0].trim()),
-      ),
-    ).slice(0, 6),
-  [properties]);
+const locations = useMemo(() =>
+  Array.from(
+    new Set(
+      properties
+        .map((p) => p.project?.location?.split(',')[0]?.trim())
+        .filter((location): location is string => Boolean(location)),
+    ),
+  ).slice(0, 6),
+[properties]);
 
   const firstName = useMemo(() => user?.name?.split(' ')[0] ?? 'Guest', [user?.name]);
   const heroImage = featuredProperties[0]?.image_url;
