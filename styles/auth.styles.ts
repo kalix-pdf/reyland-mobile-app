@@ -48,9 +48,9 @@ export const createAuthComponentStyles = createThemedStyles((Colors: AppColors) 
     gap: spacing.sm,
   },
   inputLabel: {
-    color: Colors.accent,
+    color: Colors.textPrimary,
     fontSize: fontSizes.md,
-    fontWeight: '800' as const,
+    fontWeight: '600' as const,
   },
   inputLabelError: {
     color: Colors.error,

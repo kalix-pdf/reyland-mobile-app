@@ -11,7 +11,7 @@ export const LightColors = {
   // App surfaces
   background: "#F4F8F6",
   surface: "#FFFFFF",
-  surfaceMuted: "#F0F5F2",
+  surfaceMuted: "rgba(233, 238, 235, 0.91)",
   surfaceDark: "#00171C",
 
   // Text
