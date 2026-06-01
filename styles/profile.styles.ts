@@ -203,6 +203,9 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
     buttonPressed: {
       opacity: 0.5,
     },
+    buttonDisabled: {
+      opacity: 0.7,
+    },
     headerTitle: {
       flex: 1,
       textAlign: 'center',

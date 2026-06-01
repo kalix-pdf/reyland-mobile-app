@@ -40,6 +40,12 @@
           }
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Reyland to access your photos so you can update your profile photo."
+        }
+      ],
       "expo-web-browser"
     ],
     "experiments": {
