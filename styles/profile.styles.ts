@@ -301,7 +301,7 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
     },
     editAction: {
       minHeight: 32,
-      maxWidth: 150,
+      maxWidth: 180,
       paddingHorizontal: 10,
       borderRadius: 16,
       flexDirection: 'row',

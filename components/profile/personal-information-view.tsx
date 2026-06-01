@@ -7,6 +7,7 @@ import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { createPersonalInformationStyles } from '../../styles/profile.styles'
 import { getInitials } from './get-initials'
+import { getPhoneValue } from './phone-value'
 
 type PersonalInformationViewProps = {
   user: User
@@ -35,7 +36,7 @@ function InformationField({ label, value, onPress, editable = true}: {
           style={({ pressed }) => [styles.editAction, pressed && styles.buttonPressed]}
           hitSlop={8}
         >
-          <Text style={styles.editActionText}>{`Change ${label}`}</Text>
+          <Text style={styles.editActionText} numberOfLines={1}>{`Change ${label}`}</Text>
           <Feather name="edit" size={14} color={colors.accent} />
         </Pressable>
       ) : null}
@@ -47,9 +48,8 @@ export function PersonalInformationView({ user }: PersonalInformationViewProps) 
   const { colors } = useAppTheme()
   const styles = createPersonalInformationStyles(colors)
   const initials = getInitials(user.name)
-  const phone = user.phone?.trim()
-  const hasPhone = Boolean(phone && phone !== 'null' && phone !== 'undefined')
-  const phoneNumber = hasPhone ? phone! : 'Not provided'
+  const phone = getPhoneValue(user.phone)
+  const phoneNumber = phone ?? 'Not provided'
 
   const handleDeleteAccount = () => {
     Alert.alert('Delete Account', 'This action is irreversible. Are you sure you want to delete your account?', [
