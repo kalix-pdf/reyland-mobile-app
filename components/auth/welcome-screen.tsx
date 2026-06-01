@@ -1,9 +1,9 @@
 import { useAppTheme } from '@/context/theme-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import React from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createWelcomeScreenStyles } from '../../styles/auth.styles';
 
@@ -28,29 +28,54 @@ export function WelcomeScreen({
   const insets = useSafeAreaInsets();
   const styles = createWelcomeScreenStyles(colors);
 
+  const player = useVideoPlayer(require('@/assets/vid/welcome-page-bg.mp4'), (p: any) => {
+    p.loop = true;
+    p.muted = true;
+    p.audioMixingMode = 'mixWithOthers';
+    p.play();
+  });
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-      <LinearGradient
-        colors={[colors.accent, colors.accentDark, colors.primary]}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        style={[styles.screen, { paddingTop: insets.top }]}
-      >
+      <View style={{ flex: 1 }}>
+        {/* Background Video */}
+        <VideoView
+          player={player}
+          style={StyleSheet.absoluteFillObject}
+          contentFit="cover"
+          nativeControls={false}
+        />
+
+        {/* Overlay */}
+        <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'rgba(0,0,0,0.45)' }]} />
+
+        {/* Glow effects */}
         <View style={styles.glowTopRight} />
         <View style={styles.glowBottomLeft} />
 
-        <View style={[styles.content, { paddingBottom: 36 + insets.bottom }]}>
+        <View style={[styles.content, { paddingTop: insets.top, paddingBottom: 36 + insets.bottom }]}>
           <View style={styles.brandBlock}>
-            <Image source={require('@/assets/images/logo_transparent.png')} style={styles.logo} contentFit="contain" />
-            {/* <Text style={styles.title}>Welcome Back</Text> */}
+            <Image
+              source={require('@/assets/images/logo_transparent.png')}
+              style={styles.logo}
+              contentFit="contain"
+            />
           </View>
 
           <View style={styles.actions}>
-            <Pressable style={styles.signInButton} onPress={onSignIn} disabled={isGoogleLoading || isFacebookLoading}>
+            <Pressable
+              style={styles.signInButton}
+              onPress={onSignIn}
+              disabled={isGoogleLoading || isFacebookLoading}
+            >
               <Text style={styles.signInText}>SIGN IN</Text>
             </Pressable>
 
-            <Pressable style={styles.signUpButton} onPress={onSignUp} disabled={isGoogleLoading || isFacebookLoading}>
+            <Pressable
+              style={styles.signUpButton}
+              onPress={onSignUp}
+              disabled={isGoogleLoading || isFacebookLoading}
+            >
               <Text style={styles.signUpText}>SIGN UP</Text>
             </Pressable>
           </View>
@@ -89,7 +114,7 @@ export function WelcomeScreen({
             </View>
           </View>
         </View>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 }

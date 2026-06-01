@@ -4,16 +4,10 @@ import { useAuth } from '@/context/auth-context';
 import { fetchFeaturedProperties } from '@/services/fetchData/property/fetch-property.api';
 import { Property } from '@/types/property.types';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  ImageBackground,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Text, View, StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
@@ -28,6 +22,52 @@ const QUICK_ACTIONS = [
 ] as const;
 
 const styles = createHomeDashboardStyles(Colors);
+
+// ─── Floating Header ──────────────────────────────────────────────────────────
+const FloatingHeader = React.memo(({
+  user,
+  onLoginPress,
+}: {
+  user: { name: string } | null;
+  onLoginPress: () => void;
+}) => {
+  const firstName = user?.name?.split(' ')[0] ?? null;
+  const initials  = user?.name
+    ?.split(' ')
+    .slice(0, 2)
+    .map((n) => n[0]?.toUpperCase() ?? '')
+    .join('') ?? '';
+
+  return (
+    <View style={styles.header}>
+      {/* Brand */}
+      <View style={styles.headerBrand}>
+        <Text style={styles.headerBrandText}>REYLAND</Text>
+      </View>
+
+      {/* Right side */}
+      {user ? (
+        <View style={styles.headerUser}>
+          <View style={styles.headerTextGroup}>
+            <Text style={styles.headerGreeting}>Welcome back</Text>
+            <Text style={styles.headerName}>{firstName}</Text>
+          </View>
+          <View style={styles.headerAvatar}>
+            <Text style={styles.headerAvatarText}>{initials}</Text>
+          </View>
+        </View>
+      ) : (
+        <Pressable
+          style={({ pressed }) => [styles.headerLoginBtn, pressed && styles.pressed]}
+          onPress={onLoginPress}
+        >
+          <Ionicons name="person-outline" size={15} color="#fff" />
+          <Text style={styles.headerLoginText}>Sign In</Text>
+        </Pressable>
+      )}
+    </View>
+  );
+});
 
 const LocationChip = React.memo(({ location }: { location: string }) => {
   const initials = location
@@ -94,19 +134,18 @@ export function HomeDashboard() {
 
   const featuredProperties = useMemo(() => properties.slice(0, 4), [properties]);
 
-const locations = useMemo(() =>
-  Array.from(
-    new Set(
-      properties
-        .map((p) => p.project?.location?.split(',')[0]?.trim())
-        .filter((location): location is string => Boolean(location)),
-    ),
-  ).slice(0, 6),
-[properties]);
+  const locations = useMemo(() =>
+    Array.from(
+      new Set(
+        properties
+          .map((p) => p.project?.location?.split(',')[0]?.trim())
+          .filter((location): location is string => Boolean(location)),
+      ),
+    ).slice(0, 6),
+  [properties]);
 
   const firstName = useMemo(() => user?.name?.split(' ')[0] ?? 'Guest', [user?.name]);
-  const heroImage = featuredProperties[0]?.image_url;
-  const spotlightProperty = featuredProperties[0];
+  // const spotlightProperty = featuredProperties[0];
 
   const handleLoginPress   = useCallback(() => router.push('/welcome'), []);
   const handleDiscoverPress = useCallback(() => { 
@@ -116,13 +155,22 @@ const locations = useMemo(() =>
       router.push('/(tabs)/discover');
     }
     }, [user]);
-  const handleSpotlightPress = useCallback(() => {
-    if (!user) {
-      router.push('/welcome');
-    } else {
-      router.push({ pathname: '/property/[id]', params: { id: spotlightProperty?.id } });
-    }
-  }, [user, spotlightProperty?.id]);
+
+  const player = useVideoPlayer(require('@/assets/vid/welcome-page-bg.mp4'), (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.audioMixingMode = 'mixWithOthers';
+    p.play();
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      player.play();
+      return () => {
+        player.pause();
+      };
+    }, [player])
+  );
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -137,7 +185,8 @@ const locations = useMemo(() =>
   if (error) return <ErrorScreen message={error} onRetry={fetchProperties} />
 
   return (
-    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <FloatingHeader user={user} onLoginPress={handleLoginPress} />
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={ { paddingTop: insets.top + 18 }}
@@ -152,11 +201,14 @@ const locations = useMemo(() =>
         }
       >
             {/* ── Hero ────────────────────────────────────────────────────── */}
-            <ImageBackground
-              source={{ uri: heroImage }}
-              style={styles.hero}
-              imageStyle={styles.heroImage}
-            >
+            <View style={styles.hero}>
+              <VideoView
+                player={player}
+                style={StyleSheet.absoluteFillObject}
+                contentFit="cover"
+                nativeControls={false}
+              />
+
               <View style={styles.heroOverlay} />
               <View style={styles.heroGlow} />
 
@@ -193,7 +245,7 @@ const locations = useMemo(() =>
                   </Pressable>
                 )}
               </View>
-            </ImageBackground>
+            </View>
 
             {/* ── Quick Actions ────────────────────────────────────────────── */}
             <WithRefreshSkeleton refreshing={refreshing} skeleton={<QuickActionsSkeleton />}>
@@ -264,37 +316,6 @@ const locations = useMemo(() =>
               </WithRefreshSkeleton>
             </View>
 
-            {/* ── Spotlight ────────────────────────────────────────────────── */}
-            <WithRefreshSkeleton
-              refreshing={refreshing}
-              skeleton={<SpotlightSkeleton />}
-            >
-              {spotlightProperty ? (
-                <Pressable
-                  style={({ pressed }) => [styles.spotlightCard, pressed && styles.pressed]}
-                  onPress={handleSpotlightPress}
-                >
-                  <ImageBackground
-                    source={{ uri: spotlightProperty.image_url }}
-                    style={styles.spotlightBackground}
-                    imageStyle={styles.spotlightImage}
-                  >
-                    <View style={styles.spotlightOverlay} />
-                    <View style={styles.spotlightContent}>
-                      <View style={styles.spotlightTextWrap}>
-                        <Text style={styles.spotlightTitle}>Buy properties for your future</Text>
-                        <Text style={styles.spotlightText}>
-                          Start with curated listings in high-potential locations and move from discovery to reservation faster.
-                        </Text>
-                      </View>
-                      <View style={styles.spotlightButton}>
-                        <Text style={styles.spotlightButtonText}>See Featured Property</Text>
-                      </View>
-                    </View>
-                  </ImageBackground>
-                </Pressable>
-              ) : null}
-            </WithRefreshSkeleton>
       </ScrollView>
     </SafeAreaView>
   );

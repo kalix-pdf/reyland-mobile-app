@@ -218,6 +218,78 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       flex: 1,
       backgroundColor: Colors.background,
     },
+    // ── Fixed Header ────────────────────────────────────────────────────────
+header: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: Colors.surface,
+  borderBottomWidth: StyleSheet.hairlineWidth,
+  borderBottomColor: Colors.border,
+  paddingHorizontal: 20,
+  paddingVertical: 12,
+},
+headerBrand: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+},
+headerBrandText: {
+  fontSize: 16,
+  fontWeight: '800',
+  color: Colors.textPrimary,
+  letterSpacing: 1.5,
+},
+
+// Logged-in state
+headerUser: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 10,
+},
+headerTextGroup: {
+  alignItems: 'flex-end',
+},
+headerGreeting: {
+  fontSize: 11,
+  color: Colors.textSecondary,
+  letterSpacing: 0.2,
+},
+headerName: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: Colors.textPrimary,
+},
+headerAvatar: {
+  width: 36,
+  height: 36,
+  borderRadius: 18,
+  backgroundColor: Colors.accent,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+headerAvatarText: {
+  fontSize: 13,
+  fontWeight: '700',
+  color: '#fff',
+},
+
+// Logged-out state
+headerLoginBtn: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 6,
+  backgroundColor: Colors.accent,
+  paddingHorizontal: 14,
+  paddingVertical: 8,
+  borderRadius: 20,
+},
+headerLoginText: {
+  fontSize: 13,
+  fontWeight: '600',
+  color: '#fff',
+  letterSpacing: 0.2,
+},
     errorBanner: {
       margin: 16,
       padding: 16,

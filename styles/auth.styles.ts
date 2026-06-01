@@ -429,6 +429,7 @@ export const createWelcomeScreenStyles = createThemedStyles((Colors: AppColors) 
       gap: 16,
       marginTop: 54,
       marginBottom: 60,
+      padding: 20
     },
     signInButton: {
       minHeight: 56,
