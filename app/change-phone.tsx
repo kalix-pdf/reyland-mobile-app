@@ -1,17 +1,19 @@
 import { ChangePersonalInfoView } from '@/components/profile/change-personal-info-view';
+import { getPhoneValue } from '@/components/profile/phone-value';
 import { useAuth } from '@/context/auth-context';
 import { setCachedUser } from '@/services/auth/auth-session';
 import { updatePhoneNumber } from '../services/user/update-phone.api';
 
 export default function ChangePhoneScreen() {
   const { setUser, user } = useAuth();
-  const hasPhone = Boolean(user?.phone?.trim()) && user?.phone !== 'null';
+  const phone = getPhoneValue(user?.phone);
+  const hasPhone = Boolean(phone);
 
   return (
     <ChangePersonalInfoView
       title={hasPhone ? "Change Phone Number" : "Add Phone Number"}
       currentLabel="Current Phone Number"
-      currentValue={hasPhone ? user?.phone ?? '' : ''}
+      currentValue={hasPhone ? phone ?? '' : ''}
       inputs={[
         { key: 'phone', placeholder: 'Phone number', keyboardType: 'phone-pad' },
         { key: 'confirmPhone', placeholder: 'Confirm phone number', keyboardType: 'phone-pad' },
