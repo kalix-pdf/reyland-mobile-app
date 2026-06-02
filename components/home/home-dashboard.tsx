@@ -23,52 +23,6 @@ const QUICK_ACTIONS = [
 
 const styles = createHomeDashboardStyles(Colors);
 
-// ─── Floating Header ──────────────────────────────────────────────────────────
-const FloatingHeader = React.memo(({
-  user,
-  onLoginPress,
-}: {
-  user: { name: string } | null;
-  onLoginPress: () => void;
-}) => {
-  const firstName = user?.name?.split(' ')[0] ?? null;
-  const initials  = user?.name
-    ?.split(' ')
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase() ?? '')
-    .join('') ?? '';
-
-  return (
-    <View style={styles.header}>
-      {/* Brand */}
-      <View style={styles.headerBrand}>
-        <Text style={styles.headerBrandText}>REYLAND</Text>
-      </View>
-
-      {/* Right side */}
-      {user ? (
-        <View style={styles.headerUser}>
-          <View style={styles.headerTextGroup}>
-            <Text style={styles.headerGreeting}>Welcome back</Text>
-            <Text style={styles.headerName}>{firstName}</Text>
-          </View>
-          <View style={styles.headerAvatar}>
-            <Text style={styles.headerAvatarText}>{initials}</Text>
-          </View>
-        </View>
-      ) : (
-        <Pressable
-          style={({ pressed }) => [styles.headerLoginBtn, pressed && styles.pressed]}
-          onPress={onLoginPress}
-        >
-          <Ionicons name="person-outline" size={15} color="#fff" />
-          <Text style={styles.headerLoginText}>Sign In</Text>
-        </Pressable>
-      )}
-    </View>
-  );
-});
-
 const LocationChip = React.memo(({ location }: { location: string }) => {
   const initials = location
     .split(' ')
@@ -185,8 +139,7 @@ export function HomeDashboard() {
   if (error) return <ErrorScreen message={error} onRetry={fetchProperties} />
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <FloatingHeader user={user} onLoginPress={handleLoginPress} />
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={ { paddingTop: insets.top + 18 }}
