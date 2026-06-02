@@ -34,6 +34,7 @@ export async function updateAvatar(file: AvatarFile) {
   try {
     const response = await apiClient.patch<UpdateAvatarResponse>(UPDATE_AVATAR_ENDPOINT, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      transformRequest: (data) => data,
     });
 
     return {
