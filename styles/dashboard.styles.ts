@@ -1,5 +1,5 @@
 import { AppColors } from '@/constants/colors';
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 import { createThemedStyles } from './foundations';
 import {
@@ -15,6 +15,8 @@ import {
   sharedPressedScale,
   sharedSmallAvatarBase,
 } from './shared-primitives';
+
+const { width } = Dimensions.get('window');
 
 export const createInvestorTabStyles = createThemedStyles((Colors: AppColors) =>
   StyleSheet.create({
@@ -240,7 +242,7 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       // paddingBottom: 32,
     // },
     hero: {
-      minHeight: 300,
+      minHeight: 260,
       marginHorizontal: 18,
       borderRadius: 30,
       overflow: 'hidden',
@@ -332,15 +334,15 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       lineHeight: 21,
       maxWidth: 330,
     },
-    avatarImage: {
-      ...sharedAvatarImageFill,
-    },
+    // avatarImage: {
+    //   ...sharedAvatarImageFill,
+    // },
     quickActionsRow: {
-      marginTop: 18,
       marginHorizontal: 18,
       flexDirection: 'row',
       justifyContent: 'space-between',
       gap: 12,
+      marginVertical: 8,
     },
     quickAction: {
       flex: 1,
@@ -579,18 +581,36 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       fontWeight: '900',
     },
     pressed: sharedPressedScale,
-    loginPillText: sharedLoginPillText,
-    loginPill: {
-      ...sharedLoginPillBase,
-      backgroundColor: Colors.primary,
-      borderColor: 'rgba(255,255,255,0.35)',
+    
+    // CAROUSEL STYLES --------------------------------
+    promoSection: {
+      marginVertical: 25,
     },
-    headerActionPressed: sharedHeaderActionPressed,
-    avatar: {
-      ...sharedSmallAvatarBase,
-      backgroundColor: Colors.primaryLight,
-      borderColor: 'rgba(255,255,255,0.24)',
+
+    promoCard: {
+      width,
+      height: 140,
+      paddingHorizontal: 16,
     },
+
+    promoImage: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 24,
+    },
+
+    // loginPillText: sharedLoginPillText,
+    // loginPill: {
+    //   ...sharedLoginPillBase,
+    //   backgroundColor: Colors.primary,
+    //   borderColor: 'rgba(255,255,255,0.35)',
+    // },
+    // headerActionPressed: sharedHeaderActionPressed,
+    // avatar: {
+    //   ...sharedSmallAvatarBase,
+    //   backgroundColor: Colors.primaryLight,
+    //   borderColor: 'rgba(255,255,255,0.24)',
+    // },
   }),
 );
 
@@ -766,18 +786,16 @@ export const createInvestorDashboardStyles = createThemedStyles((Colors: AppColo
     },
     heroHeader: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: 18,
+      justifyContent: 'flex-end',
     },
-    heroKicker: {
-      fontSize: 13,
-      fontWeight: '800',
-      color: 'rgba(255,255,255,0.76)',
-      textTransform: 'uppercase',
-      letterSpacing: 0.8,
-      marginBottom: 8,
-    },
+    // heroKicker: {
+    //   fontSize: 13,
+    //   fontWeight: '800',
+    //   color: 'rgba(255,255,255,0.76)',
+    //   textTransform: 'uppercase',
+    //   letterSpacing: 0.8,
+    //   marginBottom: 8,
+    // },
     heroTitle: {
       color: Colors.white,
       fontSize: 32,

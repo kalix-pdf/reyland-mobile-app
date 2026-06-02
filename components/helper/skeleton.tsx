@@ -93,12 +93,12 @@ export function LocationsSkeleton() {
   );
 }
 
-export function SpotlightSkeleton() {
+export function PromotionalCarouselSkeleton() {
   return (
-    <View style={{ paddingHorizontal: 16 }}>
-      <SkeletonBox width="100%" height={180} borderRadius={16} />
+    <View style={{ paddingHorizontal: 16, gap: 12 }}>
+      <SkeletonBox width="100%" height={140} borderRadius={24} />
     </View>
-  );
+  )
 }
 
 export function ProjectCardsSkeleton() {

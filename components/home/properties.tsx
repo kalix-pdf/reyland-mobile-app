@@ -1,7 +1,7 @@
 import PropertyCard from '@/components/property-card';
 import { Colors } from '@/constants/colors';
-import { fetchPropertyInfo } from '@/services/fetchData/property/fetch-property.api';
-import { Property } from '@/types/property.types';
+import { propertiesApi } from '@/services/fetchData/property/fetch-property.api';
+import type { Property } from '@/types';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -59,7 +59,7 @@ export function PropertiesScreen() {
         setRefreshing(false);
       }, 5000);
 
-      const { data, nextCursor: cursor, hasMore: more } = await fetchPropertyInfo();
+      const { data, nextCursor: cursor, hasMore: more } = await propertiesApi.getPaginated();
 
       setProperties(Array.isArray(data) ? data : []);
       setNextCursor(cursor);
@@ -79,7 +79,7 @@ export function PropertiesScreen() {
     try {
       setLoadingMore(true);
 
-      const { data, nextCursor: cursor, hasMore: more } = await fetchPropertyInfo(nextCursor);
+      const { data, nextCursor: cursor, hasMore: more } = await propertiesApi.getPaginated(nextCursor);
 
       setProperties((prev) => [...prev, ...(Array.isArray(data) ? data : [])]);
       setNextCursor(cursor);

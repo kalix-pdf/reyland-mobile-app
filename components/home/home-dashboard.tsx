@@ -1,23 +1,26 @@
 /* eslint-disable react/display-name */
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
-import { fetchFeaturedProperties } from '@/services/fetchData/property/fetch-property.api';
-import { Property } from '@/types/property.types';
+import { projectsApi } from '@/services/fetchData/project/fetch-project.api';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View, StyleSheet } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Text, View, StyleSheet, Dimensions } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
-import { ProjectCard } from '../helper/project-card';
-import { DashboardSkeleton, LocationsSkeleton, ProjectCardsSkeleton, QuickActionsSkeleton, SpotlightSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
+import { DashboardSkeleton, LocationsSkeleton, ProjectCardsSkeleton, QuickActionsSkeleton, PromotionalCarouselSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
+import { Header } from './header';
+import { Image } from 'expo-image';
+import { PromotionalCarousel } from './carousel';
+import type { Project } from '@/types';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
   { key: 'visit',   label: 'Site Visit',icon: 'calendar-outline'           },
   { key: 'reserve', label: 'Reserve',   icon: 'bookmark-outline'           },
+  { key: 'Invest', label: 'Invest',   icon: 'cash-outline'              },
   { key: 'support', label: 'Support',   icon: 'chatbubble-ellipses-outline'},
 ] as const;
 
@@ -45,13 +48,13 @@ const LocationChip = React.memo(({ location }: { location: string }) => {
 export function HomeDashboard() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState<string | null>(null);
   const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchProperties = useCallback(async (isRefreshing = false) => {
+  const fetchFeaturedProject = useCallback(async (isRefreshing = false) => {
       try {
         isRefreshing ? setRefreshing(true) : setLoading(true);
         setError(null);
@@ -64,10 +67,10 @@ export function HomeDashboard() {
           setRefreshing(false);
         }, 5000);
   
-        const data = await fetchFeaturedProperties();
-        setProperties(Array.isArray(data) ? data : []);
+        const data = await projectsApi.getFeatured();
+        setProjects(Array.isArray(data) ? data : []);
       } catch {
-        setError('Failed to load properties. Pull down to retry.');
+        setError('Failed to load projects. Pull down to retry.');
       } finally {
         clearTimeout(errorTimerRef.current!);
         errorTimerRef.current = null;
@@ -76,30 +79,25 @@ export function HomeDashboard() {
     }, []);
 
    useEffect(() => {
-      fetchProperties();
+      fetchFeaturedProject();
       return () => {
         if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
       };
-    }, [fetchProperties]);
+    }, [fetchFeaturedProject]);
 
   const handleRefresh = useCallback(() => {
-      fetchProperties(true); 
-    }, [fetchProperties]);
-
-  const featuredProperties = useMemo(() => properties.slice(0, 4), [properties]);
+      fetchFeaturedProject(true); 
+    }, [fetchFeaturedProject]);
 
   const locations = useMemo(() =>
     Array.from(
       new Set(
-        properties
-          .map((p) => p.project?.location?.split(',')[0]?.trim())
+        projects
+          .map((p) => p.location?.split(',')[0]?.trim())
           .filter((location): location is string => Boolean(location)),
       ),
     ).slice(0, 6),
-  [properties]);
-
-  const firstName = useMemo(() => user?.name?.split(' ')[0] ?? 'Guest', [user?.name]);
-  // const spotlightProperty = featuredProperties[0];
+  [projects]);
 
   const handleLoginPress   = useCallback(() => router.push('/welcome'), []);
   const handleDiscoverPress = useCallback(() => { 
@@ -117,15 +115,6 @@ export function HomeDashboard() {
     p.play();
   });
 
-  useFocusEffect(
-    useCallback(() => {
-      player.play();
-      return () => {
-        player.pause();
-      };
-    }, [player])
-  );
-
   // ── Render ─────────────────────────────────────────────────────────────────
 
   if (loading) {
@@ -136,71 +125,22 @@ export function HomeDashboard() {
     );
   }
 
-  if (error) return <ErrorScreen message={error} onRetry={fetchProperties} />
+  if (error) return <ErrorScreen message={error} onRetry={fetchFeaturedProject} />
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right']}>
-      <ScrollView
-        contentInsetAdjustmentBehavior="never"
-        contentContainerStyle={ { paddingTop: insets.top + 18 }}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={Colors.accentDark}
-            progressViewOffset={insets.top + 28}
-          />
-        }
-      >
-            {/* ── Hero ────────────────────────────────────────────────────── */}
-            <View style={styles.hero}>
-              <VideoView
-                player={player}
-                style={StyleSheet.absoluteFillObject}
-                contentFit="cover"
-                nativeControls={false}
-              />
+      <Header mode="home" user={user} onLogin={handleLoginPress} />
 
-              <View style={styles.heroOverlay} />
-              <View style={styles.heroGlow} />
-
-              <View style={styles.heroHeader}>
-                <View style={styles.brandPill}>
-                  <View style={styles.brandDot} />
-                  <Text style={styles.brandPillText}>REYLAND</Text>
-                </View>
-                <Pressable style={({ pressed }) => [styles.brandPill, pressed && styles.pressed]}>
-                  <Text style={styles.helpPillText}>Need Help?</Text>
-                </Pressable>
-              </View>
-
-              <View style={styles.heroBody}>
-                <View style={styles.heroCopy}>
-                  <Text style={styles.kicker}>Good day, {firstName}!</Text>
-                  <Text style={styles.heroTitle}>Find your next property with confidence.</Text>
-                  <Text style={styles.heroSubtitle}>
-                    Explore verified developments, featured locations, and ready-to-reserve listings.
-                  </Text>
-                </View>
-
-                {user ? (
-                  <Pressable style={({ pressed }) => [styles.avatar, pressed && styles.headerActionPressed]}>
-                    <Text style={styles.loginPillText}>{user.name}</Text>
-                  </Pressable>
-                ) : (
-                  <Pressable
-                    style={({ pressed }) => [styles.loginPill, pressed && styles.headerActionPressed]}
-                    onPress={handleLoginPress}
-                  >
-                    <Ionicons name="person-outline" size={16} color="#FFFFFF" />
-                    <Text style={styles.loginPillText}>Login</Text>
-                  </Pressable>
-                )}
-              </View>
-            </View>
-
-            {/* ── Quick Actions ────────────────────────────────────────────── */}
+      <ScrollView contentInsetAdjustmentBehavior="never"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={Colors.accentDark}
+              progressViewOffset={insets.top + 28}
+            />}>
+             {/* ── Quick Actions ────────────────────────────────────────────── */}
             <WithRefreshSkeleton refreshing={refreshing} skeleton={<QuickActionsSkeleton />}>
               <View style={styles.quickActionsRow}>
                 {QUICK_ACTIONS.map((action) => (
@@ -218,27 +158,44 @@ export function HomeDashboard() {
               </View>
             </WithRefreshSkeleton>
 
-            {/* ── Ongoing Projects ─────────────────────────────────────────── */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <View>
-                  <Text style={styles.sectionTitle}>Ongoing Projects</Text>
-                  <Text style={styles.sectionSubtitle}>Handpicked developments across key locations</Text>
+            <WithRefreshSkeleton refreshing={refreshing} skeleton={<PromotionalCarouselSkeleton />}>
+              <PromotionalCarousel />
+            </WithRefreshSkeleton>
+
+            {/* Featured Projects */}
+            <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton />}>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Featured Projects</Text>
+
+              </View>
+            </WithRefreshSkeleton>
+            
+            {/* ── Hero ────────────────────────────────────────────────────── */}
+            <View style={styles.hero}>
+              <VideoView
+                player={player}
+                style={StyleSheet.absoluteFillObject}
+                contentFit="cover"
+                nativeControls={false}
+              />
+
+              <View style={styles.heroOverlay} />
+              <View style={styles.heroGlow} />
+
+              <View style={styles.heroHeader}>
+                <Pressable style={({ pressed }) => [styles.brandPill, pressed && styles.pressed]}>
+                  <Text style={styles.helpPillText}>Need Help?</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.heroBody}>
+                <View style={styles.heroCopy}>
+                  <Text style={styles.heroTitle}>Find your next property with confidence.</Text>
+                  <Text style={styles.heroSubtitle}>
+                    Explore verified developments, featured locations, and ready-to-reserve listings.
+                  </Text>
                 </View>
               </View>
-              <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton />}>
-                <ScrollView
-                  horizontal
-                  contentInsetAdjustmentBehavior="never"
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.projectRow}
-                  decelerationRate="fast"
-                >
-                  {featuredProperties.map((property) => (
-                    <ProjectCard key={property.id} property={property} />
-                  ))}
-                </ScrollView>
-              </WithRefreshSkeleton>
             </View>
 
             {/* ── Project Locations ────────────────────────────────────────── */}
@@ -268,6 +225,8 @@ export function HomeDashboard() {
                 </ScrollView>
               </WithRefreshSkeleton>
             </View>
+
+
 
       </ScrollView>
     </SafeAreaView>

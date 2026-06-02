@@ -7,7 +7,7 @@ import { Alert, Image, Pressable, RefreshControl, ScrollView, Switch, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createProfileViewStyles } from '../../styles/profile.styles';
 import { getInitials } from './get-initials';
-// ─── Row ────────────────────────────────────────────────────────────────────
+import { Header } from '../home/header';
 
 type RowProps = {
   styles: ReturnType<typeof createProfileViewStyles>;
@@ -55,31 +55,31 @@ function Row({
 
 // ─── Toggle Row ─────────────────────────────────────────────────────────────
 
-type ToggleRowProps = Omit<RowProps, 'right' | 'showArrow' | 'danger' | 'value'> & {
-  value: boolean;
-  onValueChange: (v: boolean) => void;
-};
+// type ToggleRowProps = Omit<RowProps, 'right' | 'showArrow' | 'danger' | 'value'> & {
+//   value: boolean;
+//   onValueChange: (v: boolean) => void;
+// };
 
-function ToggleRow({ styles, colors, icon, label, value, isLast = false, onValueChange }: ToggleRowProps) {
-  return (
-    <Row
-      styles={styles}
-      colors={colors}
-      icon={icon}
-      label={label}
-      isLast={isLast}
-      showArrow={false}
-      right={
-        <Switch
-          value={value}
-          onValueChange={onValueChange}
-          // trackColor={{ false: colors.border, true: colors.accentLight }}
-          thumbColor={value ? colors.accent : '#F4F4F5'}
-        />
-      }
-    />
-  );
-}
+// function ToggleRow({ styles, colors, icon, label, value, isLast = false, onValueChange }: ToggleRowProps) {
+//   return (
+//     <Row
+//       styles={styles}
+//       colors={colors}
+//       icon={icon}
+//       label={label}
+//       isLast={isLast}
+//       showArrow={false}
+//       right={
+//         <Switch
+//           value={value}
+//           onValueChange={onValueChange}
+//           // trackColor={{ false: colors.border, true: colors.accentLight }}
+//           thumbColor={value ? colors.accent : '#F4F4F5'}
+//         />
+//       }
+//     />
+//   );
+// }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
@@ -108,9 +108,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       {/* Fixed header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Account</Text>
-      </View>
+      <Header mode="account" />
 
       <ScrollView
         contentInsetAdjustmentBehavior="never"
@@ -126,10 +124,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
         }
       >
         {/* Profile strip */}
-        <Pressable
-          style={({ pressed }) => [styles.profileCard, pressed && styles.rowPressed]}
-          onPress={() => Alert.alert('Edit Profile')}
-        >
+        <View style={styles.profileCard}>
           {/* Avatar */}
           <View style={styles.avatar}>
             {user.avatar ? (
@@ -162,7 +157,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
               )}
             </View>
           </View>
-        </Pressable>
+        </View>
 
         {user.status !== 0 && (
           <>

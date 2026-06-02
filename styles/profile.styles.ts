@@ -215,12 +215,12 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
     },
     scrollContent: {
       paddingHorizontal: 20,
-      paddingTop: 18,
+      // paddingTop: 18,
       paddingBottom: 40,
     },
     profileSummary: {
       alignItems: 'center',
-      marginBottom: 24,
+      marginVertical: 24,
     },
     avatar: {
       width: 104,

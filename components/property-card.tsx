@@ -1,3 +1,5 @@
+//needs to be refactored
+
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import React from 'react';
