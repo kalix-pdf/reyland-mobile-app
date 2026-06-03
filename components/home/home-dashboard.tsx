@@ -1,19 +1,19 @@
 /* eslint-disable react/display-name */
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
+import { useDashboard } from '@/context/dashboard-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import React, { useCallback } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
-import { DashboardSkeleton, LocationsSkeleton, ProjectCardsSkeleton, QuickActionsSkeleton, PromotionalCarouselSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
-import { Header } from './header';
+import { DashboardSkeleton, LocationsSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, QuickActionsSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll } from './featured-project';
-import { useDashboard } from '@/context/dashboard-context';
+import { Header } from './header';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },

@@ -1,4 +1,4 @@
-import { AppColors, Colors } from '@/constants/colors';
+import { AppColors } from '@/constants/colors';
 import { StyleSheet } from 'react-native';
 
 import { createThemedStyles } from './foundations';
@@ -7,73 +7,96 @@ import { sharedHeaderActionPressed, sharedLoginPillBase, sharedLoginPillText, sh
 export const createHeaderStyles = createThemedStyles((colors: AppColors) =>
     StyleSheet.create({
         header: {
-            paddingHorizontal: 20,
-            paddingVertical: 16,
+            paddingHorizontal: 18,
+            paddingTop: 12,
+            paddingBottom: 14,
             borderBottomWidth: StyleSheet.hairlineWidth,
-            borderBottomColor: Colors.border,
-            backgroundColor: Colors.background,
+            borderBottomColor: colors.border,
+            backgroundColor: colors.surface,
         },
         headerTitle: {
-            fontSize: 18,
-            fontWeight: '600',
-            color: Colors.textPrimary,
-            letterSpacing: -0.5,
+            fontSize: 22,
+            lineHeight: 28,
+            fontWeight: '900',
+            color: colors.textPrimary,
             textAlign: 'center',
+            marginBottom: 12,
         },
         headerTop: {
-            paddingTop: 20,
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            gap: 14,
+            marginBottom: 14,
         },
         user: {
             flexDirection: 'row', 
-            alignItems: 'center', gap: 8
+            alignItems: 'center',
+            gap: 8,
+            maxWidth: 180,
         },
         greetingText: {
-            color: Colors.accentDark,
-            fontWeight: '600',
+            color: colors.textSecondary,
+            fontSize: 13,
+            fontWeight: '800',
+            flexShrink: 1,
         },
         userSection: {
             flexDirection: 'row',
             alignItems: 'center',
+            flexShrink: 0,
         },
         loginPillText: sharedLoginPillText,
         loginPill: {
             ...sharedLoginPillBase,
-            backgroundColor: Colors.primary,
+            minHeight: 40,
+            paddingHorizontal: 14,
+            paddingVertical: 9,
+            backgroundColor: colors.primary,
             borderColor: 'rgba(255,255,255,0.35)',
         },
         headerActionPressed: sharedHeaderActionPressed,
         avatar: {
             ...sharedSmallAvatarBase,
-            backgroundColor: Colors.primaryLight,
-            borderColor: 'rgba(255,255,255,0.24)',
+            width: 42,
+            height: 42,
+            borderRadius: 21,
+            backgroundColor: colors.primaryLight,
+            borderColor: colors.border,
         },
         
         logoImage: {
-            width: 130,
-            height: 40,
+            width: 128,
+            height: 36,
         },
         // Search bar
         searchRow: {
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: Colors.background,
-            borderRadius: 10,
+            backgroundColor: colors.background,
+            borderRadius: 16,
             borderWidth: 1,
-            borderColor: Colors.border,
-            paddingHorizontal: 12,
-            height: 44,
+            borderColor: colors.border,
+            paddingHorizontal: 14,
+            minHeight: 48,
+            shadowColor: colors.primary,
+            shadowOpacity: 0.03,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 1,
         },
-            searchRowFocused: {
-            borderColor: Colors.accent,
+        searchRowFocused: {
+            borderColor: colors.accent,
+            backgroundColor: colors.surface,
         },
         searchInput: {
             flex: 1,
             fontSize: 14,
-            color: Colors.textPrimary,
-            marginLeft: 8,
+            lineHeight: 19,
+            color: colors.textPrimary,
+            marginLeft: 9,
+            fontWeight: '600',
+            paddingVertical: 0,
         },
     })
 );

@@ -4,6 +4,7 @@ import React, {
   useState,
   useMemo,
   useCallback,
+  useEffect,
   type ReactNode,
 } from 'react';
 import { propertiesApi } from '@/services/fetchData/property/fetch-property.api';
@@ -52,7 +53,29 @@ interface PropertiesProviderProps {
 
 export function PropertiesProvider({ children }: PropertiesProviderProps) {
   const [activeFilter, setActiveFilter] = useState<Filter>('All');
-  const [search, setSearch] = useState('');
+  const [search, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    if (search.trim().length === 0) {
+      setDebouncedSearch('');
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  const setSearch = useCallback((value: string) => {
+    setSearchInput(value);
+
+    if (value.trim().length === 0) {
+      setDebouncedSearch('');
+    }
+  }, []);
 
   // Stable fetcher reference passed to the hook
   const fetcherFn = useCallback(
@@ -65,7 +88,7 @@ export function PropertiesProvider({ children }: PropertiesProviderProps) {
   });
 
   const filtered = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
+    const normalizedSearch = debouncedSearch.trim().toLowerCase();
 
     return properties.filter((property) => {
       const location = property.project?.location ?? '';
@@ -80,7 +103,7 @@ export function PropertiesProvider({ children }: PropertiesProviderProps) {
 
       return matchesFilter && matchesSearch;
     });
-  }, [properties, activeFilter, search]);
+  }, [properties, activeFilter, debouncedSearch]);
 
   const value = useMemo<PropertiesContextValue>(
     () => ({

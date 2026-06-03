@@ -87,8 +87,9 @@ const handleConfirmAvatarUpload = async () => {
 
   const name = selectedAvatar.fileName ?? `avatar-${Date.now()}.jpg`
   const type = selectedAvatar.mimeType ?? 'image/jpeg'
-
+  
   try {
+    setSelectedAvatar(null)
     setIsUploadingAvatar(true)
 
     const updated = await updateAvatar({
@@ -96,7 +97,7 @@ const handleConfirmAvatarUpload = async () => {
       name,
       type,
     })
-
+    
     if (!updated.avatar) {
       throw new Error('Profile photo update did not return an image URL.')
     }
@@ -105,7 +106,6 @@ const handleConfirmAvatarUpload = async () => {
     setUser(nextUser)
     await setCachedUser(nextUser)
 
-    setSelectedAvatar(null)
     Alert.alert('Photo Updated', updated.message)
   } catch (error) {
     Alert.alert(
