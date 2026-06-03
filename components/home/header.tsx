@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, TextInput } from 'react-native';
 import { User } from '../../types/user.types';
 import { createHeaderStyles } from '../../styles/header.styles';
 import { Colors } from '@/constants/colors';
@@ -6,6 +6,8 @@ import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getInitials } from '../profile/get-initials';
+import { Feather } from '@expo/vector-icons';
+import { useState } from 'react';
 
 const styles = createHeaderStyles(Colors);
 
@@ -13,16 +15,13 @@ interface HeaderProps {
     mode: 'account' | 'home' | 'properties';
     user?: User | null;
     onLogin?: () => void;
+    search?: string;
+    onSearchChange?: (text: string) => void;
 }
 
-export function Header({ mode, user, onLogin }: HeaderProps) {
+export function Header({ mode, user, onLogin, search = '', onSearchChange }: HeaderProps) {
     const insets = useSafeAreaInsets();
-    const today = new Date().toLocaleDateString('en-PH', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     switch (mode) {
         case 'account':
@@ -35,14 +34,20 @@ export function Header({ mode, user, onLogin }: HeaderProps) {
             return (
                 <View style={[styles.header, { paddingTop: insets.top }]}>
                     <View style={styles.headerTop}>
-                        <View style={styles.logo}>
-                            <Text style={styles.logo}>Reyland PH</Text>
+                        <View>
+                            <Image source={require('@/assets/images/logo-header.png')}
+                                contentFit="contain"
+                                style={styles.logoImage}
+                                cachePolicy="memory-disk"
+                                priority="normal"
+                                transition={200}
+                            />
                         </View>
 
                         <View style={styles.userSection}>
                         {user ? (
                             <View style={styles.user}>
-                                <Text> Greetings, {getInitials(user.name)}!</Text>
+                                <Text style={styles.greetingText}> Greetings, {getInitials(user.name)}!</Text>
                                 <Image source={{ uri: user?.avatar }}
                                     style={styles.avatar}
                                     contentFit="cover"
@@ -63,15 +68,60 @@ export function Header({ mode, user, onLogin }: HeaderProps) {
                         </View>
                     </View>
 
-                    <Text style={styles.dateText}>{today}</Text>
+                    {/* Search */}
+                    <View style={[styles.searchRow, isSearchFocused && styles.searchRowFocused]}>
+                        <Feather
+                            name="search"
+                            size={16}
+                            color={isSearchFocused ? Colors.accent : Colors.textMuted}
+                        />
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="Search by title or location"
+                            placeholderTextColor={Colors.textMuted}
+                            value={search}
+                            onChangeText={onSearchChange}
+                            onFocus={() => setIsSearchFocused(true)}
+                            onBlur={() => setIsSearchFocused(false)}
+                            returnKeyType="search"
+                        />
+                        {search.length > 0 && (
+                        <Pressable onPress={() => onSearchChange?.('')} hitSlop={8}>
+                            <Ionicons name="close-circle" size={18} color={Colors.textMuted} />
+                        </Pressable>
+                        )}
+                    </View>
                 </View>
             );
         case 'properties':
-            return (
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Properties</Text>
+        return (
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>Properties</Text>
+
+                <View style={[styles.searchRow, isSearchFocused && styles.searchRowFocused]}>
+                    <Feather
+                        name="search"
+                        size={16}
+                        color={isSearchFocused ? Colors.accent : Colors.textMuted}
+                    />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search by title or location"
+                        placeholderTextColor={Colors.textMuted}
+                        value={search}
+                        onChangeText={onSearchChange}
+                        onFocus={() => setIsSearchFocused(true)}
+                        onBlur={() => setIsSearchFocused(false)}
+                        returnKeyType="search"
+                    />
+                    {search.length > 0 && (
+                        <Pressable onPress={() => onSearchChange?.('')} hitSlop={8}>
+                            <Ionicons name="close-circle" size={18} color={Colors.textMuted} />
+                        </Pressable>
+                    )}
                 </View>
-            );
+            </View>
+        );
         default:
             return null;
     }

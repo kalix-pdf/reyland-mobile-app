@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/auth-context';
 import { Redirect } from 'expo-router';
 import { PropertiesScreen } from '../../components/home/properties';
+import { PropertiesProvider } from '@/context/properties.context';
 
 export default function DiscoverScreen() {
   const { user } = useAuth();
@@ -9,5 +10,9 @@ export default function DiscoverScreen() {
     return <Redirect href="/" />;
   }
 
-  return <PropertiesScreen />;
+  return (
+    <PropertiesProvider>
+      <PropertiesScreen />
+    </PropertiesProvider>
+  );
 }

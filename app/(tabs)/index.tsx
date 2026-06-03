@@ -1,6 +1,7 @@
 import { HomeDashboard } from '@/components/home/home-dashboard';
 import { useAuth } from '@/context/auth-context';
 import { Redirect } from 'expo-router';
+import { DashboardProvider } from '@/context/dashboard-context';
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -8,5 +9,9 @@ export default function HomeScreen() {
     return <Redirect href="/" />;
   }
 
-  return <HomeDashboard />;
+  return (
+    <DashboardProvider>
+      <HomeDashboard />
+    </DashboardProvider>
+  )
 }

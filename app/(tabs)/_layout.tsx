@@ -15,20 +15,20 @@ const TAB_SCREENS = [
   {
     name: 'discover',
     title: 'Discover',
-    icon: 'compass-outline',
-    activeIcon: 'compass',
+    icon: 'telescope-outline',
+    activeIcon: 'telescope',
   },
   {
     name: 'investor',
     title: 'Investor',
-    icon: 'business-outline',
-    activeIcon: 'business',
+    icon: 'pulse-outline',
+    activeIcon: 'pulse',
   },
   {
     name: 'profile',
     title: 'Profile',
-    icon: 'person-outline',
-    activeIcon: 'person',
+    icon: 'person-circle-outline',
+    activeIcon: 'person-circle',
   },
 ] as const;
 

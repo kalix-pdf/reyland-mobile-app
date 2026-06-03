@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import { View, Text, Pressable, Dimensions } from 'react-native';
+import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { ReduceMotion } from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import { PROMO_BANNERS } from '../../data/promotions';
-import { createHomeDashboardStyles } from '@/styles/dashboard.styles';
-import { Colors } from '@/constants/colors';
 
-const styles = createHomeDashboardStyles(Colors);
 const { width } = Dimensions.get('window');
 
 export function PromotionalCarousel() {
@@ -18,9 +15,9 @@ export function PromotionalCarousel() {
       <ReanimatedCarousel
         loop
         autoPlay
-        autoPlayInterval={2000}
+        autoPlayInterval={3000}
         width={width}
-        height={140}
+        height={130}
         data={PROMO_BANNERS}
         withAnimation={{
           type: 'timing',
@@ -68,3 +65,24 @@ export function PromotionalCarousel() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  promoSection: {
+    marginTop: 25,
+    marginBottom: 10,
+  },
+
+  promoCard: {
+    width,
+    height: 130,
+    paddingHorizontal: 16,
+  },
+
+  promoImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 24,
+  },
+});
+
+  

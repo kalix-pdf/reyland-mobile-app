@@ -30,10 +30,9 @@ export const createHeaderStyles = createThemedStyles((colors: AppColors) =>
             flexDirection: 'row', 
             alignItems: 'center', gap: 8
         },
-        logo: {
-            flexDirection: 'column',
-            fontSize: 19,
-            fontWeight: '700',
+        greetingText: {
+            color: Colors.accentDark,
+            fontWeight: '600',
         },
         userSection: {
             flexDirection: 'row',
@@ -51,12 +50,30 @@ export const createHeaderStyles = createThemedStyles((colors: AppColors) =>
             backgroundColor: Colors.primaryLight,
             borderColor: 'rgba(255,255,255,0.24)',
         },
-        dateText: {
-            marginTop: 8,
-            fontSize: 13,
-            backgroundColor: Colors.surfaceMuted,
-            color: '#666',
-            padding: 10
+        
+        logoImage: {
+            width: 130,
+            height: 40,
+        },
+        // Search bar
+        searchRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: Colors.background,
+            borderRadius: 10,
+            borderWidth: 1,
+            borderColor: Colors.border,
+            paddingHorizontal: 12,
+            height: 44,
+        },
+            searchRowFocused: {
+            borderColor: Colors.accent,
+        },
+        searchInput: {
+            flex: 1,
+            fontSize: 14,
+            color: Colors.textPrimary,
+            marginLeft: 8,
         },
     })
 );

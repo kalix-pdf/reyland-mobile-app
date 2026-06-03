@@ -243,17 +243,12 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
     // },
     hero: {
       minHeight: 260,
-      marginHorizontal: 18,
       borderRadius: 30,
       overflow: 'hidden',
       paddingHorizontal: 22,
       paddingTop: 18,
       paddingBottom: 26,
-      justifyContent: 'space-between',
       backgroundColor: Colors.accentDark,
-    },
-    heroImage: {
-      borderRadius: 30,
     },
     heroOverlay: {
       ...StyleSheet.absoluteFillObject,
@@ -273,28 +268,7 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       justifyContent: 'space-between',
       alignItems: 'center',
     },
-    brandBadge: {
-      backgroundColor: 'rgba(0, 23, 28, 0.85)',
-      paddingHorizontal: 14,
-      paddingVertical: 10,
-      borderRadius: 999,
-      borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.18)',
-    },
-    brandBadgeText: {
-      color: Colors.textOnDark,
-      fontSize: 11,
-      fontWeight: '900',
-      letterSpacing: 1.2,
-    },
-    brandDot: {
-      ...sharedBrandDotBase,
-      backgroundColor: Colors.logoGreenLight,
-    },
-    brandPillText: {
-      ...sharedBrandPillTextBase,
-      color: Colors.white,
-    },
+    
     brandPill: {
       ...sharedBrandPillBase,
       borderColor: 'rgba(255, 255, 255, 0.14)',
@@ -368,24 +342,23 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
     quickActionLabel: {
       color: Colors.textSecondary,
       fontSize: 11,
-      fontWeight: '700',
+      fontWeight: '600',
       textAlign: 'center',
       letterSpacing: 0.2,
     },
     section: {
-      marginTop: 28,
+      marginHorizontal: 18,
+      marginTop: 15,
     },
     sectionHeader: {
-      paddingHorizontal: 18,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      gap: 14,
+      marginBottom: 15,
     },
     sectionTitle: {
-      color: Colors.textPrimary,
-      fontSize: 25,
-      fontWeight: '900',
+      fontSize: 23,
+      fontWeight: '600',
       letterSpacing: -0.7,
     },
     sectionSubtitle: {
@@ -402,52 +375,7 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       fontSize: 13,
       fontWeight: '800',
     },
-    projectRow: {
-      paddingLeft: 18,
-      paddingRight: 6,
-      paddingTop: 18,
-      gap: 14,
-    },
-    projectCard: {
-      width: 280,
-      borderRadius: 24,
-      backgroundColor: Colors.surface,
-      borderWidth: 1,
-      borderColor: Colors.border,
-      overflow: 'hidden',
-      shadowColor: Colors.primary,
-      shadowOpacity: 0.05,
-      shadowRadius: 14,
-      shadowOffset: { width: 0, height: 8 },
-      elevation: 3,
-    },
-    projectImage: {
-      width: '100%',
-      height: 158,
-      backgroundColor: Colors.surfaceMuted,
-    },
-    projectContent: {
-      padding: 16,
-    },
-    projectBadge: {
-      alignSelf: 'flex-start',
-      backgroundColor: Colors.tag,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 999,
-      marginBottom: 10,
-    },
-    projectBadgeText: {
-      color: Colors.tagText,
-      fontSize: 11,
-      fontWeight: '900',
-    },
-    projectName: {
-      color: Colors.textPrimary,
-      fontSize: 18,
-      fontWeight: '900',
-      marginBottom: 8,
-    },
+   
     locationRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -459,26 +387,7 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       fontSize: 13,
       fontWeight: '600',
     },
-    projectPrice: {
-      color: Colors.accent,
-      fontSize: 24,
-      fontWeight: '900',
-      marginTop: 14,
-      letterSpacing: -0.4,
-    },
-    projectFooter: {
-      marginTop: 14,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      gap: 10,
-    },
-    projectMeta: {
-      flex: 1,
-      color: Colors.textMuted,
-      fontSize: 12,
-      fontWeight: '700',
-    },
+   
     reservePill: {
       backgroundColor: Colors.accent,
       paddingHorizontal: 14,
@@ -490,30 +399,25 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       fontSize: 12,
       fontWeight: '900',
     },
-    locationList: {
-      paddingLeft: 18,
-      paddingRight: 6,
-      paddingTop: 18,
-      gap: 12,
-    },
     locationChip: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
       backgroundColor: Colors.surface,
-      borderRadius: 999,
+      borderRadius: 500,
       paddingVertical: 10,
       paddingHorizontal: 12,
       borderWidth: 1,
       borderColor: Colors.border,
+      marginEnd: 12,
+      marginBottom: 15,
     },
-    locationInitials: {
-      width: 42,
-      height: 42,
-      borderRadius: 21,
+    dateText: {
+      marginTop: 8,
+      fontSize: 13,
       backgroundColor: Colors.surfaceMuted,
-      alignItems: 'center',
-      justifyContent: 'center',
+      color: '#666',
+      padding: 10
     },
     locationInitialsText: {
       color: Colors.textPrimary,
@@ -526,78 +430,7 @@ export const createHomeDashboardStyles = createThemedStyles((Colors: AppColors) 
       fontWeight: '700',
       maxWidth: 140,
     },
-    spotlightCard: {
-      marginTop: 28,
-      marginHorizontal: 18,
-      borderRadius: 28,
-      overflow: 'hidden',
-      shadowColor: Colors.primary,
-      shadowOpacity: 0.08,
-      shadowRadius: 16,
-      shadowOffset: { width: 0, height: 10 },
-      elevation: 4,
-    },
-    spotlightBackground: {
-      minHeight: 214,
-      justifyContent: 'flex-end',
-    },
-    spotlightImage: {
-      borderRadius: 28,
-    },
-    spotlightOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: 'rgba(0, 44, 34, 0.58)',
-    },
-    spotlightContent: {
-      padding: 22,
-    },
-    spotlightTextWrap: {
-      maxWidth: 240,
-    },
-    spotlightTitle: {
-      color: Colors.textOnDark,
-      fontSize: 30,
-      lineHeight: 34,
-      fontWeight: '900',
-      letterSpacing: -0.8,
-    },
-    spotlightText: {
-      marginTop: 10,
-      color: 'rgba(255,255,255,0.82)',
-      fontSize: 14,
-      lineHeight: 21,
-    },
-    spotlightButton: {
-      marginTop: 18,
-      alignSelf: 'flex-start',
-      backgroundColor: Colors.surface,
-      paddingHorizontal: 16,
-      paddingVertical: 11,
-      borderRadius: 999,
-    },
-    spotlightButtonText: {
-      color: Colors.primary,
-      fontSize: 13,
-      fontWeight: '900',
-    },
     pressed: sharedPressedScale,
-    
-    // CAROUSEL STYLES --------------------------------
-    promoSection: {
-      marginVertical: 25,
-    },
-
-    promoCard: {
-      width,
-      height: 140,
-      paddingHorizontal: 16,
-    },
-
-    promoImage: {
-      width: '100%',
-      height: '100%',
-      borderRadius: 24,
-    },
 
     // loginPillText: sharedLoginPillText,
     // loginPill: {
@@ -637,28 +470,7 @@ export const createPropertiesScreenStyles = (Colors: AppColors) =>
       letterSpacing: -0.3,
       marginBottom: 12,
     },
- 
-    // Search bar
-    searchRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: Colors.background,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: Colors.border,
-      paddingHorizontal: 12,
-      height: 44,
-    },
-    searchRowFocused: {
-      borderColor: Colors.accent,
-    },
-    searchInput: {
-      flex: 1,
-      fontSize: 14,
-      color: Colors.textPrimary,
-      marginLeft: 8,
-    },
- 
+
     // Filter chips
     filters: {
       flexDirection: 'row',
@@ -685,7 +497,7 @@ export const createPropertiesScreenStyles = (Colors: AppColors) =>
     chipTextActive: {
       color: '#fff',
     },
- 
+
     // ── List ────────────────────────────────────────────────────────────────
     list: {
       paddingBottom: 24,

@@ -6,7 +6,7 @@ export const LightColors = {
 
   accent: "#008C4F",
   accentLight: "#4FC47A",
-  accentDark: "#006B3D",
+  accentDark: "#005530",
 
   // App surfaces
   background: "#F4F8F6",
