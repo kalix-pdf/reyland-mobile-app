@@ -96,7 +96,7 @@ export function Header({ mode, user, onLogin, search = '', onSearchChange }: Hea
         case 'properties':
         return (
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Properties</Text>
+                <Text style={styles.headerTitle}>Explore Projects</Text>
 
                 <View style={[styles.searchRow, isSearchFocused && styles.searchRowFocused]}>
                     <Feather

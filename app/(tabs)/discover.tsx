@@ -1,9 +1,9 @@
 import { useAuth } from '@/context/auth-context';
 import { Redirect } from 'expo-router';
-import { PropertiesScreen } from '../../components/home/properties';
-import { PropertiesProvider } from '@/context/properties.context';
+import { DiscoverScreen } from '../../components/home/discover';
+import { ProjectsProvider } from '@/context/project.context';
 
-export default function DiscoverScreen() {
+export default function DiscoverTab() {
   const { user } = useAuth();
 
   if (!user) {
@@ -11,8 +11,8 @@ export default function DiscoverScreen() {
   }
 
   return (
-    <PropertiesProvider>
-      <PropertiesScreen />
-    </PropertiesProvider>
+    <ProjectsProvider>
+      <DiscoverScreen />
+    </ProjectsProvider>
   );
 }

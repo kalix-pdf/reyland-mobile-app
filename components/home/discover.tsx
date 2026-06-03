@@ -1,4 +1,4 @@
-import PropertyCard from '@/components/property-card';
+import ProjectCard from '../project-card';
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
@@ -16,9 +16,9 @@ import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
 import { PropertiesSkeletonScreen } from '../helper/skeleton';
 import { Header } from './header';
-import { useProperties, FILTERS } from '@/context/properties.context';
+import { useProjects, FILTERS } from '@/context/project.context';
 
-export function PropertiesScreen() {
+export function DiscoverScreen() {
   const styles = createPropertiesScreenStyles(Colors);
 
   const {
@@ -35,7 +35,7 @@ export function PropertiesScreen() {
     loadMore,
     refresh,
     retry,
-  } = useProperties();
+  } = useProjects();
 
   if (loading) return <PropertiesSkeletonScreen styles={styles} />;
   if (error) return <ErrorScreen message={error} onRetry={retry} />;
@@ -72,7 +72,7 @@ export function PropertiesScreen() {
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <PropertyCard property={item} />}
+        renderItem={({ item }) => <ProjectCard project={item} />}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         onEndReached={loadMore}
@@ -85,7 +85,7 @@ export function PropertiesScreen() {
         ListHeaderComponent={
           <View style={styles.subHeader}>
             <Text style={styles.resultCount}>
-              {filtered.length} {filtered.length === 1 ? 'property' : 'properties'} found
+              {filtered.length} {filtered.length === 1 ? 'project' : 'projects'} found
             </Text>
             <Pressable style={styles.sortBtn}>
               <Ionicons name="options-outline" size={15} color={Colors.accent} />

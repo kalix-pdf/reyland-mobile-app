@@ -7,8 +7,6 @@ import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { Colors } from '../constants/colors';
 import { Property } from '../types/property.types';
 
-// const { width } = Dimensions.get('window');
-
 type Props = {
   property: Property;
 };
@@ -27,8 +25,15 @@ function PropertyCard({ property }: Props) {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => router.push({ pathname: '/property/[id]', params: { id: property.id } } as unknown as Href)}
       activeOpacity={0.92}
+      onPress={() =>
+        router.push({
+          pathname: '/property/[id]',
+          params: {
+            id: property.id.toString(),
+          },
+        })
+      }
     >
       <Image source={{ uri: property.image_url }} style={styles.image} />
 
