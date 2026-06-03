@@ -1,13 +1,13 @@
+import { useDataFetcher, type FetcherActions, type FetcherState } from '@/hooks/useDataFetcher';
+import { projectsApi } from '@/services/fetchData/project/fetch-project.api';
+import type { Project } from '@/types';
 import React, {
   createContext,
+  useCallback,
   useContext,
   useMemo,
-  useCallback,
   type ReactNode,
 } from 'react';
-import { projectsApi } from '@/services/fetchData/project/fetch-project.api';
-import { useDataFetcher, type FetcherState, type FetcherActions } from '@/hooks/useDataFetcher';
-import type { Project } from '@/types';
 
 interface DashboardContextValue extends FetcherState<Project[]>, FetcherActions {
   /** Unique city/region names derived from the fetched projects (max 6). */
