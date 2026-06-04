@@ -1,9 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Href, useRouter } from 'expo-router';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Colors } from '../constants/colors';
 import type { Project } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Colors } from '../constants/colors';
 
 type Props = {
   project: Project;
@@ -12,11 +12,11 @@ type Props = {
 function ProjectCard({ project }: Props) {
   const router = useRouter();
   const location = project.location?.trim() || 'Location unavailable';
+  const completionLabel = project.date_completed?.trim() || 'Completion TBA';
 
   return (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.92}
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
       onPress={() =>
         router.push({
           pathname: '/project-property/[id]',
@@ -29,41 +29,49 @@ function ProjectCard({ project }: Props) {
     >
       <Image source={{ uri: project.image_url }} style={styles.image} />
 
-      <View style={[styles.badge, project.location === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
-        <Text style={[styles.badgeText, project.location === 'For Rent' ? styles.rentBadgeText : styles.saleBadgeText]}>
-          {project.location}
-        </Text>
+      <View style={styles.badgeRow}>
+        {project.is_featured ? (
+          <View style={styles.featuredBadge}>
+            <Ionicons name="star" size={11} color={Colors.accent} />
+            <Text style={styles.featuredText}>Featured</Text>
+          </View>
+        ) : null}
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={1}>
-          {project.project_name}
-        </Text>
-        <View style={styles.addressRow}>
-          <Ionicons name="location-outline" size={14} color={Colors.accent} />
-          <Text style={styles.address} numberOfLines={1}>
-            {location}
-          </Text>
+        <View style={styles.titleRow}>
+          <View style={styles.titleBlock}>
+            <Text style={styles.title} numberOfLines={2}>
+              {project.project_name}
+            </Text>
+            <View style={styles.addressRow}>
+              <Ionicons name="location-outline" size={14} color={Colors.accent} />
+              <Text style={styles.address} numberOfLines={1}>
+                {location}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.openButton}>
+            <Ionicons name="chevron-forward" size={18} color={Colors.accent} />
+          </View>
         </View>
 
-        <View style={styles.specs}>
-          <View style={styles.spec}>
-            <Ionicons name="bed-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{project.status} Units</Text>
+        <View style={styles.metaRow}>
+          <View style={styles.metaItem}>
+            <Ionicons name="calendar-outline" size={14} color={Colors.textSecondary} />
+            <Text style={styles.metaText} numberOfLines={1}>
+              {completionLabel}
+            </Text>
           </View>
-          <View style={styles.specDivider} />
-          {/* <View style={styles.spec}>
-            <Ionicons name="water-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{project.status} </Text>
-          </View> */}
-          <View style={styles.specDivider} />
-          <View style={styles.spec}>
-            <Ionicons name="resize-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{project.date_completed} sqm</Text>
+          <View style={styles.metaDivider} />
+          <View style={styles.metaItem}>
+            <Ionicons name="home-outline" size={14} color={Colors.textSecondary} />
+            <Text style={styles.metaText}>View properties</Text>
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -72,53 +80,80 @@ export default React.memo(ProjectCard);
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
-    borderRadius: 24,
+    borderRadius: 20,
     marginHorizontal: 18,
-    marginBottom: 18,
+    marginBottom: 14,
     borderWidth: 1,
     borderColor: Colors.border,
     shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 14,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
     overflow: 'hidden',
+  },
+  pressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.985 }],
   },
   image: {
     width: '100%',
-    height: 200,
+    height: 190,
     backgroundColor: Colors.border,
   },
-  badge: {
+  badgeRow: {
     position: 'absolute',
     top: 14,
     left: 14,
-    paddingHorizontal: 12,
+    right: 14,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  featuredBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 11,
     paddingVertical: 6,
     borderRadius: 999,
+    backgroundColor: Colors.tag,
   },
-  rentBadge: { backgroundColor: Colors.rentBadge },
-  saleBadge: { backgroundColor: Colors.saleBadge },
-  badgeText: { fontSize: 11, fontWeight: '900', letterSpacing: 0.3 },
-  rentBadgeText: { color: Colors.rentBadgeText },
-  saleBadgeText: { color: Colors.saleBadgeText },
-  content: { padding: 18 },
-  price: {
-    fontSize: 22,
-    fontWeight: '900',
+  featuredText: {
     color: Colors.accent,
-    marginBottom: 4,
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  content: {
+    padding: 16,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  titleBlock: {
+    flex: 1,
   },
   title: {
     fontSize: 18,
+    lineHeight: 23,
     fontWeight: '900',
     color: Colors.textPrimary,
-    marginBottom: 8,
+  },
+  openButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.tag,
   },
   addressRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    marginTop: 8,
     marginBottom: 14,
   },
   address: {
@@ -127,17 +162,27 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     fontWeight: '600',
   },
-  specs: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 14,
+    paddingTop: 12,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
-  spec: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  specIcon: { marginRight: 5 },
-  specText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '600' },
-  specDivider: {
+  metaItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  metaText: {
+    flexShrink: 1,
+    fontSize: 12,
+    color: Colors.textSecondary,
+    fontWeight: '700',
+  },
+  metaDivider: {
     width: 1,
     height: 16,
     backgroundColor: Colors.border,

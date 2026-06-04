@@ -1,13 +1,15 @@
 import { useAuth } from '@/context/auth-context'
 import { useAppTheme } from '@/context/theme-context'
 import { User } from '@/types/user.types'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Feather, Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
 import { router } from 'expo-router'
 import React, { useState } from 'react'
-import { ActivityIndicator, Alert, Image, Modal, Pressable, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { setCachedUser } from '../../services/auth/auth-session'
+import { clearCachedUser, setCachedUser } from '../../services/auth/auth-session'
+import { deleteAccount } from '../../services/user/delete-account.api'
 import { updateAvatar } from '../../services/user/update-avatar.api'
 import { createPersonalInformationStyles } from '../../styles/profile.styles'
 import { getInitials } from './get-initials'
@@ -52,11 +54,15 @@ export function PersonalInformationView({ user }: PersonalInformationViewProps) 
   const { colors } = useAppTheme()
   const { setUser } = useAuth()
   const styles = createPersonalInformationStyles(colors)
-const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
-const [selectedAvatar, setSelectedAvatar] = useState<ImagePicker.ImagePickerAsset | null>(null)
-const initials = getInitials(user.name)
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false)
+  const [selectedAvatar, setSelectedAvatar] = useState<ImagePicker.ImagePickerAsset | null>(null)
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false)
+  const [deleteConfirmValue, setDeleteConfirmValue] = useState('')
+  const initials = getInitials(user.name)
   const phone = getPhoneValue(user.phone)
   const phoneNumber = phone ?? 'Not provided'
+  const canConfirmDelete = deleteConfirmValue.trim().toUpperCase() === 'DELETE'
 
 const handleChangePhoto = async () => {
   if (isUploadingAvatar) return
@@ -118,10 +124,38 @@ const handleConfirmAvatarUpload = async () => {
 }
 
   const handleDeleteAccount = () => {
-    Alert.alert('Delete Account', 'This action is irreversible. Are you sure you want to delete your account?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive' },
-    ])
+    setDeleteConfirmation(true)
+  }
+
+  const handleCloseDeleteConfirmation = () => {
+    if (isDeletingAccount) return
+
+    setDeleteConfirmation(false)
+    setDeleteConfirmValue('')
+  }
+
+  const handleConfirmDeleteAccount = async () => {
+    if (!canConfirmDelete || isDeletingAccount) return
+
+    try {
+      setIsDeletingAccount(true)
+      const result = await deleteAccount()
+
+      setDeleteConfirmation(false)
+      setDeleteConfirmValue('')
+      await AsyncStorage.multiRemove(['token', 'refreshToken'])
+      await clearCachedUser()
+      setUser(null)
+      Alert.alert('Account Deleted', result.message)
+      router.replace('/')
+    } catch (error) {
+      Alert.alert(
+        'Delete Failed',
+        error instanceof Error ? error.message : 'Unable to delete your account right now.',
+      )
+    } finally {
+      setIsDeletingAccount(false)
+    }
   }
 
   return (
@@ -247,6 +281,65 @@ const handleConfirmAvatarUpload = async () => {
                   <ActivityIndicator size="small" color={colors.background} />
                 ) : (
                   <Text style={styles.previewConfirmText}>Use Photo</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={deleteConfirmation}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          handleCloseDeleteConfirmation()
+        }}
+      >
+        <View style={styles.previewOverlay}>
+          <View style={styles.previewCard}>
+            <Text style={styles.previewTitle}>Delete Account</Text>
+            <Text style={styles.previewText}>
+              This action is permanent. Type DELETE to confirm you want to continue.
+            </Text>
+
+            <TextInput
+              value={deleteConfirmValue}
+              onChangeText={(value) => setDeleteConfirmValue(value.toUpperCase())}
+              placeholder="Type DELETE"
+              placeholderTextColor={colors.textMuted}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              editable={!isDeletingAccount}
+              style={styles.previewInput}
+            />
+
+            <View style={styles.previewActions}>
+              <Pressable
+                onPress={handleCloseDeleteConfirmation}
+                disabled={isDeletingAccount}
+                style={({ pressed }) => [
+                  styles.previewCancelButton,
+                  pressed && !isDeletingAccount && styles.buttonPressed,
+                  isDeletingAccount && styles.buttonDisabled,
+                ]}
+              >
+                <Text style={styles.previewCancelText}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={handleConfirmDeleteAccount}
+                disabled={!canConfirmDelete || isDeletingAccount}
+                style={({ pressed }) => [
+                  styles.previewDangerButton,
+                  pressed && canConfirmDelete && !isDeletingAccount && styles.buttonPressed,
+                  (!canConfirmDelete || isDeletingAccount) && styles.buttonDisabled,
+                ]}
+              >
+                {isDeletingAccount ? (
+                  <ActivityIndicator size="small" color={colors.error} />
+                ) : (
+                  <Text style={styles.previewDangerText}>Delete</Text>
                 )}
               </Pressable>
             </View>
