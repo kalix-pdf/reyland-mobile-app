@@ -26,8 +26,8 @@ export function Header({ mode, user, onLogin, search = '', onSearchChange }: Hea
     switch (mode) {
         case 'account':
             return (
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Account</Text>
+                <View style={styles.headerAccount}>
+                    <Text style={styles.headerAccountTitle}>Account</Text>
                 </View>
             );
         case 'home':

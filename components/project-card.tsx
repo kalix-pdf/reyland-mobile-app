@@ -2,7 +2,8 @@ import type { Project } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '../constants/colors';
 
 type Props = {
@@ -27,7 +28,12 @@ function ProjectCard({ project }: Props) {
         })
       }
     >
-      <Image source={{ uri: project.image_url }} style={styles.image} />
+      <Image source={{ uri: project.image_url }}
+        contentFit='cover'
+        transition={200}
+        priority={'low'}
+        cachePolicy={'memory-disk'}
+        style={styles.image} />
 
       <View style={styles.badgeRow}>
         {project.is_featured ? (

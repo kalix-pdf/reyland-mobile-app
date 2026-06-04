@@ -22,6 +22,20 @@ export const createHeaderStyles = createThemedStyles((colors: AppColors) =>
             textAlign: 'center',
             marginBottom: 12,
         },
+        headerAccount: {
+            paddingHorizontal: 20,
+            paddingVertical: 16,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: colors.border,
+            backgroundColor: colors.background,
+        },
+        headerAccountTitle: {
+            fontSize: 18,
+            fontWeight: '600',
+            color: colors.textPrimary,
+            letterSpacing: -0.5,
+            textAlign: 'center',
+        },
         headerTop: {
             flexDirection: 'row',
             justifyContent: 'space-between',

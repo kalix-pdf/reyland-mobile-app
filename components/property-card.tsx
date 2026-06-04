@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Href, useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '../constants/colors';
 import { Property } from '../types/property.types';
 
@@ -39,7 +40,12 @@ function PropertyCard({ property }: Props) {
         } as unknown as Href)
       }
     >
-      <Image source={{ uri: property.image_url }} style={styles.image} />
+      <Image source={{ uri: property.image_url }} 
+        cachePolicy={'memory-disk'}
+        transition={200}
+        priority={'normal'}
+        contentFit='cover'
+        style={styles.image} />
 
       <View style={styles.badgeRow}>
         <View style={[styles.badge, property.category === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
