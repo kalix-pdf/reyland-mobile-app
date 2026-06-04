@@ -108,10 +108,6 @@ export function HomeDashboard() {
               </View>
             </WithRefreshSkeleton>
 
-            <WithRefreshSkeleton refreshing={refreshing} skeleton={<PromotionalCarouselSkeleton />}>
-              <PromotionalCarousel />
-            </WithRefreshSkeleton>
-
             {/* Featured Projects */}
             <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton />}>
               <View style={styles.section}>
@@ -157,6 +153,10 @@ export function HomeDashboard() {
                 </View>
               </View>
             </View>
+
+            <WithRefreshSkeleton refreshing={refreshing} skeleton={<PromotionalCarouselSkeleton />}>
+              <PromotionalCarousel />
+            </WithRefreshSkeleton>
                   
             {/* ── Project Locations ────────────────────────────────────────── */}
             <View style={styles.section}>

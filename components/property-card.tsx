@@ -30,7 +30,14 @@ function PropertyCard({ property }: Props) {
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-      onPress={() => router.push({ pathname: '/property/[id]', params: { id: property.id } } as unknown as Href)}
+      onPress={() =>
+        router.push({
+          pathname: '/property/[id]',
+          params: {
+            id: property.id.toString(),
+          },
+        } as unknown as Href)
+      }
     >
       <Image source={{ uri: property.image_url }} style={styles.image} />
 

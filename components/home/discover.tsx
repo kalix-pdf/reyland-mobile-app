@@ -1,6 +1,5 @@
-import PropertyCard from '@/components/property-card';
 import { Colors } from '@/constants/colors';
-import { FILTERS, useProperties } from '@/context/properties.context';
+import { useProjects } from '@/context/project.context';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -16,30 +15,29 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
 import { PropertiesSkeletonScreen } from '../helper/skeleton';
+import ProjectCard from '../project-card';
 import { Header } from './header';
 
-export function PropertiesScreen() {
+export function DiscoverScreen() {
   const styles = createPropertiesScreenStyles(Colors);
 
   const {
+    project,
     filtered,
     loading,
     error,
     refreshing,
     loadingMore,
     hasMore,
-    activeFilter,
-    setActiveFilter,
     search,
     setSearch,
     loadMore,
     refresh,
     retry,
-  } = useProperties();
+  } = useProjects();
 
   const hasActiveSearch = search.trim().length > 0;
-  const hasActiveFilter = activeFilter !== 'All';
-  const resultLabel = filtered.length === 1 ? 'property' : 'properties';
+  const resultLabel = filtered.length === 1 ? 'project' : 'projects';
   const canLoadMore = hasMore && !loadingMore && filtered.length > 0;
 
   if (loading) return <PropertiesSkeletonScreen styles={styles} />;
@@ -60,7 +58,7 @@ export function PropertiesScreen() {
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <PropertyCard property={item} />}
+        renderItem={({ item }) => <ProjectCard project={item} />}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         onEndReached={canLoadMore ? loadMore : undefined}
@@ -69,7 +67,7 @@ export function PropertiesScreen() {
           loadingMore ? (
             <View style={styles.loadingMore}>
               <ActivityIndicator size="small" color={Colors.accent} />
-              <Text style={styles.loadingMoreText}>Loading more properties</Text>
+              <Text style={styles.loadingMoreText}>Loading more projects</Text>
             </View>
           ) : filtered.length > 0 && !hasMore ? (
             <Text style={styles.endText}>You have reached the end</Text>
@@ -77,40 +75,19 @@ export function PropertiesScreen() {
         }
         ListHeaderComponent={
           <View>
-            {/* <View style={styles.summaryCard}>
+            <View style={styles.summaryCard}>
               <View style={styles.summaryTopRow}>
                 <View>
                   <Text style={styles.summaryLabel}>Discover</Text>
-                  <Text style={styles.summaryTitle}>Available Properties</Text>
+                  <Text style={styles.summaryTitle}>Reyland Projects</Text>
                 </View>
                 <View style={styles.summaryIcon}>
-                  <Ionicons name="business-outline" size={21} color={Colors.accent} />
+                  <Ionicons name="map-outline" size={21} color={Colors.accent} />
                 </View>
               </View>
               <Text style={styles.summaryText}>
-                {properties.length} listed {properties.length === 1 ? 'property' : 'properties'} across Reyland projects.
+                Browse {project.length} development{project.length === 1 ? '' : 's'} by location and project name.
               </Text>
-            </View> */}
-
-            <View style={styles.filters}>
-              {FILTERS.map((f) => {
-                const active = activeFilter === f;
-                return (
-                  <Pressable
-                    key={f}
-                    style={({ pressed }) => [
-                      styles.chip,
-                      active && styles.chipActive,
-                      pressed && styles.chipPressed,
-                    ]}
-                    onPress={() => setActiveFilter(f)}
-                  >
-                    <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                      {f}
-                    </Text>
-                  </Pressable>
-                );
-              })}
             </View>
 
             <View style={styles.subHeader}>
@@ -118,19 +95,18 @@ export function PropertiesScreen() {
                 <Text style={styles.resultCount}>
                   {filtered.length} {resultLabel} found
                 </Text>
-                {(hasActiveSearch || hasActiveFilter) && (
+                {hasActiveSearch && (
                   <Text style={styles.resultContext}>
-                    {hasActiveSearch ? `Search: "${search.trim()}"` : `Showing ${activeFilter.toLowerCase()} listings`}
+                    Search: {search.trim()}
                   </Text>
                 )}
               </View>
 
-              {(hasActiveSearch || hasActiveFilter) && (
+              {hasActiveSearch && (
                 <Pressable
                   style={({ pressed }) => [styles.clearBtn, pressed && styles.chipPressed]}
                   onPress={() => {
                     setSearch('');
-                    setActiveFilter('All');
                   }}
                 >
                   <Ionicons name="close-circle" size={15} color={Colors.accent} />
@@ -143,21 +119,20 @@ export function PropertiesScreen() {
         ListEmptyComponent={
           <View style={styles.empty}>
             <View style={styles.emptyIcon}>
-              <Ionicons name="home-outline" size={28} color={Colors.accent} />
+              <Ionicons name="business-outline" size={28} color={Colors.accent} />
             </View>
-            <Text style={styles.emptyTitle}>No properties found</Text>
+            <Text style={styles.emptyTitle}>No projects found</Text>
             <Text style={styles.emptyText}>
-              Try changing your search or selecting a different filter.
+              Try changing your search or checking a nearby location.
             </Text>
-            {(hasActiveSearch || hasActiveFilter) && (
+            {hasActiveSearch && (
               <Pressable
                 style={({ pressed }) => [styles.emptyButton, pressed && styles.chipPressed]}
                 onPress={() => {
                   setSearch('');
-                  setActiveFilter('All');
                 }}
               >
-                <Text style={styles.emptyButtonText}>Reset filters</Text>
+                <Text style={styles.emptyButtonText}>Clear search</Text>
               </Pressable>
             )}
           </View>
