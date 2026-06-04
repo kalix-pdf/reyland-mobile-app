@@ -1,13 +1,13 @@
-import { View, Text, Pressable, TextInput } from 'react-native';
-import { User } from '../../types/user.types';
-import { createHeaderStyles } from '../../styles/header.styles';
 import { Colors } from '@/constants/colors';
+import { Feather } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { getInitials } from '../profile/get-initials';
-import { Feather } from '@expo/vector-icons';
 import { useState } from 'react';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { createHeaderStyles } from '../../styles/header.styles';
+import { User } from '../../types/user.types';
+import { getInitials } from '../profile/get-initials';
 
 const styles = createHeaderStyles(Colors);
 
@@ -114,11 +114,11 @@ export function Header({ mode, user, onLogin, search = '', onSearchChange }: Hea
                         onBlur={() => setIsSearchFocused(false)}
                         returnKeyType="search"
                     />
-                    {search.length > 0 && (
+                    {/* {search.length > 0 && (
                         <Pressable onPress={() => onSearchChange?.('')} hitSlop={8}>
                             <Ionicons name="close-circle" size={18} color={Colors.textMuted} />
                         </Pressable>
-                    )}
+                    )} */}
                 </View>
             </View>
         );

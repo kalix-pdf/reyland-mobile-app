@@ -1,6 +1,7 @@
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import { HomeDashboard } from '@/components/home/home-dashboard';
 import { useAuth } from '@/context/auth-context';
+import { DashboardProvider } from '@/context/dashboard-context';
 import { Redirect } from 'expo-router';
 
 export default function IndexScreen() {
@@ -18,7 +19,11 @@ export default function IndexScreen() {
     return <Redirect href="/(tabs)" />;
   }
 
-  return <HomeDashboard />;
+  return (
+    <DashboardProvider>
+      <HomeDashboard />
+    </DashboardProvider>
+  );
 }
 
 const styles = StyleSheet.create({

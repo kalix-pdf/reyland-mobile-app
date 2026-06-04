@@ -1,6 +1,7 @@
 import React, {
   createContext,
   useContext,
+  useEffect,
   useState,
   useMemo,
   useCallback,
@@ -14,22 +15,11 @@ import {
 } from '@/hooks/useDataFetcher';
 import type { Project } from '@/types';
 
-export const FILTERS = ['All', 'Available', 'Sold', 'Reserved'] as const;
-export type Filter = (typeof FILTERS)[number];
-
-export const STATUS_MAP: Record<Exclude<Filter, 'All'>, Project['status']> = {
-  Available: 0,
-  Sold: 1,
-  Reserved: 2,
-};
-
 interface ProjectsContextValue
   extends Omit<PaginatedFetcherState<Project>, 'data'>,
     FetcherActions {
   project: Project[];
   filtered: Project[];
-  activeFilter: Filter;
-  setActiveFilter: (filter: Filter) => void;
   search: string;
   setSearch: (value: string) => void;
 }
@@ -41,8 +31,29 @@ interface ProjectsProviderProps {
 }
 
 export function ProjectsProvider({ children }: ProjectsProviderProps) {
-  const [activeFilter, setActiveFilter] = useState<Filter>('All');
-  const [search, setSearch] = useState('');
+  const [search, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    if (search.trim().length === 0) {
+      setDebouncedSearch('');
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  const setSearch = useCallback((value: string) => {
+    setSearchInput(value);
+
+    if (value.trim().length === 0) {
+      setDebouncedSearch('');
+    }
+  }, []);
 
   const fetcherFn = useCallback(
     (cursor?: string) => projectsApi.getPaginated(cursor),
@@ -54,35 +65,29 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   });
 
   const filtered = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
+    const normalizedSearch = debouncedSearch.trim().toLowerCase();
 
     return project.filter((item) => {
       const location = item.location ?? '';
-
-      const matchesFilter =
-        activeFilter === 'All' ||
-        item.status === STATUS_MAP[activeFilter];
 
       const matchesSearch =
         normalizedSearch.length === 0 ||
         item.project_name.toLowerCase().includes(normalizedSearch) ||
         location.toLowerCase().includes(normalizedSearch);
 
-      return matchesFilter && matchesSearch;
+      return matchesSearch;
     });
-  }, [project, activeFilter, search]);
+  }, [project, debouncedSearch]);
 
   const value = useMemo<ProjectsContextValue>(
     () => ({
       project,
       filtered,
-      activeFilter,
-      setActiveFilter,
       search,
       setSearch,
       ...rest,
     }),
-    [project, filtered, activeFilter, search, rest],
+    [project, filtered, search, rest],
   );
 
   return (

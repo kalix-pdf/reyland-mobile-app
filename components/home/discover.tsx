@@ -1,5 +1,5 @@
-import ProjectCard from '../project-card';
 import { Colors } from '@/constants/colors';
+import { useProjects } from '@/context/project.context';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
@@ -15,27 +15,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
 import { PropertiesSkeletonScreen } from '../helper/skeleton';
+import ProjectCard from '../project-card';
 import { Header } from './header';
-import { useProjects, FILTERS } from '@/context/project.context';
 
 export function DiscoverScreen() {
   const styles = createPropertiesScreenStyles(Colors);
 
   const {
+    project,
     filtered,
     loading,
     error,
     refreshing,
     loadingMore,
     hasMore,
-    activeFilter,
-    setActiveFilter,
     search,
     setSearch,
     loadMore,
     refresh,
     retry,
   } = useProjects();
+
+  const hasActiveSearch = search.trim().length > 0;
+  const resultLabel = filtered.length === 1 ? 'project' : 'projects';
+  const canLoadMore = hasMore && !loadingMore && filtered.length > 0;
 
   if (loading) return <PropertiesSkeletonScreen styles={styles} />;
   if (error) return <ErrorScreen message={error} onRetry={retry} />;
@@ -50,23 +53,6 @@ export function DiscoverScreen() {
           search={search}
           onSearchChange={setSearch}
         />
-        
-        <View style={styles.filters}>
-          {FILTERS.map((f) => {
-            const active = activeFilter === f;
-            return (
-              <Pressable
-                key={f}
-                style={[styles.chip, active && styles.chipActive]}
-                onPress={() => setActiveFilter(f)}
-              >
-                <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                  {f}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
       </SafeAreaView>
 
       <FlatList
@@ -75,31 +61,80 @@ export function DiscoverScreen() {
         renderItem={({ item }) => <ProjectCard project={item} />}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0}
+        onEndReached={canLoadMore ? loadMore : undefined}
+        onEndReachedThreshold={0.35}
         ListFooterComponent={
           loadingMore ? (
-            <ActivityIndicator size="small" style={{ marginVertical: 25 }} />
+            <View style={styles.loadingMore}>
+              <ActivityIndicator size="small" color={Colors.accent} />
+              <Text style={styles.loadingMoreText}>Loading more projects</Text>
+            </View>
+          ) : filtered.length > 0 && !hasMore ? (
+            <Text style={styles.endText}>You have reached the end</Text>
           ) : null
         }
         ListHeaderComponent={
-          <View style={styles.subHeader}>
-            <Text style={styles.resultCount}>
-              {filtered.length} {filtered.length === 1 ? 'project' : 'projects'} found
-            </Text>
-            <Pressable style={styles.sortBtn}>
-              <Ionicons name="options-outline" size={15} color={Colors.accent} />
-              <Text style={styles.sortText}>Filter</Text>
-            </Pressable>
+          <View>
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryTopRow}>
+                <View>
+                  <Text style={styles.summaryLabel}>Discover</Text>
+                  <Text style={styles.summaryTitle}>Reyland Projects</Text>
+                </View>
+                <View style={styles.summaryIcon}>
+                  <Ionicons name="map-outline" size={21} color={Colors.accent} />
+                </View>
+              </View>
+              <Text style={styles.summaryText}>
+                Browse {project.length} development{project.length === 1 ? '' : 's'} by location and project name.
+              </Text>
+            </View>
+
+            <View style={styles.subHeader}>
+              <View>
+                <Text style={styles.resultCount}>
+                  {filtered.length} {resultLabel} found
+                </Text>
+                {hasActiveSearch && (
+                  <Text style={styles.resultContext}>
+                    Search: {search.trim()}
+                  </Text>
+                )}
+              </View>
+
+              {hasActiveSearch && (
+                <Pressable
+                  style={({ pressed }) => [styles.clearBtn, pressed && styles.chipPressed]}
+                  onPress={() => {
+                    setSearch('');
+                  }}
+                >
+                  <Ionicons name="close-circle" size={15} color={Colors.accent} />
+                  <Text style={styles.clearText}>Clear</Text>
+                </Pressable>
+              )}
+            </View>
           </View>
         }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons name="home-outline" size={36} color={Colors.textMuted} />
-            <Text style={styles.emptyTitle}>No properties found</Text>
+            <View style={styles.emptyIcon}>
+              <Ionicons name="business-outline" size={28} color={Colors.accent} />
+            </View>
+            <Text style={styles.emptyTitle}>No projects found</Text>
             <Text style={styles.emptyText}>
-              Try changing your search or selecting a different filter.
+              Try changing your search or checking a nearby location.
             </Text>
+            {hasActiveSearch && (
+              <Pressable
+                style={({ pressed }) => [styles.emptyButton, pressed && styles.chipPressed]}
+                onPress={() => {
+                  setSearch('');
+                }}
+              >
+                <Text style={styles.emptyButtonText}>Clear search</Text>
+              </Pressable>
+            )}
           </View>
         }
         refreshControl={

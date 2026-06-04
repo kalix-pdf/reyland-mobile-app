@@ -204,7 +204,7 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
       opacity: 0.5,
     },
     buttonDisabled: {
-      opacity: 0.7,
+      opacity: 0.6,
     },
     headerTitle: {
       flex: 1,
@@ -373,6 +373,21 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
       textAlign: 'center',
       marginBottom: 18,
     },
+    previewInput: {
+      width: '100%',
+      minHeight: 48,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surface,
+      paddingHorizontal: 14,
+      fontSize: 14,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+      marginBottom: 14,
+      textAlign: 'center',
+      textAlignVertical: 'center',
+    },
     previewActions: {
       width: '100%',
       flexDirection: 'row',
@@ -405,6 +420,21 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
       fontSize: 14,
       fontWeight: '800',
       color: Colors.background,
+    },
+    previewDangerButton: {
+      flex: 1,
+      minHeight: 46,
+      borderRadius: 8,
+      backgroundColor: Colors.errorBackground,
+      borderWidth: 1,
+      borderColor: Colors.errorBorder,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    previewDangerText: {
+      fontSize: 14,
+      fontWeight: '800',
+      color: Colors.error,
     },
   }),
 )
