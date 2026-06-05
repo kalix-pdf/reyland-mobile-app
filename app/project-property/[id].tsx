@@ -14,20 +14,18 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { usePropertySearch } from '@/hooks/user-property-search';
 
 import PropertyCard from '@/components/property-card';
 import { Colors } from '@/constants/colors';
 import { useProjectProperties } from '@/hooks/useProjectProperties';
 import type { Property } from '@/types/property.types';
 
-const STATUS_FILTERS: {
-  label: string;
-  value: 'All' | Property['status'];
-}[] = [
+const STATUS_FILTERS: { label: string; value: 'All' | Property['status']}[] = [
   { label: 'All', value: 'All' },
-  { label: 'Available', value: 0 },
-  { label: 'Sold', value: 1 },
-  { label: 'Reserved', value: 2 },
+  { label: 'Company Hold', value: 0 },
+  { label: 'Reserved', value: 1 },
+  { label: 'Sold', value: 2 },
 ];
 
 export default function ProjectPropertiesScreen() {
@@ -38,10 +36,8 @@ export default function ProjectPropertiesScreen() {
   const projectId = Number(id);
   const projectName = name?.trim() || 'Project Properties';
   const hasValidProjectId = Number.isFinite(projectId) && projectId > 0;
-  const [search, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeStatus, setActiveStatus] = useState<'All' | Property['status']>('All');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const {
     properties,
@@ -55,75 +51,40 @@ export default function ProjectPropertiesScreen() {
     error,
   } = useProjectProperties(hasValidProjectId ? projectId : 0);
 
-  useEffect(() => {
-    const trimmedSearch = search.trim();
-
-    if (!trimmedSearch) {
-      setDebouncedSearch('');
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setDebouncedSearch(trimmedSearch);
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [search]);
+  const {
+    inputValue: search,
+    results: searchResults,  
+    searching,               
+    searchError,
+    setInputValue: setSearchInput,
+    clear: clearSearch,
+  } = usePropertySearch({
+    projectId,
+    localProperties: properties,
+  });
+  
 
   const filteredProperties = useMemo(() => {
-    const normalizedSearch = debouncedSearch.toLowerCase();
+    if (activeStatus === 'All') return searchResults;
+      return searchResults.filter((p) => p.status === activeStatus);
+    }, [activeStatus, searchResults]);
+  
+  const hasActiveSearch = search.trim().length > 0;
+  const hasActiveStatusFilter = activeStatus !== 'All';
+  const hasActiveFilters = hasActiveSearch || hasActiveStatusFilter;
 
-    return properties.filter((property) => {
-      const matchesStatus =
-        activeStatus === 'All' || property.status === activeStatus;
-
-      if (!matchesStatus) {
-        return false;
-      }
-
-      if (!normalizedSearch) {
-        return true;
-      }
-
-      const searchableText = [
-        property.title,
-        property.short_description,
-        property.category,
-        property.project?.location,
-        property.price?.toString(),
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-
-      return searchableText.includes(normalizedSearch);
-    });
-  }, [activeStatus, debouncedSearch, properties]);
+  const activeStatusLabel =
+    STATUS_FILTERS.find((filter) => filter.value === activeStatus)?.label ?? 'All';
+  const resultLabel = filteredProperties.length === 1 ? 'property' : 'properties';
 
   const handleSearchChange = (value: string) => {
     setSearchInput(value);
-
-    if (!value.trim()) {
-      setDebouncedSearch('');
-    }
   };
-
-  const clearSearch = () => {
-    setSearchInput('');
-    setDebouncedSearch('');
-  };
-
+  
   const clearFilters = () => {
     clearSearch();
     setActiveStatus('All');
   };
-
-  const hasActiveSearch = search.trim().length > 0;
-  const hasActiveStatusFilter = activeStatus !== 'All';
-  const hasActiveFilters = hasActiveSearch || hasActiveStatusFilter;
-  const activeStatusLabel =
-    STATUS_FILTERS.find((filter) => filter.value === activeStatus)?.label ?? 'All';
-  const resultLabel = filteredProperties.length === 1 ? 'property' : 'properties';
 
   const renderHeader = () => (
     <View>
@@ -174,7 +135,9 @@ export default function ProjectPropertiesScreen() {
       <View style={styles.subHeader}>
         <View>
           <Text style={styles.resultCount}>
-            {filteredProperties.length} {resultLabel} found
+            {searching
+              ? 'Searching…'
+              : `${filteredProperties.length} ${resultLabel} found`}
           </Text>
           {hasActiveSearch ? (
             <Text style={styles.resultContext}>
@@ -204,11 +167,16 @@ export default function ProjectPropertiesScreen() {
   const renderSearchBar = () => (
     <View style={styles.headerSearchWrap}>
       <View style={[styles.searchRow, isSearchFocused && styles.searchRowFocused]}>
-        <Ionicons
-          name="search-outline"
-          size={18}
-          color={isSearchFocused ? Colors.accent : Colors.textMuted}
-        />
+        {searching ? (
+          <ActivityIndicator size="small" color={Colors.accent} />
+        ) : (
+          <Ionicons
+            name="search-outline"
+            size={18}
+            color={isSearchFocused ? Colors.accent : Colors.textMuted}
+          />
+        )}
+  
         <TextInput
           value={search}
           onChangeText={handleSearchChange}
@@ -221,7 +189,7 @@ export default function ProjectPropertiesScreen() {
           onBlur={() => setIsSearchFocused(false)}
           returnKeyType="search"
         />
-
+  
         {search ? (
           <Pressable
             onPress={clearSearch}
@@ -233,7 +201,13 @@ export default function ProjectPropertiesScreen() {
           </Pressable>
         ) : null}
       </View>
-
+  
+      {/* Surface search errors inline below the bar */}
+      {searchError ? (
+        <Text style={{ color: 'red', fontSize: 12, marginTop: 4, marginHorizontal: 4 }}>
+          {searchError}
+        </Text>
+      ) : null}
     </View>
   );
 

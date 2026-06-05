@@ -1,16 +1,10 @@
 import { Colors } from '@/constants/colors';
 import { useProjects } from '@/context/project.context';
+import { useProjectSearch } from '@/hooks/use-project-search'; 
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  StatusBar,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl,
+  StatusBar, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
@@ -22,23 +16,21 @@ export function DiscoverScreen() {
   const styles = createPropertiesScreenStyles(Colors);
 
   const {
-    project,
-    filtered,
-    loading,
-    error,
-    refreshing,
-    loadingMore,
-    hasMore,
-    search,
-    setSearch,
-    loadMore,
-    refresh,
-    retry,
-  } = useProjects();
+    project, loading, error, refreshing, loadingMore,
+    hasMore, loadMore, refresh, retry } = useProjects();
+
+  const {
+    inputValue: search,
+    results: filtered,
+    searching,
+    searchError,
+    setInputValue: setSearch,
+    clear: clearSearch,
+  } = useProjectSearch({ localProjects: project });
 
   const hasActiveSearch = search.trim().length > 0;
   const resultLabel = filtered.length === 1 ? 'project' : 'projects';
-  const canLoadMore = hasMore && !loadingMore && filtered.length > 0;
+  const canLoadMore = hasMore && !loadingMore && filtered.length > 0 && !hasActiveSearch;
 
   if (loading) return <PropertiesSkeletonScreen styles={styles} />;
   if (error) return <ErrorScreen message={error} onRetry={retry} />;
@@ -64,12 +56,12 @@ export function DiscoverScreen() {
         onEndReached={canLoadMore ? loadMore : undefined}
         onEndReachedThreshold={0.35}
         ListFooterComponent={
-          loadingMore ? (
+          loadingMore && !hasActiveSearch ? (
             <View style={styles.loadingMore}>
               <ActivityIndicator size="small" color={Colors.accent} />
               <Text style={styles.loadingMoreText}>Loading more projects</Text>
             </View>
-          ) : filtered.length > 0 && !hasMore ? (
+          ) : filtered.length > 0 && !hasMore && !hasActiveSearch ? (
             <Text style={styles.endText}>You have reached the end</Text>
           ) : null
         }
@@ -92,22 +84,28 @@ export function DiscoverScreen() {
 
             <View style={styles.subHeader}>
               <View>
+                {/* Show a subtle searching indicator in the result count row */}
                 <Text style={styles.resultCount}>
-                  {filtered.length} {resultLabel} found
+                  {searching
+                    ? 'Searching…'
+                    : `${filtered.length} ${resultLabel} found`}
                 </Text>
-                {hasActiveSearch && (
+                {hasActiveSearch && !searching && (
                   <Text style={styles.resultContext}>
                     Search: {search.trim()}
                   </Text>
                 )}
+                {searchError ? (
+                  <Text style={[styles.resultContext, { color: 'red' }]}>
+                    {searchError}
+                  </Text>
+                ) : null}
               </View>
 
               {hasActiveSearch && (
                 <Pressable
                   style={({ pressed }) => [styles.clearBtn, pressed && styles.chipPressed]}
-                  onPress={() => {
-                    setSearch('');
-                  }}
+                  onPress={clearSearch}
                 >
                   <Ionicons name="close-circle" size={15} color={Colors.accent} />
                   <Text style={styles.clearText}>Clear</Text>
@@ -117,25 +115,25 @@ export function DiscoverScreen() {
           </View>
         }
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <View style={styles.emptyIcon}>
-              <Ionicons name="business-outline" size={28} color={Colors.accent} />
+          !searching ? (
+            <View style={styles.empty}>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="business-outline" size={28} color={Colors.accent} />
+              </View>
+              <Text style={styles.emptyTitle}>No projects found</Text>
+              <Text style={styles.emptyText}>
+                Try changing your search or checking a nearby location.
+              </Text>
+              {hasActiveSearch && (
+                <Pressable
+                  style={({ pressed }) => [styles.emptyButton, pressed && styles.chipPressed]}
+                  onPress={clearSearch}
+                >
+                  <Text style={styles.emptyButtonText}>Clear search</Text>
+                </Pressable>
+              )}
             </View>
-            <Text style={styles.emptyTitle}>No projects found</Text>
-            <Text style={styles.emptyText}>
-              Try changing your search or checking a nearby location.
-            </Text>
-            {hasActiveSearch && (
-              <Pressable
-                style={({ pressed }) => [styles.emptyButton, pressed && styles.chipPressed]}
-                onPress={() => {
-                  setSearch('');
-                }}
-              >
-                <Text style={styles.emptyButtonText}>Clear search</Text>
-              </Pressable>
-            )}
-          </View>
+          ) : null
         }
         refreshControl={
           <RefreshControl

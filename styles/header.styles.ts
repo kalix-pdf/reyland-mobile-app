@@ -7,8 +7,7 @@ import { sharedHeaderActionPressed, sharedLoginPillBase, sharedLoginPillText, sh
 export const createHeaderStyles = createThemedStyles((colors: AppColors) =>
     StyleSheet.create({
         header: {
-            paddingHorizontal: 18,
-            paddingTop: 12,
+            paddingHorizontal: 20,
             paddingBottom: 14,
             borderBottomWidth: StyleSheet.hairlineWidth,
             borderBottomColor: colors.border,
@@ -42,6 +41,7 @@ export const createHeaderStyles = createThemedStyles((colors: AppColors) =>
             alignItems: 'center',
             gap: 14,
             marginBottom: 14,
+            paddingTop: 10
         },
         user: {
             flexDirection: 'row', 

@@ -76,7 +76,13 @@ export function HomeDashboard() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right']}>
-      <Header mode="home" user={user} onLogin={handleLoginPress} />
+      <Header mode="home" user={user} 
+        onLogin={handleLoginPress} 
+          // search={search}
+          onSearchSubmit={(text) => {
+            router.push({ pathname: '/(tabs)/discover', params: {q: text}})
+          }}
+        />
 
       <ScrollView contentInsetAdjustmentBehavior="never"
           showsVerticalScrollIndicator={false}

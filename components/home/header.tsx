@@ -17,6 +17,7 @@ interface HeaderProps {
     onLogin?: () => void;
     search?: string;
     onSearchChange?: (text: string) => void;
+    onSearchSubmit?: (text: string) => void;
 }
 
 export function Header({ mode, user, onLogin, search = '', onSearchChange }: HeaderProps) {
