@@ -3,9 +3,9 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { useDashboard } from '@/context/dashboard-context';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { Href, router } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
@@ -45,6 +45,7 @@ const LocationChip = React.memo(({ location }: { location: string }) => {
 export function HomeDashboard() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const [search, setSearch] = useState('');
 
   const { data: projects, locations, loading, error, retry, refresh: handleRefresh, refreshing } = useDashboard();
   
@@ -59,6 +60,16 @@ export function HomeDashboard() {
   const handleDiscoverPress = useCallback(() => {
     router.push(user ? '/(tabs)/discover' : '/welcome');
   }, [user]);
+
+  const handleSearchSubmit = useCallback((query: string) => {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return;
+
+    router.push({
+      pathname: '/search-home-screen',
+      params: { q: trimmedQuery },
+    } as unknown as Href);
+  }, []);
 
   // ── Guard Render ─────────────────────────────────────────────────────────────────
 
@@ -78,10 +89,9 @@ export function HomeDashboard() {
     <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <Header mode="home" user={user} 
         onLogin={handleLoginPress} 
-          // search={search}
-          onSearchSubmit={(text) => {
-            router.push({ pathname: '/(tabs)/discover', params: {q: text}})
-          }}
+        search={search}
+        onSearchChange={setSearch}
+        onSearchSubmit={handleSearchSubmit}
         />
 
       <ScrollView contentInsetAdjustmentBehavior="never"

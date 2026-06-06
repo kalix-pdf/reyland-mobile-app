@@ -20,7 +20,7 @@ interface HeaderProps {
     onSearchSubmit?: (text: string) => void;
 }
 
-export function Header({ mode, user, onLogin, search = '', onSearchChange }: HeaderProps) {
+export function Header({ mode, user, onLogin, search = '', onSearchChange, onSearchSubmit }: HeaderProps) {
     const insets = useSafeAreaInsets();
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -84,6 +84,7 @@ export function Header({ mode, user, onLogin, search = '', onSearchChange }: Hea
                             onChangeText={onSearchChange}
                             onFocus={() => setIsSearchFocused(true)}
                             onBlur={() => setIsSearchFocused(false)}
+                            onSubmitEditing={(e) => onSearchSubmit?.(e.nativeEvent.text)}
                             returnKeyType="search"
                         />
                         {search.length > 0 && (

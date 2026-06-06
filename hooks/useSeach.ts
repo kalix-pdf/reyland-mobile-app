@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 export interface UseSearchOptions<TResult> {
   /**
-   * Debounce delay in milliseconds.
    * @default 100000
    */
   debounceMs?: number;

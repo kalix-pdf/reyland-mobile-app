@@ -24,6 +24,17 @@ export interface PaginatedResult<T> {
   total: number;
 }
 
+export interface PaginationMeta {
+  nextCursor: string | null;
+  hasMore: boolean;
+  total: number;
+}
+
+export interface paginatedResponse<T> {
+  data: T[];
+  pagination: PaginationMeta | null;
+}
+
 // ─── Error ───────────────────────────────────────────────────────────────────
 
 export class ApiError extends Error { constructor(
