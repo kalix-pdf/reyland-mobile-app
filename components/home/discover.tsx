@@ -1,10 +1,12 @@
 import { Colors } from '@/constants/colors';
 import { useProjects } from '@/context/project.context';
-import { useProjectSearch } from '@/hooks/use-project-search'; 
+import { useProjectSearch } from '@/hooks/use-project-search';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl,
-  StatusBar, Text, View } from 'react-native';
+import {
+  ActivityIndicator, FlatList, Pressable, RefreshControl,
+  StatusBar, Text, View
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
@@ -41,7 +43,7 @@ export function DiscoverScreen() {
 
       <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.surface }}>
         <Header
-          mode="properties"
+          mode="projects"
           search={search}
           onSearchChange={setSearch}
         />

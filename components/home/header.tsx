@@ -12,7 +12,7 @@ import { getInitials } from '../profile/get-initials';
 const styles = createHeaderStyles(Colors);
 
 interface HeaderProps {
-    mode: 'account' | 'home' | 'properties';
+    mode: 'account' | 'home' | 'projects';
     user?: User | null;
     onLogin?: () => void;
     search?: string;
@@ -95,7 +95,7 @@ export function Header({ mode, user, onLogin, search = '', onSearchChange, onSea
                     </View>
                 </View>
             );
-        case 'properties':
+        case 'projects':
         return (
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Explore Projects</Text>

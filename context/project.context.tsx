@@ -1,19 +1,19 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  type ReactNode,
-} from 'react';
-import { projectsApi } from '@/services/fetchData/project/fetch-project.api';
 import {
   usePaginatedFetcher,
-  type PaginatedFetcherState,
   type FetcherActions,
+  type PaginatedFetcherState,
 } from '@/hooks/useDataFetcher';
+import { projectsApi } from '@/services/fetchData/project/fetch-project.api';
 import type { Project } from '@/types';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
 interface ProjectsContextValue
   extends Omit<PaginatedFetcherState<Project>, 'data'>,
