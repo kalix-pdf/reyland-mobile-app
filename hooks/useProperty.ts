@@ -11,9 +11,18 @@ export function useProperty(id: number) {
   }, [id]);
 
   async function load() {
+    if (!Number.isFinite(id) || id <= 0) {
+      setProperty(null);
+      setLoading(false);
+      return;
+    }
+
     try {
+      setLoading(true);
       const data = await propertiesApi.getById(id);
       setProperty(data);
+    } catch {
+      setProperty(null);
     } finally {
       setLoading(false);
     }

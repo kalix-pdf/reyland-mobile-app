@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { Href, useRouter } from 'expo-router';
 import React from 'react';
-import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '../constants/colors';
 import { Property } from '../types/property.types';
@@ -20,12 +20,13 @@ function PropertyCard({ property }: Props) {
   const router = useRouter();
   const location = property.project?.location?.trim() || 'Location unavailable';
   const statusLabel = STATUS_LABELS[property.status] ?? 'Available';
+  const totalPrice = property.total_price ?? Number(property.price ?? 0) * Number(property.area ?? 0);
 
-  const formatPrice = (price: number, type: string) => {
+  const formatPrice = (price: number) => {
     if (price >= 1_000_000) {
       return `₱${(price / 1_000_000).toFixed(1)}M`;
     }
-    return `₱${price.toLocaleString()}${type === 'For Rent' ? '/mo' : ''}`;
+    return `₱${price.toLocaleString()}`;
   };
 
   return (
@@ -41,10 +42,10 @@ function PropertyCard({ property }: Props) {
       }
     >
       <Image source={{ uri: property.image_url }} 
-        cachePolicy={'memory-disk'}
         transition={200}
         priority={'normal'}
         contentFit='cover'
+        cachePolicy={'memory-disk'}
         style={styles.image} />
 
       <View style={styles.badgeRow}>
@@ -61,7 +62,7 @@ function PropertyCard({ property }: Props) {
       <View style={styles.content}>
         <View style={styles.titleRow}>
           <View style={styles.titleBlock}>
-            <Text style={styles.price}>{formatPrice(property.price, property.category)}</Text>
+            <Text style={styles.price}>{formatPrice(totalPrice)}</Text>
             <Text style={styles.title} numberOfLines={2}>
               {property.title}
             </Text>
