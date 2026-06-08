@@ -14,6 +14,7 @@ import { updateAvatar } from '../../services/user/update-avatar.api'
 import { createPersonalInformationStyles } from '../../styles/profile.styles'
 import { getInitials } from './get-initials'
 import { getPhoneValue } from './phone-value'
+import { HeaderShell, HeaderNav, HomeAction } from '../header'
 
 type PersonalInformationViewProps = {
   user: User
@@ -160,25 +161,9 @@ const handleConfirmAvatarUpload = async () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.headerButton, pressed && styles.buttonPressed]}
-          hitSlop={10}
-        >
-          <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-        </Pressable>
-
-        <Text style={styles.headerTitle}>Personal Information</Text>
-
-        <Pressable
-          onPress={() => router.replace('/(tabs)')}
-          style={({ pressed }) => [styles.headerButton, pressed && styles.buttonPressed]}
-          hitSlop={10}
-        >
-          <Ionicons name="home" size={20} color={colors.textPrimary} />
-        </Pressable>
-      </View>
+      <HeaderShell transparent>
+        <HeaderNav title='Personal Information' rightAction={<HomeAction />}/>
+      </HeaderShell>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.profileSummary}>

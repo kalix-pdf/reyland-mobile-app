@@ -26,6 +26,6 @@ export function useProjectSearch({ localProjects }: UseProjectSearchOptions) {
   return useSearch<Project>({
     onSearch,
     localData: localProjects,
-    debounceMs: 2000,
+    debounceMs: 1000,
   });
 }

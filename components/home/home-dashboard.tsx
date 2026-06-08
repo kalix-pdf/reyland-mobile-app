@@ -13,7 +13,7 @@ import { ErrorScreen } from '../helper/error-project';
 import { DashboardSkeleton, LocationsSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, QuickActionsSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll } from './featured-project';
-import { Header } from './header';
+import { HeaderShell, HeaderBrand, HeaderSearchBar } from '../header';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -87,12 +87,10 @@ export function HomeDashboard() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right']}>
-      <Header mode="home" user={user} 
-        onLogin={handleLoginPress} 
-        search={search}
-        onSearchChange={setSearch}
-        onSearchSubmit={handleSearchSubmit}
-        />
+      <HeaderShell withSafeArea={true}>
+        <HeaderBrand user={user} onLogin={handleLoginPress}/>
+        <HeaderSearchBar value={search} onChange={setSearch} onSubmit={handleSearchSubmit}/>
+      </HeaderShell>
 
       <ScrollView contentInsetAdjustmentBehavior="never"
           showsVerticalScrollIndicator={false}

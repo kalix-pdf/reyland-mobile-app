@@ -7,7 +7,7 @@ import { Alert, Image, Pressable, RefreshControl, ScrollView, Switch, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createProfileViewStyles } from '../../styles/profile.styles';
 import { getInitials } from './get-initials';
-import { Header } from '../home/header';
+import { HeaderShell, HeaderTitle } from '../header';
 
 type RowProps = {
   styles: ReturnType<typeof createProfileViewStyles>;
@@ -53,41 +53,10 @@ function Row({
   );
 }
 
-// ─── Toggle Row ─────────────────────────────────────────────────────────────
-
-// type ToggleRowProps = Omit<RowProps, 'right' | 'showArrow' | 'danger' | 'value'> & {
-//   value: boolean;
-//   onValueChange: (v: boolean) => void;
-// };
-
-// function ToggleRow({ styles, colors, icon, label, value, isLast = false, onValueChange }: ToggleRowProps) {
-//   return (
-//     <Row
-//       styles={styles}
-//       colors={colors}
-//       icon={icon}
-//       label={label}
-//       isLast={isLast}
-//       showArrow={false}
-//       right={
-//         <Switch
-//           value={value}
-//           onValueChange={onValueChange}
-//           // trackColor={{ false: colors.border, true: colors.accentLight }}
-//           thumbColor={value ? colors.accent : '#F4F4F5'}
-//         />
-//       }
-//     />
-//   );
-// }
-
-// ─── Main ─────────────────────────────────────────────────────────────────────
-
 export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, refreshOffset = 0 }: ViewProfileProps) {
-  const { colors, isDarkMode, toggleDarkMode } = useAppTheme();
+  const { colors } = useAppTheme();
   const styles = createProfileViewStyles(colors);
 
-  // const [notifications, setNotifications] = useState(true);
   const initials = getInitials(user.name);
   const isVerified = user.status !== 0;
 
@@ -98,17 +67,12 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
     ]);
   };
 
-  const handleDeleteAccount = () => {
-    Alert.alert('Delete Account', 'This action is irreversible. Are you sure you want to delete your account?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive' },
-    ]);
-  };
-
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       {/* Fixed header */}
-      <Header mode="account" />
+      <HeaderShell transparent>
+        <HeaderTitle title='Account' />
+      </HeaderShell>
 
       <ScrollView
         contentInsetAdjustmentBehavior="never"

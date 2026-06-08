@@ -6,6 +6,7 @@ import { ActivityIndicator, Alert, Dimensions, Pressable, ScrollView, StatusBar,
 import { ReduceMotion } from 'react-native-reanimated';
 import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { HeaderShell, HeaderNav, HomeAction } from '@/components/header';
 
 import { Colors } from '@/constants/colors';
 import { useProperty } from '@/hooks/useProperty';
@@ -111,7 +112,10 @@ export default function PropertyDetailsScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
 
-      <View style={styles.topBar}>
+      <HeaderShell transparent>
+        <HeaderNav title='Property Details' rightAction={<HomeAction />} />
+      </HeaderShell>
+      {/* <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Go back"
@@ -127,7 +131,7 @@ export default function PropertyDetailsScreen() {
         </View>
 
         <View style={styles.backButtonGhost} />
-      </View>
+      </View> */}
 
       <ScrollView
         style={styles.scroll}

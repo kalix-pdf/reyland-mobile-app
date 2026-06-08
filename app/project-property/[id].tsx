@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -10,12 +10,12 @@ import {
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePropertySearch } from '@/hooks/user-property-search';
 
+import { HeaderNav, HeaderSearchBar, HeaderShell } from '@/components/header';
 import PropertyCard from '@/components/property-card';
 import { Colors } from '@/constants/colors';
 import { useProjectProperties } from '@/hooks/useProjectProperties';
@@ -37,7 +37,6 @@ export default function ProjectPropertiesScreen() {
   const projectName = name?.trim() || 'Project Properties';
   const hasValidProjectId = Number.isFinite(projectId) && projectId > 0;
   const [activeStatus, setActiveStatus] = useState<'All' | Property['status']>('All');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const {
     properties,
@@ -78,6 +77,11 @@ export default function ProjectPropertiesScreen() {
   const resultLabel = filteredProperties.length === 1 ? 'property' : 'properties';
 
   const handleSearchChange = (value: string) => {
+    if (value.length === 0) {
+      clearSearch();
+      return;
+    }
+
     setSearchInput(value);
   };
   
@@ -88,23 +92,14 @@ export default function ProjectPropertiesScreen() {
 
   const renderHeader = () => (
     <View>
-      <View style={styles.summaryCard}>
-        <View style={styles.summaryTopRow}>
-          <View style={styles.summaryTitleWrap}>
-            <Text style={styles.summaryLabel}>Properties</Text>
-            <Text style={styles.summaryTitle} numberOfLines={2}>
-              {projectName}
-            </Text>
-          </View>
-          <View style={styles.summaryIcon}>
-            <Ionicons name="home-outline" size={21} color={Colors.accent} />
-          </View>
-        </View>
-
-        <Text style={styles.summaryText}>
-          Browse {properties.length} listing{properties.length === 1 ? '' : 's'} by title, location, category, or price.
-        </Text>
-      </View>
+      <HeaderShell transparent>
+        <HeaderNav title="Properties" borderBottom />
+          <HeaderSearchBar
+            value={search}
+            onChange={handleSearchChange}
+            placeholder="Search properties"
+          />
+      </HeaderShell>
 
       <ScrollView
         horizontal
@@ -149,9 +144,14 @@ export default function ProjectPropertiesScreen() {
               Status: {activeStatusLabel}
             </Text>
           ) : null}
+          {searchError ? (
+            <Text style={[styles.resultContext, styles.errorText]}>
+              {searchError}
+            </Text>
+          ) : null}
         </View>
 
-        {hasActiveFilters ? (
+        {/* {hasActiveFilters ? (
           <Pressable
             style={({ pressed }) => [styles.clearBtn, pressed && styles.chipPressed]}
             onPress={clearFilters}
@@ -159,81 +159,8 @@ export default function ProjectPropertiesScreen() {
             <Ionicons name="close-circle" size={15} color={Colors.accent} />
             <Text style={styles.clearText}>Clear</Text>
           </Pressable>
-        ) : null}
+        ) : null} */}
       </View>
-    </View>
-  );
-
-  const renderSearchBar = () => (
-    <View style={styles.headerSearchWrap}>
-      <View style={[styles.searchRow, isSearchFocused && styles.searchRowFocused]}>
-        {searching ? (
-          <ActivityIndicator size="small" color={Colors.accent} />
-        ) : (
-          <Ionicons
-            name="search-outline"
-            size={18}
-            color={isSearchFocused ? Colors.accent : Colors.textMuted}
-          />
-        )}
-  
-        <TextInput
-          value={search}
-          onChangeText={handleSearchChange}
-          placeholder="Search properties"
-          placeholderTextColor={Colors.textMuted}
-          style={styles.searchInput}
-          autoCapitalize="none"
-          autoCorrect={false}
-          onFocus={() => setIsSearchFocused(true)}
-          onBlur={() => setIsSearchFocused(false)}
-          returnKeyType="search"
-        />
-  
-        {search ? (
-          <Pressable
-            onPress={clearSearch}
-            accessibilityRole="button"
-            accessibilityLabel="Clear property search"
-            hitSlop={8}
-          >
-            <Ionicons name="close-circle" size={18} color={Colors.textMuted} />
-          </Pressable>
-        ) : null}
-      </View>
-  
-      {/* Surface search errors inline below the bar */}
-      {searchError ? (
-        <Text style={{ color: 'red', fontSize: 12, marginTop: 4, marginHorizontal: 4 }}>
-          {searchError}
-        </Text>
-      ) : null}
-    </View>
-  );
-
-  const renderTopBar = (showSearch = false) => (
-    <View style={styles.topBar}>
-      <View style={styles.topBarRow}>
-        <Pressable
-          style={({ pressed }) => [styles.backButton, pressed && styles.pressedButton]}
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-        >
-          <Ionicons name="chevron-back" size={22} color={Colors.textPrimary} />
-        </Pressable>
-
-        <View style={styles.topBarTitleWrap}>
-          <Text style={styles.topBarTitle}>Properties</Text>
-          <Text style={styles.topBarSubtitle} numberOfLines={1}>
-            {projectName}
-          </Text>
-        </View>
-
-        <View style={styles.headerSpacer} />
-      </View>
-
-      {showSearch ? renderSearchBar() : null}
     </View>
   );
 
@@ -246,7 +173,7 @@ export default function ProjectPropertiesScreen() {
   ) => (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
-      {renderTopBar()}
+      {renderHeader()}
 
       <View style={styles.feedbackContainer}>
         <View style={styles.feedbackIcon}>
@@ -280,7 +207,7 @@ export default function ProjectPropertiesScreen() {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
-        {renderTopBar()}
+        {renderHeader()}
 
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.accent} />
@@ -303,13 +230,13 @@ export default function ProjectPropertiesScreen() {
   return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
-      {renderTopBar(true)}
+      {renderHeader()}
 
       <FlatList
         data={filteredProperties}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <PropertyCard property={item} />}
-        ListHeaderComponent={renderHeader}
+        // ListHeaderComponent={renderHeader}
         contentContainerStyle={[
           styles.listContent,
           filteredProperties.length === 0 && styles.emptyListContent,
@@ -340,7 +267,7 @@ export default function ProjectPropertiesScreen() {
                 ? 'No listings match your current filters. Try another search or status.'
                 : 'This project does not have available listings at the moment.'}
             </Text>
-            {hasActiveFilters ? (
+            {/* {hasActiveFilters ? (
               <Pressable
                 style={({ pressed }) => [styles.emptyAction, pressed && styles.pressedButton]}
                 onPress={clearFilters}
@@ -348,7 +275,7 @@ export default function ProjectPropertiesScreen() {
               >
                 <Text style={styles.emptyActionText}>Clear filters</Text>
               </Pressable>
-            ) : null}
+            ) : null} */}
           </View>
         }
         ListFooterComponent={
@@ -371,48 +298,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  topBar: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  topBarRow: {
-    minHeight: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.surfaceMuted,
-  },
   pressedButton: {
     opacity: 0.78,
     transform: [{ scale: 0.98 }],
-  },
-  topBarTitleWrap: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 12,
-  },
-  topBarTitle: {
-    fontSize: 17,
-    fontWeight: '900',
-    color: Colors.textPrimary,
-  },
-  topBarSubtitle: {
-    marginTop: 2,
-    fontSize: 12,
-    fontWeight: '700',
-    color: Colors.textMuted,
-  },
-  headerSpacer: {
-    width: 42,
   },
   listContent: {
     paddingTop: 16,
@@ -519,6 +407,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.textMuted,
   },
+  errorText: {
+    color: 'red',
+  },
   clearBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -536,37 +427,6 @@ const styles = StyleSheet.create({
   chipPressed: {
     opacity: 0.78,
     transform: [{ scale: 0.98 }],
-  },
-  headerSearchWrap: {
-    marginTop: 10,
-  },
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.background,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingHorizontal: 14,
-    minHeight: 48,
-    shadowColor: Colors.primary,
-    shadowOpacity: 0.03,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 1,
-  },
-  searchRowFocused: {
-    borderColor: Colors.accent,
-    backgroundColor: Colors.surface,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    lineHeight: 19,
-    color: Colors.textPrimary,
-    marginLeft: 9,
-    fontWeight: '600',
-    paddingVertical: 0,
   },
   loadingContainer: {
     flex: 1,

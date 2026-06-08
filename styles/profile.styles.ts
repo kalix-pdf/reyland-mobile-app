@@ -184,34 +184,11 @@ export const createPersonalInformationStyles = createThemedStyles((Colors: AppCo
       flex: 1,
       backgroundColor: Colors.background,
     },
-    header: {
-      minHeight: 58,
-      paddingHorizontal: 16,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: Colors.border,
-      backgroundColor: Colors.background,
-    },
-    headerButton: {
-      width: 42,
-      height: 42,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
     buttonPressed: {
       opacity: 0.5,
     },
     buttonDisabled: {
       opacity: 0.6,
-    },
-    headerTitle: {
-      flex: 1,
-      textAlign: 'center',
-      fontSize: 16,
-      fontWeight: '700',
-      color: Colors.textPrimary,
     },
     scrollContent: {
       paddingHorizontal: 20,

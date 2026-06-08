@@ -26,6 +26,6 @@ export function usePropertySearch({
   return useSearch<Property>({
     onSearch,
     localData: localProperties,
-    debounceMs: 2000,
+    debounceMs: 1000,
   });
 }

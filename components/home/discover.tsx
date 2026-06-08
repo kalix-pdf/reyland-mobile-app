@@ -12,7 +12,7 @@ import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 import { ErrorScreen } from '../helper/error-project';
 import { PropertiesSkeletonScreen } from '../helper/skeleton';
 import ProjectCard from '../project-card';
-import { Header } from './header';
+import { HeaderShell, HeaderSearchBar } from '../header';
 
 export function DiscoverScreen() {
   const styles = createPropertiesScreenStyles(Colors);
@@ -42,11 +42,9 @@ export function DiscoverScreen() {
       <StatusBar barStyle="dark-content" />
 
       <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.surface }}>
-        <Header
-          mode="projects"
-          search={search}
-          onSearchChange={setSearch}
-        />
+        <HeaderShell>
+          <HeaderSearchBar value={search} onChange={setSearch} />
+        </HeaderShell>
       </SafeAreaView>
 
       <FlatList
@@ -72,7 +70,7 @@ export function DiscoverScreen() {
             <View style={styles.summaryCard}>
               <View style={styles.summaryTopRow}>
                 <View>
-                  <Text style={styles.summaryLabel}>Discover</Text>
+                  <Text style={styles.summaryLabel}>Explore</Text>
                   <Text style={styles.summaryTitle}>Reyland Projects</Text>
                 </View>
                 <View style={styles.summaryIcon}>
