@@ -54,7 +54,7 @@ export function DiscoverScreen() {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         onEndReached={canLoadMore ? loadMore : undefined}
-        onEndReachedThreshold={0.35}
+        onEndReachedThreshold={0}
         ListFooterComponent={
           loadingMore && !hasActiveSearch ? (
             <View style={styles.loadingMore}>

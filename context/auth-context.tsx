@@ -5,6 +5,8 @@ import { clearCachedUser, establishAuthenticatedSession, getCachedUser } from "@
 import { User } from "@/types/user.types";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { authEvents } from "@/lib/auth-events";
+import { refreshSession } from "@/services/auth/auth-refresh";
+import { AppState, AppStateStatus } from "react-native";
 
 type LoginResult = {
   success: boolean;
@@ -33,35 +35,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   //persistent login session restoration
   useEffect(() => {
-    const restoreSession = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        if (!token) return; 
+      const isRestoring = { current: true };
 
-        const cachedUser = await getCachedUser();
-        if (cachedUser) {
-          setUser(cachedUser); 
+      const subscription = AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+        if (nextState === 'active' && !isRestoring.current) {
+          const token = await AsyncStorage.getItem('token');
+          if (token) refreshSession();
         }
+      });
 
-        // try {
-        //   const refreshToken = await AsyncStorage.getItem('refreshToken');
-        //   await establishAuthenticatedSession(token, setUser, refreshToken ?? undefined);
-        // } catch (networkError) {
-        //   // Offline or server error — cached user is already set, stay logged in
-        //   // Optional: set a flag like setIsOnline(false) for UI indicators
-        //   console.warn('Session re-validation failed, using cached user:', networkError);
-        // }
+      const restoreSession = async () => {
+        try {
+          const token = await AsyncStorage.getItem('token');
+          if (!token) return;
 
-      } catch (err) {
-        await AsyncStorage.multiRemove(['token', 'refreshToken']);
-        await clearCachedUser();
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          const cachedUser = await getCachedUser();
+          if (cachedUser) setUser(cachedUser);
 
-    restoreSession();
-  }, []);
+          await refreshSession();
+        } catch {
+          await AsyncStorage.multiRemove(['token', 'refreshToken']);
+          await clearCachedUser();
+        } finally {
+          setIsLoading(false);
+          isRestoring.current = false; 
+        }
+      };
+
+      restoreSession();
+      return () => subscription.remove();
+    }, []);
 
   //Listen for forced logout from axios interceptor
   useEffect(() => {

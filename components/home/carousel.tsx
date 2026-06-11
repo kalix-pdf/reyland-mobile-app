@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { ReduceMotion } from 'react-native-reanimated';
 import { Image } from 'expo-image';
-import { PROMO_BANNERS } from '../../data/promotions';
+// import { PROMO_BANNERS } from '../../data/promotions';
+import { PromotionProps } from '@/types';
+import { getPromotionImage } from '@/services/fetchData/promotion/fetch-promotion.api';
 
 const { width } = Dimensions.get('window');
 
 export function PromotionalCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [promotionImages, setPromotionImages] = useState<PromotionProps[]>([]);
+
+  const fetchImages = async () => {
+    try {
+      const result = await getPromotionImage();
+      setPromotionImages(result);
+    } catch (error) {
+      console.error('Failed to fetch promotions:', error);
+    }
+  };
+  useEffect(() => {
+    fetchImages();
+  }, []);
 
   return (
     <View style={styles.promoSection}>
@@ -18,7 +33,7 @@ export function PromotionalCarousel() {
         autoPlayInterval={3000}
         width={width}
         height={130}
-        data={PROMO_BANNERS}
+        data={promotionImages}
         withAnimation={{
           type: 'timing',
           config: {
@@ -27,12 +42,13 @@ export function PromotionalCarousel() {
           },
         }}
         onProgressChange={(_, absoluteProgress) => {
-          setActiveIndex(Math.round(absoluteProgress) % PROMO_BANNERS.length);
+            if (promotionImages.length === 0) return;
+            setActiveIndex(Math.round(absoluteProgress) % promotionImages.length);
         }}
         renderItem={({ item }) => (
           <Pressable style={styles.promoCard}>
             <Image
-              source={{ uri: item.image }}
+              source={{ uri: item.image_url }}
               style={styles.promoImage}
               contentFit="cover"
               cachePolicy="memory-disk"
@@ -50,7 +66,7 @@ export function PromotionalCarousel() {
         gap: 6,
         marginTop: 10,
       }}>
-        {PROMO_BANNERS.map((_, index) => (
+        {promotionImages.map((_, index) => (
           <View
             key={index}
             style={{
