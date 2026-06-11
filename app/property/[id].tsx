@@ -1,12 +1,12 @@
+import { HeaderNav, HeaderShell, HomeAction } from '@/components/header';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Dimensions, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { ReduceMotion } from 'react-native-reanimated';
 import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { HeaderShell, HeaderNav, HomeAction } from '@/components/header';
 
 import { Colors } from '@/constants/colors';
 import { useProperty } from '@/hooks/useProperty';
@@ -53,7 +53,7 @@ function formatNumber(value?: number | null, fallback = 'Not specified') {
 }
 
 export default function PropertyDetailsScreen() {
-  const router = useRouter();
+  // const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const propertyId = Number(id);
   const { property, loading } = useProperty(propertyId);
@@ -103,10 +103,11 @@ export default function PropertyDetailsScreen() {
   const statusLabel = STATUS_LABELS[property.status] ?? 'Available';
   const lotTypeLabel = LOT_TYPE_LABELS[property.lot_type] ?? 'Regular Lot';
   const location = property.project?.location?.trim() || 'Location unavailable';
-  const projectName = property.project?.project_name?.trim() || 'Reyland property';
+  // const projectName = property.project?.project_name?.trim() || 'Reyland property';
   const category = property.category?.trim() || 'Property';
   const totalPrice = property.total_price ?? property.price;
   const yearsToPay = Number(property.years_to_pay ?? 0);
+  const amenities = (property.amenities ?? []).filter((amenity) => amenity.trim().length > 0);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
@@ -115,24 +116,6 @@ export default function PropertyDetailsScreen() {
       <HeaderShell transparent>
         <HeaderNav title='Property Details' rightAction={<HomeAction />} />
       </HeaderShell>
-      {/* <View style={styles.topBar}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-        >
-          <Ionicons name="chevron-back" size={22} color={Colors.textPrimary} />
-        </Pressable>
-
-        <View style={styles.topTitleBlock}>
-          <Text style={styles.topTitle}>Property Details</Text>
-          <Text style={styles.topSubtitle} numberOfLines={1}>{projectName}</Text>
-        </View>
-
-        <View style={styles.backButtonGhost} />
-      </View> */}
-
       <ScrollView
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -251,6 +234,21 @@ export default function PropertyDetailsScreen() {
             </View>
           </View>
         </Section>
+
+        {amenities.length > 0 ? (
+          <Section title="Amenities">
+            <View style={styles.amenitiesCard}>
+              {amenities.map((amenity) => (
+                <View key={amenity} style={styles.amenityChip}>
+                  <View style={styles.amenityIcon}>
+                    <Ionicons name="checkmark" size={13} color={Colors.white} />
+                  </View>
+                  <Text style={styles.amenityText} numberOfLines={2}>{amenity}</Text>
+                </View>
+              ))}
+            </View>
+          </Section>
+        ) : null}
 
         {property.short_description ? (
           <Section title="Overview">
@@ -657,6 +655,44 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '900',
     textAlign: 'right',
+  },
+  amenitiesCard: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    padding: 14,
+    borderRadius: 22,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  amenityChip: {
+    minHeight: 42,
+    maxWidth: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 16,
+    backgroundColor: Colors.tag,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 140, 79, 0.16)',
+  },
+  amenityIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.accent,
+  },
+  amenityText: {
+    flexShrink: 1,
+    color: Colors.tagText,
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '800',
   },
   description: {
     padding: 16,
