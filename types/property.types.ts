@@ -33,4 +33,5 @@ export interface Property {
     image_url: string;
     public_id: string;
   }[];
+  amenities: string[];
 }
