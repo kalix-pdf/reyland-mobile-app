@@ -1,6 +1,6 @@
 import { Colors } from '@/constants/colors';
 import React, { useEffect, useRef } from 'react';
-import { Animated, StatusBar, View } from 'react-native';
+import { Animated, ScrollView, StatusBar, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 
@@ -44,26 +44,84 @@ export function SkeletonBox({
 // __ DASHBOARD SKELETON COMPONENT __
 export function DashboardSkeleton({ paddingTop }: { paddingTop: number }) {
   return (
-    <View style={{ paddingTop }}>
-      <SkeletonBox width="100%" height={320} borderRadius={0} />
+    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+      <StatusBar barStyle="dark-content" />
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 16, gap: 8 }}>
-        {[...Array(4)].map((_, i) => (
-          <View key={i} style={{ alignItems: 'center', gap: 6 }}>
-            <SkeletonBox width={48} height={48} borderRadius={12} />
-            <SkeletonBox width={40} height={10} />
-          </View>
-        ))}
+      <View
+        style={{
+          paddingTop,
+          paddingHorizontal: 20,
+          paddingBottom: 14,
+          backgroundColor: Colors.surface,
+          borderBottomWidth: 1,
+          borderBottomColor: Colors.border,
+        }}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 14 }}>
+          <SkeletonBox width={110} height={32} borderRadius={8} />
+          <SkeletonBox width={42} height={42} borderRadius={21} />
+        </View>
+        <SkeletonBox width="100%" height={40} borderRadius={10} style={{ marginTop: 12 }} />
       </View>
 
-      {/* Cards */}
-      <View style={{ paddingHorizontal: 16, gap: 8 }}>
-        <SkeletonBox width={160} height={14} />
-        <View style={{ flexDirection: 'row', gap: 12 }}>
-          {[...Array(3)].map((_, i) => (
-            <SkeletonBox key={i} width={180} height={220} borderRadius={16} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 18, gap: 8 }}>
+          {[...Array(5)].map((_, i) => (
+            <View key={i} style={{ alignItems: 'center', gap: 7, flex: 1 }}>
+              <SkeletonBox width={48} height={48} borderRadius={16} />
+              <SkeletonBox width={44} height={10} borderRadius={5} />
+            </View>
           ))}
         </View>
+
+        <DashboardSectionSkeleton cardCount={3} />
+
+        <View style={{ paddingHorizontal: 16, marginTop: 18 }}>
+          <SkeletonBox width="100%" height={270} borderRadius={26} />
+        </View>
+
+        <View style={{ paddingHorizontal: 16, marginTop: 18 }}>
+          <SkeletonBox width="100%" height={140} borderRadius={24} />
+        </View>
+
+        <View style={{ paddingHorizontal: 16, marginTop: 22 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <View>
+              <SkeletonBox width={142} height={18} borderRadius={6} />
+              <SkeletonBox width={160} height={12} borderRadius={6} style={{ marginTop: 7 }} />
+            </View>
+            <SkeletonBox width={58} height={16} borderRadius={6} />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            {[120, 108, 132, 116].map((width, i) => (
+              <SkeletonBox key={i} width={width} height={42} borderRadius={21} />
+            ))}
+          </View>
+        </View>
+
+        <DashboardSectionSkeleton cardCount={3} />
+      </ScrollView>
+    </View>
+  );
+}
+
+function DashboardSectionSkeleton({ cardCount }: { cardCount: number }) {
+  return (
+    <View style={{ paddingHorizontal: 16, marginTop: 22 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+        <SkeletonBox width={132} height={18} borderRadius={6} />
+        <SkeletonBox width={82} height={14} borderRadius={6} />
+      </View>
+      <View style={{ flexDirection: 'row', gap: 17 }}>
+        {[...Array(cardCount)].map((_, i) => (
+          <View key={i} style={{ width: 180 }}>
+            <SkeletonBox width={180} height={160} borderRadius={18} />
+            <View style={{ paddingVertical: 14, gap: 7 }}>
+              <SkeletonBox width={132} height={16} borderRadius={6} />
+              <SkeletonBox width={150} height={13} borderRadius={6} />
+            </View>
+          </View>
+        ))}
       </View>
     </View>
   );
