@@ -20,7 +20,7 @@ interface HeaderNavProps {
  *   <HeaderNav title="Property Details" showBack />
  *   <HeaderNav title="Edit Project" onBack={handleUnsavedChanges} />
  */
-export function HeaderNav({title, onBack, showBack = true, rightAction, borderBottom = false }: HeaderNavProps) {
+export function HeaderNav({ title, onBack, showBack = true, rightAction, borderBottom = false }: HeaderNavProps) {
     const { colors } = useAppTheme();
 
     const handleBack = () => {
@@ -32,20 +32,23 @@ export function HeaderNav({title, onBack, showBack = true, rightAction, borderBo
     };
 
     return (
-        <View style={[styles.row, 
-            !borderBottom && {borderBottomColor: colors.border, borderBottomWidth: StyleSheet.hairlineWidth},
-            { backgroundColor: colors.background}]}>
-            {showBack && (
-                <Pressable
-                    onPress={handleBack}
-                    style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
-                    hitSlop={10}
-                    accessibilityLabel="Go back"
-                    accessibilityRole="button"
-                >
-                    <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-                </Pressable>
-            )}
+        <View style={[
+            styles.row,
+            borderBottom && { borderBottomColor: colors.border, borderBottomWidth: StyleSheet.hairlineWidth },
+        ]}>
+            <View style={styles.side}>
+                {showBack && (
+                    <Pressable
+                        onPress={handleBack}
+                        style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
+                        hitSlop={10}
+                        accessibilityLabel="Go back"
+                        accessibilityRole="button"
+                    >
+                        <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
+                    </Pressable>
+                )}
+            </View>
 
             <Text style={[styles.title, { color: colors.textPrimary }]}
                 numberOfLines={1}
@@ -53,8 +56,9 @@ export function HeaderNav({title, onBack, showBack = true, rightAction, borderBo
                 {title}
             </Text>
 
-            
-            {rightAction ?? null}
+            <View style={[styles.side, styles.sideRight]}>
+                {rightAction ?? null}
+            </View>
         </View>
     );
 }
@@ -77,13 +81,11 @@ export function HomeAction() {
 const styles = StyleSheet.create({
     row: {
         minHeight: 58,
-        paddingHorizontal: 16,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
     },
     side: {
-        width: 40,
+        width: 42,
         alignItems: 'flex-start',
         justifyContent: 'center',
     },

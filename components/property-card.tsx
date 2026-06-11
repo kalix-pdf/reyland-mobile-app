@@ -49,11 +49,11 @@ function PropertyCard({ property }: Props) {
         style={styles.image} />
 
       <View style={styles.badgeRow}>
-        <View style={[styles.badge, property.category === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
+        {/* <View style={[styles.badge, property.category === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
           <Text style={[styles.badgeText, property.category === 'For Rent' ? styles.rentBadgeText : styles.saleBadgeText]}>
-            {property.category}
           </Text>
-        </View>
+            {property.category}
+        </View> */}
         <View style={styles.statusBadge}>
           <Text style={styles.statusText}>{statusLabel}</Text>
         </View>

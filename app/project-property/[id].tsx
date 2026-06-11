@@ -1,3 +1,4 @@
+import { usePropertySearch } from '@/hooks/user-property-search';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useMemo, useState } from 'react';
@@ -13,7 +14,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { usePropertySearch } from '@/hooks/user-property-search';
 
 import { HeaderNav, HeaderSearchBar, HeaderShell } from '@/components/header';
 import PropertyCard from '@/components/property-card';
@@ -29,12 +29,11 @@ const STATUS_FILTERS: { label: string; value: 'All' | Property['status']}[] = [
 ];
 
 export default function ProjectPropertiesScreen() {
-  const { id, name } = useLocalSearchParams<{
+  const { id } = useLocalSearchParams<{
     id?: string;
     name?: string;
   }>();
   const projectId = Number(id);
-  const projectName = name?.trim() || 'Project Properties';
   const hasValidProjectId = Number.isFinite(projectId) && projectId > 0;
   const [activeStatus, setActiveStatus] = useState<'All' | Property['status']>('All');
 
@@ -84,23 +83,20 @@ export default function ProjectPropertiesScreen() {
 
     setSearchInput(value);
   };
-  
-  const clearFilters = () => {
-    clearSearch();
-    setActiveStatus('All');
-  };
 
   const renderHeader = () => (
-    <View>
       <HeaderShell transparent>
-        <HeaderNav title="Properties" borderBottom />
+        <HeaderNav title="Properties"/>
           <HeaderSearchBar
             value={search}
             onChange={handleSearchChange}
             placeholder="Search properties"
           />
       </HeaderShell>
+  );
 
+  const renderListHeader = () => (
+    <View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -151,15 +147,6 @@ export default function ProjectPropertiesScreen() {
           ) : null}
         </View>
 
-        {/* {hasActiveFilters ? (
-          <Pressable
-            style={({ pressed }) => [styles.clearBtn, pressed && styles.chipPressed]}
-            onPress={clearFilters}
-          >
-            <Ionicons name="close-circle" size={15} color={Colors.accent} />
-            <Text style={styles.clearText}>Clear</Text>
-          </Pressable>
-        ) : null} */}
       </View>
     </View>
   );
@@ -174,6 +161,7 @@ export default function ProjectPropertiesScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
       {renderHeader()}
+      {renderListHeader()}
 
       <View style={styles.feedbackContainer}>
         <View style={styles.feedbackIcon}>
@@ -206,10 +194,10 @@ export default function ProjectPropertiesScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-        <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
-        {renderHeader()}
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
+      {renderHeader()}
 
-        <View style={styles.loadingContainer}>
+      <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.accent} />
           <Text style={styles.loadingText}>Loading properties...</Text>
         </View>
@@ -236,7 +224,7 @@ export default function ProjectPropertiesScreen() {
         data={filteredProperties}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <PropertyCard property={item} />}
-        // ListHeaderComponent={renderHeader}
+        ListHeaderComponent={renderListHeader}
         contentContainerStyle={[
           styles.listContent,
           filteredProperties.length === 0 && styles.emptyListContent,
@@ -267,15 +255,6 @@ export default function ProjectPropertiesScreen() {
                 ? 'No listings match your current filters. Try another search or status.'
                 : 'This project does not have available listings at the moment.'}
             </Text>
-            {/* {hasActiveFilters ? (
-              <Pressable
-                style={({ pressed }) => [styles.emptyAction, pressed && styles.pressedButton]}
-                onPress={clearFilters}
-                accessibilityRole="button"
-              >
-                <Text style={styles.emptyActionText}>Clear filters</Text>
-              </Pressable>
-            ) : null} */}
           </View>
         }
         ListFooterComponent={
