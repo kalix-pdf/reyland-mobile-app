@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Pressable, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Pressable, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { ReduceMotion } from 'react-native-reanimated';
 import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -53,10 +53,14 @@ function formatNumber(value?: number | null, fallback = 'Not specified') {
 }
 
 export default function PropertyDetailsScreen() {
-  // const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const propertyId = Number(id);
-  const { property, loading } = useProperty(propertyId);
+  const {
+    property,
+    loading,
+    refreshing,
+    refresh,
+  } = useProperty(propertyId);
   const [activeImage, setActiveImage] = useState(0);
 
   const galleryImages = useMemo<GalleryImage[]>(() => {
@@ -120,6 +124,14 @@ export default function PropertyDetailsScreen() {
         style={styles.scroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refresh}
+            tintColor={Colors.accent}
+            colors={[Colors.accent]}
+          />
+        }
       >
         <View style={styles.carouselSection}>
           <ReanimatedCarousel
