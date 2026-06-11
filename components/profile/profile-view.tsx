@@ -3,11 +3,11 @@ import { ViewProfileProps } from '@/types/user.types';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { ReactNode } from 'react';
-import { Alert, Image, Pressable, RefreshControl, ScrollView, Switch, Text, View } from 'react-native';
+import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createProfileViewStyles } from '../../styles/profile.styles';
-import { getInitials } from './get-initials';
 import { HeaderShell, HeaderTitle } from '../header';
+import { getInitials } from './get-initials';
 
 type RowProps = {
   styles: ReturnType<typeof createProfileViewStyles>;
