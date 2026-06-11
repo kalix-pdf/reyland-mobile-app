@@ -9,11 +9,11 @@ import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
+import { HeaderBrand, HeaderSearchBar, HeaderShell } from '../header';
 import { ErrorScreen } from '../helper/error-project';
-import { DashboardSkeleton, LocationsSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, QuickActionsSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
+import { DashboardSkeleton } from '../helper/skeleton';
 import { PromotionalCarousel } from './carousel';
-import { FeaturedProjectsScroll } from './featured-project';
-import { HeaderShell, HeaderBrand, HeaderSearchBar } from '../header';
+import { FeaturedProjectsScroll, FeaturedPropertiesScroll } from './featured-project';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -47,7 +47,8 @@ export function HomeDashboard() {
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
 
-  const { data: projects, locations, loading, error, retry, refresh: handleRefresh, refreshing } = useDashboard();
+  const { data, locations, loading, error, retry, refresh: handleRefresh, refreshing } = useDashboard();
+  const { projects, featuredProperties } = data;
   
   const player = useVideoPlayer(require('@/assets/vid/welcome-page-bg.mp4'), (p) => {
     p.loop = true;
@@ -99,44 +100,36 @@ export function HomeDashboard() {
               refreshing={refreshing}
               onRefresh={handleRefresh}
               tintColor={Colors.accentDark}
-              progressViewOffset={insets.top + 28}
             />}>
 
             {/* <Text style={styles.dateText}>{today}</Text> */}
 
              {/* ── Quick Actions ────────────────────────────────────────────── */}
-            <WithRefreshSkeleton refreshing={refreshing} skeleton={<QuickActionsSkeleton />}>
-              <View style={styles.quickActionsRow}>
-                {QUICK_ACTIONS.map((action) => (
-                  <Pressable
-                    key={action.key}
-                    style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
-                    onPress={handleDiscoverPress}
-                  >
-                    <View style={styles.quickActionIconBox}>
-                      <Ionicons name={action.icon} size={22} color={Colors.accentDark} />
-                    </View>
-                    <Text style={styles.quickActionLabel}>{action.label}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            </WithRefreshSkeleton>
+            <View style={styles.quickActionsRow}>
+              {QUICK_ACTIONS.map((action) => (
+                <Pressable
+                  key={action.key}
+                  style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
+                  onPress={handleDiscoverPress}
+                >
+                  <View style={styles.quickActionIconBox}>
+                    <Ionicons name={action.icon} size={22} color={Colors.accentDark} />
+                  </View>
+                  <Text style={styles.quickActionLabel}>{action.label}</Text>
+                </Pressable>
+              ))}
+            </View>
 
             {/* Featured Projects */}
-            <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton />}>
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Top Projects</Text>
-                  <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
-                    <Text style={styles.linkText}>Explore More</Text>
-                  </TouchableOpacity>
-                </View>
-                <FeaturedProjectsScroll
-                    projects={projects}
-                    // onPress={(project) => router.push(`/projects/${project.id}`)}
-                  />
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Top Projects</Text>
+                <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
+                  <Text style={styles.linkText}>Explore More</Text>
+                </TouchableOpacity>
               </View>
-            </WithRefreshSkeleton>
+              <FeaturedProjectsScroll projects={projects} />
+            </View>
 
             {/* ── Hero ────────────────────────────────────────────────────── */}
             <View style={styles.section}>
@@ -168,9 +161,7 @@ export function HomeDashboard() {
               </View>
             </View>
 
-            <WithRefreshSkeleton refreshing={refreshing} skeleton={<PromotionalCarouselSkeleton />}>
-              <PromotionalCarousel />
-            </WithRefreshSkeleton>
+            <PromotionalCarousel />
                   
             {/* ── Project Locations ────────────────────────────────────────── */}
             <View style={styles.section}>
@@ -186,34 +177,27 @@ export function HomeDashboard() {
                   <Text style={styles.linkText}>Explore</Text>
                 </Pressable>
               </View>
-              <WithRefreshSkeleton refreshing={refreshing} skeleton={<LocationsSkeleton />} >
-                <ScrollView
-                  horizontal
-                  contentInsetAdjustmentBehavior="never"
-                  showsHorizontalScrollIndicator={false}
-                >
-                  {locations.map((location) => (
-                    <LocationChip key={location} location={location} />
-                  ))}
-                </ScrollView>
-              </WithRefreshSkeleton>
+              <ScrollView
+                horizontal
+                contentInsetAdjustmentBehavior="never"
+                showsHorizontalScrollIndicator={false}
+              >
+                {locations.map((location) => (
+                  <LocationChip key={location} location={location} />
+                ))}
+              </ScrollView>
             </View>
 
             {/* Featured Properties  */}
-            <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton />}>
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Featured Properties</Text>
-                  <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
-                    <Text style={styles.linkText}>Explore More</Text>
-                  </TouchableOpacity>
-                </View>
-                <FeaturedProjectsScroll
-                    projects={projects}
-                    // onPress={(project) => router.push(`/projects/${project.id}`)}
-                  />
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Featured Properties</Text>
+                <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
+                  <Text style={styles.linkText}>Explore More</Text>
+                </TouchableOpacity>
               </View>
-            </WithRefreshSkeleton>
+              <FeaturedPropertiesScroll properties={featuredProperties} />
+            </View>
 
       </ScrollView>
     </SafeAreaView>

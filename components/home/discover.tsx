@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
+import { HeaderSearchBar, HeaderShell } from '../header';
 import { ErrorScreen } from '../helper/error-project';
 import { PropertiesSkeletonScreen } from '../helper/skeleton';
 import ProjectCard from '../project-card';
-import { HeaderShell, HeaderSearchBar } from '../header';
 
 export function DiscoverScreen() {
   const styles = createPropertiesScreenStyles(Colors);
@@ -42,7 +42,7 @@ export function DiscoverScreen() {
       <StatusBar barStyle="dark-content" />
 
       <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.surface }}>
-        <HeaderShell>
+        <HeaderShell >
           <HeaderSearchBar value={search} onChange={setSearch} />
         </HeaderShell>
       </SafeAreaView>

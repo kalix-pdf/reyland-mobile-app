@@ -1,6 +1,7 @@
 import { useDataFetcher, type FetcherActions, type FetcherState } from '@/hooks/useDataFetcher';
+import { propertiesApi } from '@/services/fetchData/property/fetch-property.api';
 import { projectsApi } from '@/services/fetchData/project/fetch-project.api';
-import type { Project } from '@/types';
+import type { Project, Property } from '@/types';
 import React, {
   createContext,
   useCallback,
@@ -9,7 +10,12 @@ import React, {
   type ReactNode,
 } from 'react';
 
-interface DashboardContextValue extends FetcherState<Project[]>, FetcherActions {
+interface DashboardData {
+  projects: Project[];
+  featuredProperties: Property[];
+}
+
+interface DashboardContextValue extends FetcherState<DashboardData>, FetcherActions {
   /** Unique city/region names derived from the fetched projects (max 6). */
   locations: string[];
 }
@@ -21,28 +27,35 @@ interface DashboardProviderProps {
 }
 
 export function DashboardProvider({ children }: DashboardProviderProps) {
-  const fetchFeatured = useCallback(() => projectsApi.getFeatured(), []);
+  const fetchDashboard = useCallback(async (): Promise<DashboardData> => {
+    const [projects, featuredProperties] = await Promise.all([
+      projectsApi.getFeatured(),
+      propertiesApi.getFeatured(),
+    ]);
 
-  const { data: projects, ...rest } = useDataFetcher(fetchFeatured, {
-    initialData: [] as Project[],
-    errorMessage: 'Failed to load projects. Pull down to retry.',
+    return { projects, featuredProperties };
+  }, []);
+
+  const { data, ...rest } = useDataFetcher(fetchDashboard, {
+    initialData: { projects: [], featuredProperties: [] },
+    errorMessage: 'Failed to load dashboard. Pull down to retry.',
   });
 
   const locations = useMemo(
     () =>
       Array.from(
         new Set(
-          projects
+          data.projects
             .map((p) => p.location?.split(',')[0]?.trim())
             .filter((loc): loc is string => Boolean(loc)),
         ),
       ).slice(0, 6),
-    [projects],
+    [data.projects],
   );
 
   const value = useMemo<DashboardContextValue>(
-    () => ({ data: projects, locations, ...rest }),
-    [projects, locations, rest],
+    () => ({ data, locations, ...rest }),
+    [data, locations, rest],
   );
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;

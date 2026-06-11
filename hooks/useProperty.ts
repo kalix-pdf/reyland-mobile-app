@@ -1,35 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { propertiesApi } from '@/services/fetchData/property/fetch-property.api';
 import { Property } from '@/types';
+import { useDataFetcher } from './useDataFetcher';
 
 export function useProperty(id: number) {
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState(true);
+  const fetcher = useCallback(async () => {
+    if (!Number.isFinite(id) || id <= 0) {
+      return null;
+    }
 
-  useEffect(() => {
-    load();
+    return propertiesApi.getById(id);
   }, [id]);
 
-  async function load() {
-    if (!Number.isFinite(id) || id <= 0) {
-      setProperty(null);
-      setLoading(false);
-      return;
+  const { data: property, ...rest } = useDataFetcher<Property | null>(
+    fetcher,
+    {
+      initialData: null,
+      errorMessage: 'Failed to load property details. Pull down to retry.',
     }
-
-    try {
-      setLoading(true);
-      const data = await propertiesApi.getById(id);
-      setProperty(data);
-    } catch {
-      setProperty(null);
-    } finally {
-      setLoading(false);
-    }
-  }
+  );
 
   return {
     property,
-    loading,
+    ...rest,
   };
 }

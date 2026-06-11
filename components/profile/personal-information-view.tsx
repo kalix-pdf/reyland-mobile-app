@@ -1,8 +1,8 @@
 import { useAuth } from '@/context/auth-context'
 import { useAppTheme } from '@/context/theme-context'
 import { User } from '@/types/user.types'
+import { Feather } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Feather, Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
 import { router } from 'expo-router'
 import React, { useState } from 'react'
@@ -12,9 +12,9 @@ import { clearCachedUser, setCachedUser } from '../../services/auth/auth-session
 import { deleteAccount } from '../../services/user/delete-account.api'
 import { updateAvatar } from '../../services/user/update-avatar.api'
 import { createPersonalInformationStyles } from '../../styles/profile.styles'
+import { HeaderNav, HeaderShell, HomeAction } from '../header'
 import { getInitials } from './get-initials'
 import { getPhoneValue } from './phone-value'
-import { HeaderShell, HeaderNav, HomeAction } from '../header'
 
 type PersonalInformationViewProps = {
   user: User
