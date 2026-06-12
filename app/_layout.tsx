@@ -42,6 +42,7 @@ function RootNavigator() {
           <Stack.Screen name="change-email" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="change-phone" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="change-password" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="affiliate" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="property/[id]" />
           <Stack.Screen name="project-property/[id]" />
           <Stack.Screen name="search-home-screen" />

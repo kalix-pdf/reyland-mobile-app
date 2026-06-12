@@ -1,0 +1,232 @@
+import { AppColors } from '@/constants/colors';
+import { StyleSheet } from 'react-native';
+import { createThemedStyles } from './foundations';
+
+export const createAffiliateStyles = createThemedStyles((Colors: AppColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: Colors.background,
+    },
+    centered: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 12,
+      backgroundColor: Colors.background,
+      paddingHorizontal: 20,
+    },
+    loadingText: {
+      fontSize: 14,
+      color: Colors.textSecondary,
+    },
+    scrollContent: {
+      paddingHorizontal: 20,
+      paddingTop: 18,
+      paddingBottom: 40,
+    },
+    panel: {
+      borderRadius: 8,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surface,
+      padding: 18,
+      gap: 16,
+    },
+    iconBadge: {
+      width: 52,
+      height: 52,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.tag,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+    },
+    subtitle: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: Colors.textSecondary,
+    },
+    benefitList: {
+      gap: 10,
+    },
+    benefitRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 9,
+    },
+    benefitText: {
+      flex: 1,
+      fontSize: 14,
+      lineHeight: 20,
+      color: Colors.textPrimary,
+    },
+    termsRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 10,
+      paddingVertical: 2,
+    },
+    checkbox: {
+      width: 20,
+      height: 20,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 1,
+    },
+    checkboxChecked: {
+      borderColor: Colors.accent,
+      backgroundColor: Colors.accent,
+    },
+    termsText: {
+      flex: 1,
+      fontSize: 13,
+      lineHeight: 19,
+      color: Colors.textSecondary,
+    },
+    primaryButton: {
+      minHeight: 54,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.accent,
+    },
+    primaryButtonText: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: Colors.white,
+    },
+    secondaryButton: {
+      minHeight: 48,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surface,
+      paddingHorizontal: 18,
+    },
+    secondaryButtonText: {
+      fontSize: 14,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+    },
+    disabled: {
+      opacity: 0.55,
+    },
+    pressed: {
+      opacity: 0.6,
+    },
+    dashboardHeader: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    eyebrow: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: Colors.accent,
+      textTransform: 'uppercase',
+      marginBottom: 4,
+    },
+    activeBadge: {
+      borderRadius: 8,
+      backgroundColor: Colors.tag,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    activeBadgeText: {
+      fontSize: 12,
+      fontWeight: '800',
+      color: Colors.tagText,
+    },
+    referralBox: {
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surfaceMuted,
+      padding: 14,
+      gap: 6,
+    },
+    referralLabel: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: Colors.textMuted,
+    },
+    referralCode: {
+      fontSize: 24,
+      fontWeight: '900',
+      color: Colors.textPrimary,
+    },
+    referralLink: {
+      fontSize: 13,
+      color: Colors.textSecondary,
+    },
+    statsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    statTile: {
+      width: '48%',
+      minHeight: 92,
+      borderRadius: 8,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surface,
+      padding: 12,
+      justifyContent: 'space-between',
+    },
+    statValue: {
+      fontSize: 18,
+      fontWeight: '900',
+      color: Colors.textPrimary,
+    },
+    statLabel: {
+      fontSize: 12,
+      lineHeight: 16,
+      color: Colors.textMuted,
+    },
+    inlineError: {
+      marginBottom: 12,
+      borderRadius: 8,
+      backgroundColor: Colors.errorBackground,
+      borderWidth: 1,
+      borderColor: Colors.errorBorder,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      color: Colors.error,
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    errorPanel: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 20,
+      gap: 12,
+    },
+    errorTitle: {
+      fontSize: 18,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+      textAlign: 'center',
+    },
+    errorText: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: Colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+  }),
+);
+
