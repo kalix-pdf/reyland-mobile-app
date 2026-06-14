@@ -48,7 +48,7 @@ export function HomeDashboard() {
   const [search, setSearch] = useState('');
 
   const { data, locations, loading, error, retry, refresh: handleRefresh, refreshing } = useDashboard();
-  const { projects, featuredProperties } = data;
+  const { projects, featuredProperties, promotionImages } = data;
   
   const player = useVideoPlayer(require('@/assets/vid/welcome-page-bg.mp4'), (p) => {
     p.loop = true;
@@ -161,7 +161,7 @@ export function HomeDashboard() {
               </View>
             </View>
 
-            <PromotionalCarousel />
+            <PromotionalCarousel promotionImages={promotionImages} />
                   
             {/* ── Project Locations ────────────────────────────────────────── */}
             <View style={styles.section}>
