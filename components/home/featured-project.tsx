@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { Colors } from '@/constants/colors';
 import { Project, Property } from '@/types';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
 import { Href, router } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 interface Props {
   projects: Project[];
@@ -21,7 +21,15 @@ export function FeaturedProjectsScroll({ projects, onPress }: Props) {
         <Pressable
           key={project.id}
           style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-          onPress={() => onPress?.(project)}
+          onPress={() =>{
+              router.push({
+                pathname: '/project-property/[id]',
+                params: {
+                  id: project.id.toString(),
+                  name: project.project_name,
+                },
+              } as unknown as Href)
+          }}
         >
           <Image
             source={{ uri: project.image_url }}
