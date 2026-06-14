@@ -25,57 +25,112 @@ export const createAffiliateStyles = createThemedStyles((Colors: AppColors) =>
       paddingTop: 18,
       paddingBottom: 40,
     },
+
+    // ─── Enroll Panel ────────────────────────────────────────────────────────
+
     panel: {
-      borderRadius: 8,
+      borderRadius: 20,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: Colors.border,
       backgroundColor: Colors.surface,
-      padding: 18,
-      gap: 16,
+      overflow: 'hidden',
+    },
+    panelAccentBar: {
+      height: 3,
+      backgroundColor: Colors.accent,
+      opacity: 0.9,
+    },
+    panelInner: {
+      padding: 24,
+      paddingBottom: 20,
+      gap: 0,
     },
     iconBadge: {
       width: 52,
       height: 52,
-      borderRadius: 8,
+      borderRadius: 14,
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: Colors.tag,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: Colors.border,
+      marginBottom: 16,
+    },
+    eyebrow: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: Colors.accent,
+      textTransform: 'uppercase',
+      letterSpacing: 0.8,
+      marginBottom: 6,
     },
     title: {
-      fontSize: 22,
-      fontWeight: '800',
+      fontSize: 20,
+      fontWeight: '700',
       color: Colors.textPrimary,
+      lineHeight: 26,
+      marginBottom: 8,
     },
     subtitle: {
       fontSize: 14,
       lineHeight: 21,
       color: Colors.textSecondary,
+      marginBottom: 20,
+    },
+    panelDivider: {
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: Colors.border,
+      marginBottom: 18,
+    },
+    benefitsLabel: {
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 0.7,
+      textTransform: 'uppercase',
+      color: Colors.textMuted,
+      marginBottom: 10,
     },
     benefitList: {
       gap: 10,
+      marginBottom: 0,
     },
     benefitRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      gap: 9,
+      gap: 10,
+    },
+    benefitCheck: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: Colors.tag,
+      marginTop: 1,
     },
     benefitText: {
       flex: 1,
       fontSize: 14,
-      lineHeight: 20,
+      lineHeight: 21,
       color: Colors.textPrimary,
     },
     termsRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       gap: 10,
-      paddingVertical: 2,
+      marginTop: 18,
+      marginBottom: 16,
+      backgroundColor: Colors.surfaceMuted,
+      borderRadius: 10,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: Colors.border,
+      padding: 12,
     },
     checkbox: {
-      width: 20,
-      height: 20,
-      borderRadius: 6,
-      borderWidth: 1,
+      width: 18,
+      height: 18,
+      borderRadius: 5,
+      borderWidth: 1.5,
       borderColor: Colors.border,
       alignItems: 'center',
       justifyContent: 'center',
@@ -87,55 +142,56 @@ export const createAffiliateStyles = createThemedStyles((Colors: AppColors) =>
     },
     termsText: {
       flex: 1,
-      fontSize: 13,
-      lineHeight: 19,
+      fontSize: 12.5,
+      lineHeight: 18,
       color: Colors.textSecondary,
     },
+    termsLink: {
+      color: Colors.accent,
+    },
     primaryButton: {
-      minHeight: 54,
-      borderRadius: 8,
+      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      gap: 8,
+      minHeight: 50,
+      borderRadius: 12,
       backgroundColor: Colors.accent,
     },
     primaryButtonText: {
       fontSize: 15,
-      fontWeight: '800',
+      fontWeight: '600',
       color: Colors.white,
+      letterSpacing: 0.1,
     },
-    secondaryButton: {
-      minHeight: 48,
-      borderRadius: 8,
+    safeNote: {
+      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 1,
-      borderColor: Colors.border,
-      backgroundColor: Colors.surface,
-      paddingHorizontal: 18,
+      gap: 5,
+      marginTop: 12,
     },
-    secondaryButtonText: {
-      fontSize: 14,
-      fontWeight: '800',
-      color: Colors.textPrimary,
+    safeNoteText: {
+      fontSize: 11.5,
+      color: Colors.textMuted,
     },
+
+    // ─── Shared Utilities ────────────────────────────────────────────────────
+
     disabled: {
       opacity: 0.55,
     },
     pressed: {
       opacity: 0.6,
     },
+
+    // ─── Dashboard ───────────────────────────────────────────────────────────
+
     dashboardHeader: {
       flexDirection: 'row',
       alignItems: 'flex-start',
       justifyContent: 'space-between',
       gap: 12,
-    },
-    eyebrow: {
-      fontSize: 12,
-      fontWeight: '800',
-      color: Colors.accent,
-      textTransform: 'uppercase',
-      marginBottom: 4,
     },
     activeBadge: {
       borderRadius: 8,
@@ -195,6 +251,27 @@ export const createAffiliateStyles = createThemedStyles((Colors: AppColors) =>
       lineHeight: 16,
       color: Colors.textMuted,
     },
+
+    // ─── Secondary Button ────────────────────────────────────────────────────
+
+    secondaryButton: {
+      minHeight: 48,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: Colors.border,
+      backgroundColor: Colors.surface,
+      paddingHorizontal: 18,
+    },
+    secondaryButtonText: {
+      fontSize: 14,
+      fontWeight: '800',
+      color: Colors.textPrimary,
+    },
+
+    // ─── Errors ──────────────────────────────────────────────────────────────
+
     inlineError: {
       marginBottom: 12,
       borderRadius: 8,
@@ -229,4 +306,3 @@ export const createAffiliateStyles = createThemedStyles((Colors: AppColors) =>
     },
   }),
 );
-

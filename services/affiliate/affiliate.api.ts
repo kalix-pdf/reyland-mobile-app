@@ -9,7 +9,9 @@ type AffiliateApiResponse = AffiliateStatus | {
   message?: string;
 };
 
-const AFFILIATE_STATUS_ENDPOINT = '/api/affiliate/me';
+
+// do not touch, hindi pa tapos, transaction muna before this
+const AFFILIATE_STATUS_ENDPOINT = '/affiliate/api/getMe/Status';
 const AFFILIATE_ENROLL_ENDPOINT = '/api/affiliate/enroll';
 
 function normalizeAffiliateStatus(payload: AffiliateApiResponse): AffiliateStatus {
