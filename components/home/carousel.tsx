@@ -1,29 +1,18 @@
-import { useEffect, useState } from 'react';
-import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
-import ReanimatedCarousel from 'react-native-reanimated-carousel';
-import { ReduceMotion } from 'react-native-reanimated';
-import { Image } from 'expo-image';
-// import { PROMO_BANNERS } from '../../data/promotions';
 import { PromotionProps } from '@/types';
-import { getPromotionImage } from '@/services/fetchData/promotion/fetch-promotion.api';
+import { Image } from 'expo-image';
+import { useState } from 'react';
+import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
+import { ReduceMotion } from 'react-native-reanimated';
+import ReanimatedCarousel from 'react-native-reanimated-carousel';
 
 const { width } = Dimensions.get('window');
 
-export function PromotionalCarousel() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [promotionImages, setPromotionImages] = useState<PromotionProps[]>([]);
+interface PromotionalCarouselProps {
+  promotionImages: PromotionProps[];
+}
 
-  const fetchImages = async () => {
-    try {
-      const result = await getPromotionImage();
-      setPromotionImages(result);
-    } catch (error) {
-      console.error('Failed to fetch promotions:', error);
-    }
-  };
-  useEffect(() => {
-    fetchImages();
-  }, []);
+export function PromotionalCarousel({ promotionImages }: PromotionalCarouselProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <View style={styles.promoSection}>

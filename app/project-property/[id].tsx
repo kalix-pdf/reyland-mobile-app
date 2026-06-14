@@ -29,11 +29,12 @@ const STATUS_FILTERS: { label: string; value: 'All' | Property['status']}[] = [
 ];
 
 export default function ProjectPropertiesScreen() {
-  const { id } = useLocalSearchParams<{
+  const { id, name } = useLocalSearchParams<{
     id?: string;
     name?: string;
   }>();
   const projectId = Number(id);
+  const projectName = name?.trim() || 'Properties';
   const hasValidProjectId = Number.isFinite(projectId) && projectId > 0;
   const [activeStatus, setActiveStatus] = useState<'All' | Property['status']>('All');
 
@@ -86,7 +87,7 @@ export default function ProjectPropertiesScreen() {
 
   const renderHeader = () => (
       <HeaderShell transparent>
-        <HeaderNav title="Properties"/>
+        <HeaderNav title={projectName}/>
           <HeaderSearchBar
             value={search}
             onChange={handleSearchChange}

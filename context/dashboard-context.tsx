@@ -1,7 +1,8 @@
 import { useDataFetcher, type FetcherActions, type FetcherState } from '@/hooks/useDataFetcher';
-import { propertiesApi } from '@/services/fetchData/property/fetch-property.api';
 import { projectsApi } from '@/services/fetchData/project/fetch-project.api';
-import type { Project, Property } from '@/types';
+import { getPromotionImage } from '@/services/fetchData/promotion/fetch-promotion.api';
+import { propertiesApi } from '@/services/fetchData/property/fetch-property.api';
+import type { Project, PromotionProps, Property } from '@/types';
 import React, {
   createContext,
   useCallback,
@@ -13,6 +14,7 @@ import React, {
 interface DashboardData {
   projects: Project[];
   featuredProperties: Property[];
+  promotionImages: PromotionProps[];
 }
 
 interface DashboardContextValue extends FetcherState<DashboardData>, FetcherActions {
@@ -28,16 +30,17 @@ interface DashboardProviderProps {
 
 export function DashboardProvider({ children }: DashboardProviderProps) {
   const fetchDashboard = useCallback(async (): Promise<DashboardData> => {
-    const [projects, featuredProperties] = await Promise.all([
+    const [projects, featuredProperties, promotionImages] = await Promise.all([
       projectsApi.getFeatured(),
       propertiesApi.getFeatured(),
+      getPromotionImage(),
     ]);
 
-    return { projects, featuredProperties };
+    return { projects, featuredProperties, promotionImages };
   }, []);
 
   const { data, ...rest } = useDataFetcher(fetchDashboard, {
-    initialData: { projects: [], featuredProperties: [] },
+    initialData: { projects: [], featuredProperties: [], promotionImages: [] },
     errorMessage: 'Failed to load dashboard. Pull down to retry.',
   });
 
