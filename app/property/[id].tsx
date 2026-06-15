@@ -26,6 +26,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/colors';
 import { useProperty } from '@/hooks/useProperty';
+import { addInquiry, InquiryApiError } from '@/services/inquiries/inquiry.api';
 
 const { width } = Dimensions.get('window');
 const PAGE_PADDING = 15;
@@ -84,6 +85,8 @@ export default function PropertyDetailsScreen() {
   const [inquiryEmail, setInquiryEmail] = useState('');
   const [inquiryPhone, setInquiryPhone] = useState('');
   const [inquiryMessage, setInquiryMessage] = useState('');
+  const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [hasActiveInquiry, setHasActiveInquiry] = useState(false);
 
   const galleryImages = useMemo<GalleryImage[]>(() => {
     if (!property) return [];
@@ -145,7 +148,7 @@ export default function PropertyDetailsScreen() {
   const yearsToPay = Number(property.years_to_pay ?? 0);
   const amenities = (property.amenities ?? []).filter((amenity) => amenity.trim().length > 0);
 
-  const handleSubmitInquiry = () => {
+  const handleSubmitInquiry = async () => {
     const hasContact = inquiryEmail.trim().length > 0 || inquiryPhone.trim().length > 0;
 
     if (!inquiryName.trim()) {
@@ -158,8 +161,40 @@ export default function PropertyDetailsScreen() {
       return;
     }
 
-    setInquiryVisible(false);
-    Alert.alert('Inquiry ready', 'The inquiry form is ready. We can connect this to the backend next.');
+    try {
+      setSubmittingInquiry(true);
+
+      await addInquiry({
+        property_id: property.id,
+        name: inquiryName.trim(),
+        email: inquiryEmail.trim() || null,
+        phone: inquiryPhone.trim() || null,
+        message: inquiryMessage.trim() || null,
+      });
+
+      setHasActiveInquiry(true);
+      setInquiryVisible(false);
+      Alert.alert(
+        'Inquiry sent',
+        'Your inquiry has been submitted. Our team will contact you soon.',
+      );
+    } catch (error) {
+      if (error instanceof InquiryApiError && error.statusCode === 409) {
+        setHasActiveInquiry(true);
+        Alert.alert(
+          'Inquiry already active',
+          'You already have an active inquiry for this property. Our team will contact you soon.',
+        );
+        return;
+      }
+
+      Alert.alert(
+        'Unable to send inquiry',
+        error instanceof Error ? error.message : 'Please try again in a moment.',
+      );
+    } finally {
+      setSubmittingInquiry(false);
+    }
   };
 
   return (
@@ -321,12 +356,32 @@ export default function PropertyDetailsScreen() {
       <View style={styles.actionBar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Inquire now"
-          onPress={() => setInquiryVisible(true)}
-          style={({ pressed }) => [styles.secondaryAction, pressed && styles.pressed]}
+          accessibilityLabel={hasActiveInquiry ? 'Inquiry already sent' : 'Inquire now'}
+          onPress={() => {
+            if (hasActiveInquiry) {
+              Alert.alert(
+                'Inquiry already active',
+                'You already have an active inquiry for this property. Our team will contact you soon.',
+              );
+              return;
+            }
+
+            setInquiryVisible(true);
+          }}
+          style={({ pressed }) => [
+            styles.secondaryAction,
+            hasActiveInquiry && styles.activeInquiryAction,
+            pressed && styles.pressed,
+          ]}
           >
-          <Ionicons name="chatbubble-ellipses-outline" size={18} color={Colors.accent} />
-          <Text style={styles.secondaryActionText}>Inquire Now</Text>
+          <Ionicons
+            name={hasActiveInquiry ? 'checkmark-circle-outline' : 'chatbubble-ellipses-outline'}
+            size={18}
+            color={Colors.accent}
+          />
+          <Text style={styles.secondaryActionText}>
+            {hasActiveInquiry ? 'Inquiry Sent' : 'Inquire Now'}
+          </Text>
         </Pressable>
 
         <Pressable
@@ -418,7 +473,12 @@ export default function PropertyDetailsScreen() {
               <Pressable
                 accessibilityRole="button"
                 onPress={() => setInquiryVisible(false)}
-                style={({ pressed }) => [styles.cancelInquiryButton, pressed && styles.pressed]}
+                disabled={submittingInquiry}
+                style={({ pressed }) => [
+                  styles.cancelInquiryButton,
+                  pressed && styles.pressed,
+                  submittingInquiry && styles.disabledButton,
+                ]}
               >
                 <Text style={styles.cancelInquiryText}>Cancel</Text>
               </Pressable>
@@ -426,9 +486,18 @@ export default function PropertyDetailsScreen() {
               <Pressable
                 accessibilityRole="button"
                 onPress={handleSubmitInquiry}
-                style={({ pressed }) => [styles.submitInquiryButton, pressed && styles.pressed]}
+                disabled={submittingInquiry}
+                style={({ pressed }) => [
+                  styles.submitInquiryButton,
+                  pressed && styles.pressed,
+                  submittingInquiry && styles.disabledButton,
+                ]}
               >
-                <Text style={styles.submitInquiryText}>Submit Inquiry</Text>
+                {submittingInquiry ? (
+                  <ActivityIndicator size="small" color={Colors.white} />
+                ) : (
+                  <Text style={styles.submitInquiryText}>Submit Inquiry</Text>
+                )}
               </Pressable>
             </View>
           </View>
@@ -923,6 +992,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.accent,
     backgroundColor: Colors.surface,
   },
+  activeInquiryAction: {
+    backgroundColor: Colors.tag,
+  },
   primaryAction: {
     flex: 1.1,
     minHeight: 52,
@@ -1055,6 +1127,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 15,
     backgroundColor: Colors.accent,
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
   cancelInquiryText: {
     color: Colors.textSecondary,
