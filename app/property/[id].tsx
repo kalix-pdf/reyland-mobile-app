@@ -1,9 +1,25 @@
 import { HeaderNav, HeaderShell, HomeAction } from '@/components/header';
+import { useAuth } from '@/context/auth-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Pressable, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { ReduceMotion } from 'react-native-reanimated';
 import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -54,6 +70,7 @@ function formatNumber(value?: number | null, fallback = 'Not specified') {
 
 export default function PropertyDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
   const propertyId = Number(id);
   const {
     property,
@@ -62,6 +79,11 @@ export default function PropertyDetailsScreen() {
     refresh,
   } = useProperty(propertyId);
   const [activeImage, setActiveImage] = useState(0);
+  const [inquiryVisible, setInquiryVisible] = useState(false);
+  const [inquiryName, setInquiryName] = useState('');
+  const [inquiryEmail, setInquiryEmail] = useState('');
+  const [inquiryPhone, setInquiryPhone] = useState('');
+  const [inquiryMessage, setInquiryMessage] = useState('');
 
   const galleryImages = useMemo<GalleryImage[]>(() => {
     if (!property) return [];
@@ -86,6 +108,16 @@ export default function PropertyDetailsScreen() {
       return true;
     });
   }, [property]);
+
+  useEffect(() => {
+    setInquiryName(user?.name ?? '');
+    setInquiryEmail(user?.email ?? '');
+    setInquiryPhone(user?.phone ?? '');
+
+    if (property?.title) {
+      setInquiryMessage(`Hi, I would like to inquire about ${property.title}.`);
+    }
+  }, [property?.title, user?.email, user?.name, user?.phone]);
 
   if (!Number.isFinite(propertyId)) {
     return <StateScreen icon="alert-circle-outline" title="Property unavailable" message="This listing could not be opened." />;
@@ -112,6 +144,23 @@ export default function PropertyDetailsScreen() {
   const totalPrice = property.total_price ?? property.price;
   const yearsToPay = Number(property.years_to_pay ?? 0);
   const amenities = (property.amenities ?? []).filter((amenity) => amenity.trim().length > 0);
+
+  const handleSubmitInquiry = () => {
+    const hasContact = inquiryEmail.trim().length > 0 || inquiryPhone.trim().length > 0;
+
+    if (!inquiryName.trim()) {
+      Alert.alert('Name required', 'Please enter your name so our team knows who to contact.');
+      return;
+    }
+
+    if (!hasContact) {
+      Alert.alert('Contact required', 'Please enter your email or phone number.');
+      return;
+    }
+
+    setInquiryVisible(false);
+    Alert.alert('Inquiry ready', 'The inquiry form is ready. We can connect this to the backend next.');
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
@@ -273,7 +322,7 @@ export default function PropertyDetailsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Inquire now"
-          onPress={() => Alert.alert('Inquiry', 'Inquiry feature coming soon.')}
+          onPress={() => setInquiryVisible(true)}
           style={({ pressed }) => [styles.secondaryAction, pressed && styles.pressed]}
           >
           <Ionicons name="chatbubble-ellipses-outline" size={18} color={Colors.accent} />
@@ -290,6 +339,101 @@ export default function PropertyDetailsScreen() {
           <Text style={styles.primaryActionText}>Schedule Visit</Text>
         </Pressable>
       </View>
+
+      <Modal
+        visible={inquiryVisible}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={() => setInquiryVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalRoot}
+        >
+          <Pressable style={styles.modalBackdrop} onPress={() => setInquiryVisible(false)} />
+
+          <View style={styles.inquirySheet}>
+            <View style={styles.sheetHandle} />
+
+            <View style={styles.inquiryHeader}>
+              <View style={styles.inquiryIcon}>
+                <Ionicons name="chatbubble-ellipses-outline" size={20} color={Colors.accent} />
+              </View>
+              <View style={styles.inquiryHeaderCopy}>
+                <Text style={styles.inquiryTitle}>Inquire about this property</Text>
+                <Text style={styles.inquirySubtitle} numberOfLines={1}>
+                  {property.title}
+                </Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close inquiry form"
+                hitSlop={10}
+                onPress={() => setInquiryVisible(false)}
+                style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}
+              >
+                <Ionicons name="close" size={20} color={Colors.textMuted} />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.inquiryForm}
+            >
+              <InquiryField
+                label="Full name"
+                value={inquiryName}
+                onChangeText={setInquiryName}
+                placeholder="Juan Dela Cruz"
+                autoCapitalize="words"
+              />
+              <InquiryField
+                label="Email"
+                value={inquiryEmail}
+                onChangeText={setInquiryEmail}
+                placeholder="name@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <InquiryField
+                label="Phone"
+                value={inquiryPhone}
+                onChangeText={setInquiryPhone}
+                placeholder="09xx xxx xxxx"
+                keyboardType="phone-pad"
+              />
+              <InquiryField
+                label="Message"
+                value={inquiryMessage}
+                onChangeText={setInquiryMessage}
+                placeholder="Tell us what you want to know"
+                multiline
+                inputStyle={styles.messageInput}
+              />
+            </ScrollView>
+
+            <View style={styles.inquiryActions}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setInquiryVisible(false)}
+                style={({ pressed }) => [styles.cancelInquiryButton, pressed && styles.pressed]}
+              >
+                <Text style={styles.cancelInquiryText}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                accessibilityRole="button"
+                onPress={handleSubmitInquiry}
+                style={({ pressed }) => [styles.submitInquiryButton, pressed && styles.pressed]}
+              >
+                <Text style={styles.submitInquiryText}>Submit Inquiry</Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -330,6 +474,24 @@ function BreakdownRow({ label, value, last }: { label: string; value: string; la
     <View style={[styles.breakdownRow, last && styles.lastRow]}>
       <Text style={styles.breakdownLabel}>{label}</Text>
       <Text style={styles.breakdownValue}>{value}</Text>
+    </View>
+  );
+}
+
+type InquiryFieldProps = React.ComponentProps<typeof TextInput> & {
+  label: string;
+  inputStyle?: React.ComponentProps<typeof TextInput>['style'];
+};
+
+function InquiryField({ label, inputStyle, ...props }: InquiryFieldProps) {
+  return (
+    <View style={styles.inputGroup}>
+      <Text style={styles.inputLabel}>{label}</Text>
+      <TextInput
+        {...props}
+        placeholderTextColor={Colors.textMuted}
+        style={[styles.input, inputStyle]}
+      />
     </View>
   );
 }
@@ -777,6 +939,129 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   primaryActionText: {
+    color: Colors.white,
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  modalRoot: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.42)',
+  },
+  inquirySheet: {
+    maxHeight: '88%',
+    paddingTop: 10,
+    paddingHorizontal: PAGE_PADDING,
+    paddingBottom: 30,
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    backgroundColor: Colors.surface,
+  },
+  sheetHandle: {
+    alignSelf: 'center',
+    width: 44,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: Colors.border,
+    marginBottom: 16,
+  },
+  inquiryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  inquiryIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.tag,
+  },
+  inquiryHeaderCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
+  inquiryTitle: {
+    color: Colors.textPrimary,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  inquirySubtitle: {
+    marginTop: 3,
+    color: Colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.background,
+  },
+  inquiryForm: {
+    gap: 12,
+    paddingBottom: 8,
+  },
+  inputGroup: {
+    gap: 7,
+  },
+  inputLabel: {
+    color: Colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '900',
+  },
+  input: {
+    minHeight: 48,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.background,
+    color: Colors.textPrimary,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  messageInput: {
+    minHeight: 108,
+    textAlignVertical: 'top',
+  },
+  inquiryActions: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingTop: 14,
+  },
+  cancelInquiryButton: {
+    flex: 1,
+    minHeight: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  submitInquiryButton: {
+    flex: 1.35,
+    minHeight: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 15,
+    backgroundColor: Colors.accent,
+  },
+  cancelInquiryText: {
+    color: Colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  submitInquiryText: {
     color: Colors.white,
     fontSize: 14,
     fontWeight: '900',
