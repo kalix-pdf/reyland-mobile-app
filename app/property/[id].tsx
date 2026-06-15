@@ -1,4 +1,11 @@
 import { HeaderNav, HeaderShell, HomeAction } from '@/components/header';
+import {
+  PropertyBreakdownRow as BreakdownRow,
+  PropertyInquiryField as InquiryField,
+  PropertySection as Section,
+  PropertyStateScreen as StateScreen,
+  PropertyStatItem as StatItem,
+} from '@/components/property-details-components';
 import { useAuth } from '@/context/auth-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -7,7 +14,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -15,9 +21,7 @@ import {
   RefreshControl,
   ScrollView,
   StatusBar,
-  StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { ReduceMotion } from 'react-native-reanimated';
@@ -25,12 +29,18 @@ import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/colors';
+import {
+  CAROUSEL_HEIGHT,
+  propertyDetailsStyles as styles,
+  PROPERTY_SCREEN_WIDTH as width,
+} from '@/styles/property.styles';
 import { useProperty } from '@/hooks/useProperty';
-import { addInquiry, InquiryApiError } from '@/services/inquiries/inquiry.api';
+import {
+  addInquiry,
+  fetchActivePropertyInquiry,
+  InquiryApiError,
+} from '@/services/inquiries/inquiry.api';
 
-const { width } = Dimensions.get('window');
-const PAGE_PADDING = 15;
-const CAROUSEL_HEIGHT = 300;
 
 const STATUS_LABELS: Record<number, string> = {
   0: 'Available',
@@ -69,6 +79,16 @@ function formatNumber(value?: number | null, fallback = 'Not specified') {
   return Number(value).toLocaleString();
 }
 
+function isValidMobilePhone(value: string) {
+  if (!/^[+()\d\s-]{7,20}$/.test(value)) return false;
+
+  const digits = value.replace(/\D/g, '');
+  return (
+    (digits.length === 11 && digits.startsWith('09')) ||
+    (digits.length === 12 && digits.startsWith('639'))
+  );
+}
+
 export default function PropertyDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
@@ -86,6 +106,7 @@ export default function PropertyDetailsScreen() {
   const [inquiryPhone, setInquiryPhone] = useState('');
   const [inquiryMessage, setInquiryMessage] = useState('');
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [checkingInquiry, setCheckingInquiry] = useState(false);
   const [hasActiveInquiry, setHasActiveInquiry] = useState(false);
 
   const galleryImages = useMemo<GalleryImage[]>(() => {
@@ -122,6 +143,40 @@ export default function PropertyDetailsScreen() {
     }
   }, [property?.title, user?.email, user?.name, user?.phone]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkActiveInquiry = async () => {
+      if (!property?.id || !user?.uuid) {
+        setHasActiveInquiry(false);
+        return;
+      }
+
+      try {
+        setCheckingInquiry(true);
+        const activeInquiry = await fetchActivePropertyInquiry(property.id);
+
+        if (!cancelled) {
+          setHasActiveInquiry(Boolean(activeInquiry));
+        }
+      } catch {
+        if (!cancelled) {
+          setHasActiveInquiry(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setCheckingInquiry(false);
+        }
+      }
+    };
+
+    checkActiveInquiry();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [property?.id, user?.uuid]);
+
   if (!Number.isFinite(propertyId)) {
     return <StateScreen icon="alert-circle-outline" title="Property unavailable" message="This listing could not be opened." />;
   }
@@ -147,17 +202,33 @@ export default function PropertyDetailsScreen() {
   const totalPrice = property.total_price ?? property.price;
   const yearsToPay = Number(property.years_to_pay ?? 0);
   const amenities = (property.amenities ?? []).filter((amenity) => amenity.trim().length > 0);
+  const trimmedInquiryName = inquiryName.trim();
+  const trimmedInquiryEmail = inquiryEmail.trim();
+  const trimmedInquiryPhone = inquiryPhone.trim();
+  const inquiryPhoneIsInvalid =
+    trimmedInquiryPhone.length > 0 && !isValidMobilePhone(trimmedInquiryPhone);
+  const inquirySubmitDisabled =
+    submittingInquiry ||
+    trimmedInquiryName.length === 0 ||
+    trimmedInquiryPhone.length === 0 ||
+    inquiryPhoneIsInvalid;
 
   const handleSubmitInquiry = async () => {
-    const hasContact = inquiryEmail.trim().length > 0 || inquiryPhone.trim().length > 0;
-
-    if (!inquiryName.trim()) {
+    if (!trimmedInquiryName) {
       Alert.alert('Name required', 'Please enter your name so our team knows who to contact.');
       return;
     }
 
-    if (!hasContact) {
-      Alert.alert('Contact required', 'Please enter your email or phone number.');
+    if (!trimmedInquiryPhone) {
+      Alert.alert('Phone required', 'Please enter your mobile number.');
+      return;
+    }
+
+    if (inquiryPhoneIsInvalid) {
+      Alert.alert(
+        'Invalid mobile number',
+        'Please enter a valid Philippine mobile number like 09171234567 or +639171234567.',
+      );
       return;
     }
 
@@ -166,9 +237,9 @@ export default function PropertyDetailsScreen() {
 
       await addInquiry({
         property_id: property.id,
-        name: inquiryName.trim(),
-        email: inquiryEmail.trim() || null,
-        phone: inquiryPhone.trim() || null,
+        name: trimmedInquiryName,
+        email: trimmedInquiryEmail || null,
+        phone: trimmedInquiryPhone || null,
         message: inquiryMessage.trim() || null,
       });
 
@@ -356,8 +427,16 @@ export default function PropertyDetailsScreen() {
       <View style={styles.actionBar}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={hasActiveInquiry ? 'Inquiry already sent' : 'Inquire now'}
+          accessibilityLabel={
+            checkingInquiry
+              ? 'Checking inquiry status'
+              : hasActiveInquiry
+                ? 'Inquiry already sent'
+                : 'Inquire now'
+          }
           onPress={() => {
+            if (checkingInquiry) return;
+
             if (hasActiveInquiry) {
               Alert.alert(
                 'Inquiry already active',
@@ -368,9 +447,11 @@ export default function PropertyDetailsScreen() {
 
             setInquiryVisible(true);
           }}
+          disabled={checkingInquiry}
           style={({ pressed }) => [
             styles.secondaryAction,
             hasActiveInquiry && styles.activeInquiryAction,
+            checkingInquiry && styles.disabledButton,
             pressed && styles.pressed,
           ]}
           >
@@ -380,7 +461,7 @@ export default function PropertyDetailsScreen() {
             color={Colors.accent}
           />
           <Text style={styles.secondaryActionText}>
-            {hasActiveInquiry ? 'Inquiry Sent' : 'Inquire Now'}
+            {checkingInquiry ? 'Checking...' : hasActiveInquiry ? 'Inquiry Sent' : 'Inquire Now'}
           </Text>
         </Pressable>
 
@@ -485,18 +566,27 @@ export default function PropertyDetailsScreen() {
 
               <Pressable
                 accessibilityRole="button"
-                onPress={handleSubmitInquiry}
-                disabled={submittingInquiry}
+                accessibilityState={{ disabled: inquirySubmitDisabled }}
+                onPress={inquirySubmitDisabled ? undefined : handleSubmitInquiry}
+                disabled={inquirySubmitDisabled}
                 style={({ pressed }) => [
                   styles.submitInquiryButton,
-                  pressed && styles.pressed,
-                  submittingInquiry && styles.disabledButton,
+                  inquirySubmitDisabled && styles.submitInquiryButtonDisabled,
+                  inquirySubmitDisabled && styles.disabledButton,
+                  pressed && !inquirySubmitDisabled && styles.pressed,
                 ]}
               >
                 {submittingInquiry ? (
                   <ActivityIndicator size="small" color={Colors.white} />
                 ) : (
-                  <Text style={styles.submitInquiryText}>Submit Inquiry</Text>
+                  <Text
+                    style={[
+                      styles.submitInquiryText,
+                      inquirySubmitDisabled && styles.submitInquiryTextDisabled,
+                    ]}
+                  >
+                    Submit Inquiry
+                  </Text>
                 )}
               </Pressable>
             </View>
@@ -507,638 +597,3 @@ export default function PropertyDetailsScreen() {
   );
 }
 
-function StateScreen({ icon, title, message }: { icon: keyof typeof Ionicons.glyphMap; title: string; message: string }) {
-  return (
-    <SafeAreaView style={styles.stateContainer}>
-      <Ionicons name={icon} size={36} color={icon === 'alert-circle-outline' ? Colors.error : Colors.textMuted} />
-      <Text style={styles.stateTitle}>{title}</Text>
-      <Text style={styles.stateText}>{message}</Text>
-    </SafeAreaView>
-  );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {children}
-    </View>
-  );
-}
-
-function StatItem({ icon, label, value }: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string }) {
-  return (
-    <View style={styles.statItem}>
-      <View style={styles.statIcon}>
-        <Ionicons name={icon} size={18} color={Colors.accent} />
-      </View>
-      <Text style={styles.statValue} numberOfLines={1}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
-function BreakdownRow({ label, value, last }: { label: string; value: string; last?: boolean }) {
-  return (
-    <View style={[styles.breakdownRow, last && styles.lastRow]}>
-      <Text style={styles.breakdownLabel}>{label}</Text>
-      <Text style={styles.breakdownValue}>{value}</Text>
-    </View>
-  );
-}
-
-type InquiryFieldProps = React.ComponentProps<typeof TextInput> & {
-  label: string;
-  inputStyle?: React.ComponentProps<typeof TextInput>['style'];
-};
-
-function InquiryField({ label, inputStyle, ...props }: InquiryFieldProps) {
-  return (
-    <View style={styles.inputGroup}>
-      <Text style={styles.inputLabel}>{label}</Text>
-      <TextInput
-        {...props}
-        placeholderTextColor={Colors.textMuted}
-        style={[styles.input, inputStyle]}
-      />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  topBar: {
-    height: 64,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: PAGE_PADDING,
-    backgroundColor: Colors.background,
-  },
-  backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  pressed: {
-    opacity: 0.78,
-  },
-  backButtonGhost: {
-    width: 42,
-    height: 42,
-  },
-  topTitleBlock: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 12,
-  },
-  topTitle: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  topSubtitle: {
-    marginTop: 3,
-    maxWidth: '100%',
-    color: Colors.textMuted,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 60,
-  },
-  carouselSection: {
-    paddingTop: 4,
-    paddingBottom: 14,
-  },
-  carouselCard: {
-    width,
-    height: CAROUSEL_HEIGHT,
-    paddingHorizontal: PAGE_PADDING,
-  },
-  carouselImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 24,
-    backgroundColor: Colors.border,
-  },
-  carouselMeta: {
-    minHeight: 28,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  imageCountPill: {
-    position: 'absolute',
-    left: PAGE_PADDING,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: Colors.primary,
-  },
-  imageCountText: {
-    color: Colors.white,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  dots: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#D9D9D9',
-  },
-  activeDot: {
-    width: 22,
-    backgroundColor: Colors.tagText,
-  },
-  summaryCard: {
-    marginHorizontal: PAGE_PADDING,
-    padding: 16,
-    borderRadius: 22,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 14,
-    elevation: 2,
-  },
-  summaryTop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 14,
-  },
-  summaryCopy: {
-    flex: 1,
-    minWidth: 0,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
-  },
-  categoryBadge: {
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: Colors.tag,
-  },
-  categoryText: {
-    color: Colors.tagText,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  statusBadge: {
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: Colors.primary,
-  },
-  statusText: {
-    color: Colors.white,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  priceLabel: {
-    color: Colors.textMuted,
-    fontSize: 12,
-    fontWeight: '800',
-    marginBottom: 3,
-  },
-  price: {
-    color: Colors.accent,
-    fontSize: 27,
-    fontWeight: '900',
-  },
-  title: {
-    marginTop: 7,
-    color: Colors.textPrimary,
-    fontSize: 21,
-    lineHeight: 27,
-    fontWeight: '900',
-  },
-  sidePanel: {
-    width: 86,
-    minHeight: 106,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    borderRadius: 18,
-    backgroundColor: Colors.background,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  sideValue: {
-    marginTop: 8,
-    color: Colors.textPrimary,
-    fontSize: 17,
-    fontWeight: '900',
-  },
-  sideLabel: {
-    marginTop: 2,
-    color: Colors.textMuted,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  locationRow: {
-    marginTop: 14,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 9,
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  locationIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.tag,
-  },
-  location: {
-    flex: 1,
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '700',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginHorizontal: PAGE_PADDING,
-    marginTop: 14,
-  },
-  statItem: {
-    flex: 1,
-    minHeight: 98,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    borderRadius: 18,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  statIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.tag,
-    marginBottom: 7,
-  },
-  statValue: {
-    maxWidth: '100%',
-    color: Colors.textPrimary,
-    fontSize: 13,
-    fontWeight: '900',
-  },
-  statLabel: {
-    marginTop: 4,
-    color: Colors.textMuted,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  section: {
-    marginHorizontal: PAGE_PADDING,
-    marginTop: 18,
-  },
-  sectionTitle: {
-    marginBottom: 12,
-    color: Colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  paymentCard: {
-    overflow: 'hidden',
-    borderRadius: 22,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  monthlyBlock: {
-    minHeight: 96,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    padding: 16,
-    backgroundColor: Colors.primary,
-  },
-  monthlyIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.14)',
-  },
-  monthlyCopy: {
-    flex: 1,
-    minWidth: 0,
-  },
-  monthlyLabel: {
-    color: 'rgba(255, 255, 255, 0.72)',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  monthlyValue: {
-    marginTop: 5,
-    color: Colors.white,
-    fontSize: 23,
-    fontWeight: '900',
-  },
-  breakdownList: {
-    paddingHorizontal: 16,
-  },
-  breakdownRow: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  lastRow: {
-    borderBottomWidth: 0,
-  },
-  breakdownLabel: {
-    flex: 1,
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  breakdownValue: {
-    color: Colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '900',
-    textAlign: 'right',
-  },
-  amenitiesCard: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    padding: 14,
-    borderRadius: 22,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  amenityChip: {
-    minHeight: 42,
-    maxWidth: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 16,
-    backgroundColor: Colors.tag,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 140, 79, 0.16)',
-  },
-  amenityIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.accent,
-  },
-  amenityText: {
-    flexShrink: 1,
-    color: Colors.tagText,
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: '800',
-  },
-  description: {
-    padding: 16,
-    borderRadius: 20,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 23,
-    fontWeight: '600',
-  },
-  stateContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 28,
-    backgroundColor: Colors.background,
-  },
-  stateTitle: {
-    marginTop: 12,
-    color: Colors.textPrimary,
-    fontSize: 20,
-    fontWeight: '900',
-    textAlign: 'center',
-  },
-  stateText: {
-    marginTop: 8,
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 21,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  actionBar: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingHorizontal: PAGE_PADDING,
-    paddingTop: 12,
-    paddingBottom: 50,
-    backgroundColor: Colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  secondaryAction: {
-    flex: 1,
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.accent,
-    backgroundColor: Colors.surface,
-  },
-  activeInquiryAction: {
-    backgroundColor: Colors.tag,
-  },
-  primaryAction: {
-    flex: 1.1,
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    borderRadius: 16,
-    backgroundColor: Colors.accent,
-  },
-  secondaryActionText: {
-    color: Colors.accent,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  primaryActionText: {
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  modalRoot: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  modalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.42)',
-  },
-  inquirySheet: {
-    maxHeight: '88%',
-    paddingTop: 10,
-    paddingHorizontal: PAGE_PADDING,
-    paddingBottom: 30,
-    borderTopLeftRadius: 26,
-    borderTopRightRadius: 26,
-    backgroundColor: Colors.surface,
-  },
-  sheetHandle: {
-    alignSelf: 'center',
-    width: 44,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: Colors.border,
-    marginBottom: 16,
-  },
-  inquiryHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-  },
-  inquiryIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.tag,
-  },
-  inquiryHeaderCopy: {
-    flex: 1,
-    minWidth: 0,
-  },
-  inquiryTitle: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  inquirySubtitle: {
-    marginTop: 3,
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.background,
-  },
-  inquiryForm: {
-    gap: 12,
-    paddingBottom: 8,
-  },
-  inputGroup: {
-    gap: 7,
-  },
-  inputLabel: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '900',
-  },
-  input: {
-    minHeight: 48,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.background,
-    color: Colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  messageInput: {
-    minHeight: 108,
-    textAlignVertical: 'top',
-  },
-  inquiryActions: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingTop: 14,
-  },
-  cancelInquiryButton: {
-    flex: 1,
-    minHeight: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-  },
-  submitInquiryButton: {
-    flex: 1.35,
-    minHeight: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 15,
-    backgroundColor: Colors.accent,
-  },
-  disabledButton: {
-    opacity: 0.6,
-  },
-  cancelInquiryText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-  submitInquiryText: {
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-});
