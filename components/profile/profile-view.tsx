@@ -145,6 +145,15 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             <Row
               styles={styles}
               colors={colors}
+              icon={<Feather name="users" size={17} color={colors.accent} />}
+              label="Transactions"
+              onPress={() => alert("My Transaction")}
+              isLast
+            />
+
+            <Row
+              styles={styles}
+              colors={colors}
               icon={<Ionicons name="help-circle-outline" size={18} color={colors.accent} />}
               label="About Reyland PH"
               onPress={() => Alert.alert('About Reyland PH')}
