@@ -10,7 +10,7 @@ import { useAuth } from '@/context/auth-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { type RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -29,17 +29,17 @@ import ReanimatedCarousel from 'react-native-reanimated-carousel';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/colors';
-import {
-  CAROUSEL_HEIGHT,
-  propertyDetailsStyles as styles,
-  PROPERTY_SCREEN_WIDTH as width,
-} from '@/styles/property.styles';
 import { useProperty } from '@/hooks/useProperty';
 import {
   addInquiry,
   fetchActivePropertyInquiry,
   InquiryApiError,
 } from '@/services/inquiries/inquiry.api';
+import {
+  CAROUSEL_HEIGHT,
+  propertyDetailsStyles as styles,
+  PROPERTY_SCREEN_WIDTH as width,
+} from '@/styles/property.styles';
 
 
 const STATUS_LABELS: Record<number, string> = {
@@ -52,6 +52,39 @@ const LOT_TYPE_LABELS: Record<number, string> = {
   0: 'Regular Lot',
   1: 'Corner Lot',
 };
+
+const MONTH_OPTIONS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+const TIME_PERIOD_OPTIONS = ['AM', 'PM'];
+const HOUR_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
+const MINUTE_OPTIONS = Array.from({ length: 12 }, (_, index) => index * 5);
+const PICKER_OPTION_HEIGHT = 42;
+
+type VisitDateParts = {
+  month: number;
+  day: number;
+  year: number;
+};
+
+type VisitTimeParts = {
+  hour: number;
+  minute: number;
+  period: string;
+};
+
+type SchedulePicker = 'date' | 'time' | null;
 
 type GalleryImage = {
   id: string;
@@ -79,6 +112,34 @@ function formatNumber(value?: number | null, fallback = 'Not specified') {
   return Number(value).toLocaleString();
 }
 
+function getDaysInMonth(month: number, year: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function createYearOptions() {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: 6 }, (_, index) => currentYear + index);
+}
+
+function createInitialVisitDateParts(): VisitDateParts {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  return {
+    month: tomorrow.getMonth(),
+    day: tomorrow.getDate(),
+    year: tomorrow.getFullYear(),
+  };
+}
+
+function formatVisitDate(parts: VisitDateParts) {
+  return `${MONTH_OPTIONS[parts.month]} ${parts.day}, ${parts.year}`;
+}
+
+function formatVisitTime(parts: VisitTimeParts) {
+  return `${parts.hour}:${String(parts.minute).padStart(2, '0')} ${parts.period}`;
+}
+
 function isValidMobilePhone(value: string) {
   if (!/^[+()\d\s-]{7,20}$/.test(value)) return false;
 
@@ -101,14 +162,45 @@ export default function PropertyDetailsScreen() {
   } = useProperty(propertyId);
   const [activeImage, setActiveImage] = useState(0);
   const [inquiryVisible, setInquiryVisible] = useState(false);
+  const [scheduleVisitVisible, setScheduleVisitVisible] = useState(false);
   const [inquiryName, setInquiryName] = useState('');
   const [inquiryEmail, setInquiryEmail] = useState('');
   const [inquiryPhone, setInquiryPhone] = useState('');
   const [inquiryMessage, setInquiryMessage] = useState('');
+  const [schedulePickerVisible, setSchedulePickerVisible] = useState<SchedulePicker>(null);
+  const [visitDateParts, setVisitDateParts] = useState(createInitialVisitDateParts);
+  const [draftVisitDateParts, setDraftVisitDateParts] = useState(createInitialVisitDateParts);
+  const [visitTimeParts, setVisitTimeParts] = useState<VisitTimeParts>({
+    hour: 10,
+    minute: 0,
+    period: 'AM',
+  });
+  const [draftVisitTimeParts, setDraftVisitTimeParts] = useState<VisitTimeParts>({
+    hour: 10,
+    minute: 0,
+    period: 'AM',
+  });
+  const [visitDate, setVisitDate] = useState('');
+  const [visitTime, setVisitTime] = useState('');
+  const [visitNotes, setVisitNotes] = useState('');
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
   const [checkingInquiry, setCheckingInquiry] = useState(false);
   const [hasActiveInquiry, setHasActiveInquiry] = useState(false);
+  const monthPickerRef = useRef<ScrollView>(null);
+  const dayPickerRef = useRef<ScrollView>(null);
+  const yearPickerRef = useRef<ScrollView>(null);
+  const hourPickerRef = useRef<ScrollView>(null);
+  const minutePickerRef = useRef<ScrollView>(null);
+  const periodPickerRef = useRef<ScrollView>(null);
 
+  const visitYearOptions = useMemo(() => createYearOptions(), []);
+  const visitDayOptions = useMemo(
+    () => Array.from(
+      { length: getDaysInMonth(draftVisitDateParts.month, draftVisitDateParts.year) },
+      (_, index) => index + 1,
+    ),
+    [draftVisitDateParts.month, draftVisitDateParts.year],
+  );
   const galleryImages = useMemo<GalleryImage[]>(() => {
     if (!property) return [];
 
@@ -132,6 +224,61 @@ export default function PropertyDetailsScreen() {
       return true;
     });
   }, [property]);
+
+  const scrollPickerColumnToIndex = (
+    ref: RefObject<ScrollView | null>,
+    index: number,
+    animated = true,
+  ) => {
+    requestAnimationFrame(() => {
+      ref.current?.scrollTo({
+        y: Math.max(index, 0) * PICKER_OPTION_HEIGHT,
+        animated,
+      });
+    });
+  };
+
+  const getPickerIndexFromOffset = (offsetY: number, maxIndex: number) => {
+    return Math.min(
+      Math.max(Math.round(offsetY / PICKER_OPTION_HEIGHT), 0),
+      maxIndex,
+    );
+  };
+
+  useEffect(() => {
+    if (schedulePickerVisible === 'date') {
+      scrollPickerColumnToIndex(monthPickerRef, draftVisitDateParts.month, false);
+      scrollPickerColumnToIndex(dayPickerRef, draftVisitDateParts.day - 1, false);
+      scrollPickerColumnToIndex(
+        yearPickerRef,
+        visitYearOptions.indexOf(draftVisitDateParts.year),
+        false,
+      );
+    }
+
+    if (schedulePickerVisible === 'time') {
+      scrollPickerColumnToIndex(hourPickerRef, draftVisitTimeParts.hour - 1, false);
+      scrollPickerColumnToIndex(
+        minutePickerRef,
+        MINUTE_OPTIONS.indexOf(draftVisitTimeParts.minute),
+        false,
+      );
+      scrollPickerColumnToIndex(
+        periodPickerRef,
+        TIME_PERIOD_OPTIONS.indexOf(draftVisitTimeParts.period),
+        false,
+      );
+    }
+  }, [
+    draftVisitDateParts.day,
+    draftVisitDateParts.month,
+    draftVisitDateParts.year,
+    draftVisitTimeParts.hour,
+    draftVisitTimeParts.minute,
+    draftVisitTimeParts.period,
+    schedulePickerVisible,
+    visitYearOptions,
+  ]);
 
   useEffect(() => {
     setInquiryName(user?.name ?? '');
@@ -212,6 +359,48 @@ export default function PropertyDetailsScreen() {
     trimmedInquiryName.length === 0 ||
     trimmedInquiryPhone.length === 0 ||
     inquiryPhoneIsInvalid;
+  const scheduleVisitDisabled =
+    trimmedInquiryName.length === 0 ||
+    trimmedInquiryPhone.length === 0 ||
+    inquiryPhoneIsInvalid ||
+    visitDate.trim().length === 0 ||
+    visitTime.trim().length === 0;
+
+  const openDatePicker = () => {
+    setDraftVisitDateParts(visitDateParts);
+    setSchedulePickerVisible('date');
+  };
+
+  const openTimePicker = () => {
+    setDraftVisitTimeParts(visitTimeParts);
+    setSchedulePickerVisible('time');
+  };
+
+  const handleDraftDateChange = (nextParts: Partial<VisitDateParts>) => {
+    setDraftVisitDateParts((currentParts) => {
+      const mergedParts = { ...currentParts, ...nextParts };
+      const maxDay = getDaysInMonth(mergedParts.month, mergedParts.year);
+
+      return {
+        ...mergedParts,
+        day: Math.min(mergedParts.day, maxDay),
+      };
+    });
+  };
+
+  const handleConfirmSchedulePicker = () => {
+    if (schedulePickerVisible === 'date') {
+      setVisitDateParts(draftVisitDateParts);
+      setVisitDate(formatVisitDate(draftVisitDateParts));
+    }
+
+    if (schedulePickerVisible === 'time') {
+      setVisitTimeParts(draftVisitTimeParts);
+      setVisitTime(formatVisitTime(draftVisitTimeParts));
+    }
+
+    setSchedulePickerVisible(null);
+  };
 
   const handleSubmitInquiry = async () => {
     if (!trimmedInquiryName) {
@@ -266,6 +455,42 @@ export default function PropertyDetailsScreen() {
     } finally {
       setSubmittingInquiry(false);
     }
+  };
+
+  const handleRequestVisit = () => {
+    if (!trimmedInquiryName) {
+      Alert.alert('Name required', 'Please enter your name so our team knows who to expect.');
+      return;
+    }
+
+    if (!trimmedInquiryPhone) {
+      Alert.alert('Phone required', 'Please enter your mobile number.');
+      return;
+    }
+
+    if (inquiryPhoneIsInvalid) {
+      Alert.alert(
+        'Invalid mobile number',
+        'Please enter a valid Philippine mobile number like 09171234567 or +639171234567.',
+      );
+      return;
+    }
+
+    if (!visitDate.trim()) {
+      Alert.alert('Date required', 'Please enter your preferred visit date.');
+      return;
+    }
+
+    if (!visitTime.trim()) {
+      Alert.alert('Time required', 'Please enter your preferred visit time.');
+      return;
+    }
+
+    setScheduleVisitVisible(false);
+    Alert.alert(
+      'Visit request prepared',
+      `On-site visit selected for ${visitDate.trim()} at ${visitTime.trim()}. We can connect this to the visit request API next.`,
+    );
   };
 
   return (
@@ -468,7 +693,7 @@ export default function PropertyDetailsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Schedule visit"
-          onPress={() => Alert.alert('Schedule Visit', 'Site visit scheduling coming soon.')}
+          onPress={() => setScheduleVisitVisible(true)}
           style={({ pressed }) => [styles.primaryAction, pressed && styles.pressed]}
         >
           <Ionicons name="calendar-outline" size={18} color={Colors.white} />
@@ -476,6 +701,7 @@ export default function PropertyDetailsScreen() {
         </Pressable>
       </View>
 
+      {/* INQUIRY MODAL */}
       <Modal
         visible={inquiryVisible}
         transparent
@@ -592,6 +818,512 @@ export default function PropertyDetailsScreen() {
             </View>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* SCHEDULE VISIT MODAL */}
+      <Modal
+        visible={scheduleVisitVisible}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={() => setScheduleVisitVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalRoot}
+        >
+          <Pressable style={styles.modalBackdrop} onPress={() => setScheduleVisitVisible(false)} />
+
+          <View style={styles.scheduleSheet}>
+            <View style={styles.sheetHandle} />
+
+            <View style={styles.inquiryHeader}>
+              <View style={styles.scheduleIcon}>
+                <Ionicons name="calendar-outline" size={20} color={Colors.accent} />
+              </View>
+              <View style={styles.inquiryHeaderCopy}>
+                <Text style={styles.inquiryTitle}>Schedule a Visit</Text>
+                <Text style={styles.inquirySubtitle} numberOfLines={1}>
+                  {property.title}
+                </Text>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Close schedule visit form"
+                hitSlop={10}
+                onPress={() => setScheduleVisitVisible(false)}
+                style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}
+              >
+                <Ionicons name="close" size={20} color={Colors.textMuted} />
+              </Pressable>
+            </View>
+
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.scheduleForm}
+            >
+              <View style={styles.visitHero}>
+                <View style={styles.visitHeroIcon}>
+                  <Ionicons name="location-outline" size={20} color={Colors.white} />
+                </View>
+                <View style={styles.visitHeroCopy}>
+                  <Text style={styles.visitHeroLabel}>Preferred site visit</Text>
+                  <Text style={styles.visitHeroText} numberOfLines={2}>
+                    {location}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.schedulePickerRow}>
+                <View style={styles.schedulePickerField}>
+                  <Text style={styles.inputLabel}>Preferred date</Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Select preferred visit date"
+                    onPress={openDatePicker}
+                    style={({ pressed }) => [
+                      styles.schedulePickerInput,
+                      pressed && styles.pressed,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.schedulePickerInputText,
+                        !visitDate && styles.schedulePickerPlaceholder,
+                      ]}
+                    >
+                      {visitDate || 'Select date'}
+                    </Text>
+                    <Ionicons name="calendar-outline" size={18} color={Colors.textMuted} />
+                  </Pressable>
+                </View>
+
+                <View style={styles.schedulePickerField}>
+                  <Text style={styles.inputLabel}>Preferred time</Text>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Select preferred visit time"
+                    onPress={openTimePicker}
+                    style={({ pressed }) => [
+                      styles.schedulePickerInput,
+                      pressed && styles.pressed,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.schedulePickerInputText,
+                        !visitTime && styles.schedulePickerPlaceholder,
+                      ]}
+                    >
+                      {visitTime || 'Select time'}
+                    </Text>
+                    <Ionicons name="time-outline" size={18} color={Colors.textMuted} />
+                  </Pressable>
+                </View>
+              </View>
+
+              <View style={styles.scheduleDivider} />
+
+              <InquiryField
+                label="Full name"
+                value={inquiryName}
+                onChangeText={setInquiryName}
+                placeholder="Juan Dela Cruz"
+                autoCapitalize="words"
+              />
+              <InquiryField
+                label="Email"
+                value={inquiryEmail}
+                onChangeText={setInquiryEmail}
+                placeholder="name@email.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <InquiryField
+                label="Phone"
+                value={inquiryPhone}
+                onChangeText={setInquiryPhone}
+                placeholder="09xx xxx xxxx"
+                keyboardType="phone-pad"
+              />
+              <InquiryField
+                label="Notes for the visit"
+                value={visitNotes}
+                onChangeText={setVisitNotes}
+                placeholder="Add companions, timing details, or questions"
+                multiline
+                inputStyle={styles.visitNotesInput}
+              />
+            </ScrollView>
+
+            <View style={styles.inquiryActions}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setScheduleVisitVisible(false)}
+                style={({ pressed }) => [
+                  styles.cancelInquiryButton,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={styles.cancelInquiryText}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ disabled: scheduleVisitDisabled }}
+                onPress={scheduleVisitDisabled ? undefined : handleRequestVisit}
+                disabled={scheduleVisitDisabled}
+                style={({ pressed }) => [
+                  styles.submitInquiryButton,
+                  scheduleVisitDisabled && styles.submitInquiryButtonDisabled,
+                  scheduleVisitDisabled && styles.disabledButton,
+                  pressed && !scheduleVisitDisabled && styles.pressed,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.submitInquiryText,
+                    scheduleVisitDisabled && styles.submitInquiryTextDisabled,
+                  ]}
+                >
+                  Request Visit
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={schedulePickerVisible !== null}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setSchedulePickerVisible(null)}
+      >
+        <View style={styles.schedulePickerModalRoot}>
+          <Pressable
+            style={styles.schedulePickerBackdrop}
+            onPress={() => setSchedulePickerVisible(null)}
+          />
+
+          <View style={styles.schedulePickerCard}>
+            <Text style={styles.schedulePickerTitle}>
+              {schedulePickerVisible === 'date' ? 'Select date' : 'Select time'}
+            </Text>
+
+            {schedulePickerVisible === 'date' ? (
+              <View style={styles.schedulePickerColumns}>
+                <View style={styles.schedulePickerColumnFrame}>
+                  <View style={styles.schedulePickerSelectionFrame} />
+                  <ScrollView
+                    ref={monthPickerRef}
+                    style={styles.schedulePickerColumn}
+                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    showsVerticalScrollIndicator={false}
+                    snapToInterval={PICKER_OPTION_HEIGHT}
+                    decelerationRate="fast"
+                    onMomentumScrollEnd={(event) => {
+                      handleDraftDateChange({
+                        month: getPickerIndexFromOffset(
+                          event.nativeEvent.contentOffset.y,
+                          MONTH_OPTIONS.length - 1,
+                        ),
+                      });
+                    }}
+                  >
+                    {MONTH_OPTIONS.map((month, index) => {
+                      const selected = draftVisitDateParts.month === index;
+
+                      return (
+                        <Pressable
+                          key={month}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected }}
+                          onPress={() => {
+                            handleDraftDateChange({ month: index });
+                            scrollPickerColumnToIndex(monthPickerRef, index);
+                          }}
+                          style={styles.schedulePickerOption}
+                        >
+                          <Text
+                            style={[
+                              styles.schedulePickerOptionText,
+                              selected && styles.schedulePickerOptionTextSelected,
+                            ]}
+                          >
+                            {month}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+
+                <View style={styles.schedulePickerColumnFrame}>
+                  <View style={styles.schedulePickerSelectionFrame} />
+                  <ScrollView
+                    ref={dayPickerRef}
+                    style={styles.schedulePickerColumn}
+                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    showsVerticalScrollIndicator={false}
+                    snapToInterval={PICKER_OPTION_HEIGHT}
+                    decelerationRate="fast"
+                    onMomentumScrollEnd={(event) => {
+                      handleDraftDateChange({
+                        day: getPickerIndexFromOffset(
+                          event.nativeEvent.contentOffset.y,
+                          visitDayOptions.length - 1,
+                        ) + 1,
+                      });
+                    }}
+                  >
+                    {visitDayOptions.map((day) => {
+                      const selected = draftVisitDateParts.day === day;
+
+                      return (
+                        <Pressable
+                          key={day}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected }}
+                          onPress={() => {
+                            handleDraftDateChange({ day });
+                            scrollPickerColumnToIndex(dayPickerRef, day - 1);
+                          }}
+                          style={styles.schedulePickerOption}
+                        >
+                          <Text
+                            style={[
+                              styles.schedulePickerOptionText,
+                              selected && styles.schedulePickerOptionTextSelected,
+                            ]}
+                          >
+                            {day}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+
+                <View style={styles.schedulePickerColumnFrame}>
+                  <View style={styles.schedulePickerSelectionFrame} />
+                  <ScrollView
+                    ref={yearPickerRef}
+                    style={styles.schedulePickerColumn}
+                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    showsVerticalScrollIndicator={false}
+                    snapToInterval={PICKER_OPTION_HEIGHT}
+                    decelerationRate="fast"
+                    onMomentumScrollEnd={(event) => {
+                      const yearIndex = getPickerIndexFromOffset(
+                        event.nativeEvent.contentOffset.y,
+                        visitYearOptions.length - 1,
+                      );
+                      handleDraftDateChange({ year: visitYearOptions[yearIndex] });
+                    }}
+                  >
+                    {visitYearOptions.map((year, index) => {
+                      const selected = draftVisitDateParts.year === year;
+
+                      return (
+                        <Pressable
+                          key={year}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected }}
+                          onPress={() => {
+                            handleDraftDateChange({ year });
+                            scrollPickerColumnToIndex(yearPickerRef, index);
+                          }}
+                          style={styles.schedulePickerOption}
+                        >
+                          <Text
+                            style={[
+                              styles.schedulePickerOptionText,
+                              selected && styles.schedulePickerOptionTextSelected,
+                            ]}
+                          >
+                            {year}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.schedulePickerColumns}>
+                <View style={styles.schedulePickerColumnFrame}>
+                  <View style={styles.schedulePickerSelectionFrame} />
+                  <ScrollView
+                    ref={hourPickerRef}
+                    style={styles.schedulePickerColumn}
+                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    showsVerticalScrollIndicator={false}
+                    snapToInterval={PICKER_OPTION_HEIGHT}
+                    decelerationRate="fast"
+                    onMomentumScrollEnd={(event) => {
+                      setDraftVisitTimeParts((current) => ({
+                        ...current,
+                        hour: getPickerIndexFromOffset(
+                          event.nativeEvent.contentOffset.y,
+                          HOUR_OPTIONS.length - 1,
+                        ) + 1,
+                      }));
+                    }}
+                  >
+                    {HOUR_OPTIONS.map((hour) => {
+                      const selected = draftVisitTimeParts.hour === hour;
+
+                      return (
+                        <Pressable
+                          key={hour}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected }}
+                          onPress={() => {
+                            setDraftVisitTimeParts((current) => ({ ...current, hour }));
+                            scrollPickerColumnToIndex(hourPickerRef, hour - 1);
+                          }}
+                          style={styles.schedulePickerOption}
+                        >
+                          <Text
+                            style={[
+                              styles.schedulePickerOptionText,
+                              selected && styles.schedulePickerOptionTextSelected,
+                            ]}
+                          >
+                            {hour}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+
+                <View style={styles.schedulePickerColumnFrame}>
+                  <View style={styles.schedulePickerSelectionFrame} />
+                  <ScrollView
+                    ref={minutePickerRef}
+                    style={styles.schedulePickerColumn}
+                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    showsVerticalScrollIndicator={false}
+                    snapToInterval={PICKER_OPTION_HEIGHT}
+                    decelerationRate="fast"
+                    onMomentumScrollEnd={(event) => {
+                      const minuteIndex = getPickerIndexFromOffset(
+                        event.nativeEvent.contentOffset.y,
+                        MINUTE_OPTIONS.length - 1,
+                      );
+                      setDraftVisitTimeParts((current) => ({
+                        ...current,
+                        minute: MINUTE_OPTIONS[minuteIndex],
+                      }));
+                    }}
+                  >
+                    {MINUTE_OPTIONS.map((minute, index) => {
+                      const selected = draftVisitTimeParts.minute === minute;
+
+                      return (
+                        <Pressable
+                          key={minute}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected }}
+                          onPress={() => {
+                            setDraftVisitTimeParts((current) => ({ ...current, minute }));
+                            scrollPickerColumnToIndex(minutePickerRef, index);
+                          }}
+                          style={styles.schedulePickerOption}
+                        >
+                          <Text
+                            style={[
+                              styles.schedulePickerOptionText,
+                              selected && styles.schedulePickerOptionTextSelected,
+                            ]}
+                          >
+                            {String(minute).padStart(2, '0')}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+
+                <View style={styles.schedulePickerColumnFrame}>
+                  <View style={styles.schedulePickerSelectionFrame} />
+                  <ScrollView
+                    ref={periodPickerRef}
+                    style={styles.schedulePickerColumn}
+                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    showsVerticalScrollIndicator={false}
+                    snapToInterval={PICKER_OPTION_HEIGHT}
+                    decelerationRate="fast"
+                    onMomentumScrollEnd={(event) => {
+                      const periodIndex = getPickerIndexFromOffset(
+                        event.nativeEvent.contentOffset.y,
+                        TIME_PERIOD_OPTIONS.length - 1,
+                      );
+                      setDraftVisitTimeParts((current) => ({
+                        ...current,
+                        period: TIME_PERIOD_OPTIONS[periodIndex],
+                      }));
+                    }}
+                  >
+                    {TIME_PERIOD_OPTIONS.map((period, index) => {
+                      const selected = draftVisitTimeParts.period === period;
+
+                      return (
+                        <Pressable
+                          key={period}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected }}
+                          onPress={() => {
+                            setDraftVisitTimeParts((current) => ({ ...current, period }));
+                            scrollPickerColumnToIndex(periodPickerRef, index);
+                          }}
+                          style={styles.schedulePickerOption}
+                        >
+                          <Text
+                            style={[
+                              styles.schedulePickerOptionText,
+                              selected && styles.schedulePickerOptionTextSelected,
+                            ]}
+                          >
+                            {period}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              </View>
+            )}
+
+            <View style={styles.schedulePickerActions}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setSchedulePickerVisible(null)}
+                style={({ pressed }) => [
+                  styles.schedulePickerAction,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={styles.schedulePickerCancelText}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                accessibilityRole="button"
+                onPress={handleConfirmSchedulePicker}
+                style={({ pressed }) => [
+                  styles.schedulePickerAction,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Text style={styles.schedulePickerConfirmText}>Confirm</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
       </Modal>
     </SafeAreaView>
   );
