@@ -36,6 +36,11 @@ import {
   InquiryApiError,
 } from '@/services/inquiries/inquiry.api';
 import {
+  addSiteVisit,
+  fetchActivePropertySiteVisit,
+  SiteVisitApiError,
+} from '@/services/site-visits/site-visit.api';
+import {
   CAROUSEL_HEIGHT,
   propertyDetailsStyles as styles,
   PROPERTY_SCREEN_WIDTH as width,
@@ -140,6 +145,15 @@ function formatVisitTime(parts: VisitTimeParts) {
   return `${parts.hour}:${String(parts.minute).padStart(2, '0')} ${parts.period}`;
 }
 
+function createVisitDateTime(parts: VisitDateParts, time: VisitTimeParts) {
+  const hour =
+    time.period === 'PM'
+      ? time.hour === 12 ? 12 : time.hour + 12
+      : time.hour === 12 ? 0 : time.hour;
+
+  return new Date(parts.year, parts.month, parts.day, hour, time.minute).toISOString();
+}
+
 function isValidMobilePhone(value: string) {
   if (!/^[+()\d\s-]{7,20}$/.test(value)) return false;
 
@@ -184,8 +198,11 @@ export default function PropertyDetailsScreen() {
   const [visitTime, setVisitTime] = useState('');
   const [visitNotes, setVisitNotes] = useState('');
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [submittingVisit, setSubmittingVisit] = useState(false);
   const [checkingInquiry, setCheckingInquiry] = useState(false);
   const [hasActiveInquiry, setHasActiveInquiry] = useState(false);
+  const [checkingSiteVisit, setCheckingSiteVisit] = useState(false);
+  const [hasActiveSiteVisit, setHasActiveSiteVisit] = useState(false);
   const monthPickerRef = useRef<ScrollView>(null);
   const dayPickerRef = useRef<ScrollView>(null);
   const yearPickerRef = useRef<ScrollView>(null);
@@ -324,6 +341,40 @@ export default function PropertyDetailsScreen() {
     };
   }, [property?.id, user?.uuid]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkActiveSiteVisit = async () => {
+      if (!property?.id || !user?.uuid) {
+        setHasActiveSiteVisit(false);
+        return;
+      }
+
+      try {
+        setCheckingSiteVisit(true);
+        const activeSiteVisit = await fetchActivePropertySiteVisit(property.id);
+
+        if (!cancelled) {
+          setHasActiveSiteVisit(Boolean(activeSiteVisit));
+        }
+      } catch {
+        if (!cancelled) {
+          setHasActiveSiteVisit(false);
+        }
+      } finally {
+        if (!cancelled) {
+          setCheckingSiteVisit(false);
+        }
+      }
+    };
+
+    checkActiveSiteVisit();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [property?.id, user?.uuid]);
+
   if (!Number.isFinite(propertyId)) {
     return <StateScreen icon="alert-circle-outline" title="Property unavailable" message="This listing could not be opened." />;
   }
@@ -360,6 +411,8 @@ export default function PropertyDetailsScreen() {
     trimmedInquiryPhone.length === 0 ||
     inquiryPhoneIsInvalid;
   const scheduleVisitDisabled =
+    submittingVisit ||
+    hasActiveSiteVisit ||
     trimmedInquiryName.length === 0 ||
     trimmedInquiryPhone.length === 0 ||
     inquiryPhoneIsInvalid ||
@@ -457,7 +510,15 @@ export default function PropertyDetailsScreen() {
     }
   };
 
-  const handleRequestVisit = () => {
+  const handleRequestVisit = async () => {
+    if (hasActiveSiteVisit) {
+      Alert.alert(
+        'Visit already requested',
+        'You already have an active site visit request for this property. Our team will contact you soon.',
+      );
+      return;
+    }
+
     if (!trimmedInquiryName) {
       Alert.alert('Name required', 'Please enter your name so our team knows who to expect.');
       return;
@@ -486,11 +547,41 @@ export default function PropertyDetailsScreen() {
       return;
     }
 
-    setScheduleVisitVisible(false);
-    Alert.alert(
-      'Visit request prepared',
-      `On-site visit selected for ${visitDate.trim()} at ${visitTime.trim()}. We can connect this to the visit request API next.`,
-    );
+    try {
+      setSubmittingVisit(true);
+
+      await addSiteVisit({
+        property_id: property.id,
+        name: trimmedInquiryName,
+        email: trimmedInquiryEmail || null,
+        phone: trimmedInquiryPhone,
+        preferred_visit_at: createVisitDateTime(visitDateParts, visitTimeParts),
+        notes: visitNotes.trim() || null,
+      });
+
+      setHasActiveSiteVisit(true);
+      setScheduleVisitVisible(false);
+      Alert.alert(
+        'Visit requested',
+        'Your site visit request has been submitted. Our team will contact you soon.',
+      );
+    } catch (error) {
+      if (error instanceof SiteVisitApiError && error.statusCode === 409) {
+        setHasActiveSiteVisit(true);
+        Alert.alert(
+          'Visit already requested',
+          'You already have an active site visit request for this property. Our team will contact you soon.',
+        );
+        return;
+      }
+
+      Alert.alert(
+        'Unable to request visit',
+        error instanceof Error ? error.message : 'Please try again in a moment.',
+      );
+    } finally {
+      setSubmittingVisit(false);
+    }
   };
 
   return (
@@ -693,11 +784,35 @@ export default function PropertyDetailsScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Schedule visit"
-          onPress={() => setScheduleVisitVisible(true)}
-          style={({ pressed }) => [styles.primaryAction, pressed && styles.pressed]}
+          accessibilityState={{ disabled: checkingSiteVisit }}
+          onPress={() => {
+            if (checkingSiteVisit) return;
+
+            if (hasActiveSiteVisit) {
+              Alert.alert(
+                'Visit already requested',
+                'You already have an active site visit request for this property. Our team will contact you soon.',
+              );
+              return;
+            }
+
+            setScheduleVisitVisible(true);
+          }}
+          disabled={checkingSiteVisit}
+          style={({ pressed }) => [
+            styles.primaryAction,
+            checkingSiteVisit && styles.disabledButton,
+            pressed && !checkingSiteVisit && styles.pressed,
+          ]}
         >
-          <Ionicons name="calendar-outline" size={18} color={Colors.white} />
-          <Text style={styles.primaryActionText}>Schedule Visit</Text>
+          <Ionicons
+            name={hasActiveSiteVisit ? 'checkmark-circle-outline' : 'calendar-outline'}
+            size={18}
+            color={Colors.white}
+          />
+          <Text style={styles.primaryActionText}>
+            {checkingSiteVisit ? 'Checking...' : hasActiveSiteVisit ? 'Visit Requested' : 'Schedule Visit'}
+          </Text>
         </Pressable>
       </View>
 
@@ -987,7 +1102,7 @@ export default function PropertyDetailsScreen() {
                     scheduleVisitDisabled && styles.submitInquiryTextDisabled,
                   ]}
                 >
-                  Request Visit
+                  {submittingVisit ? 'Requesting...' : 'Request Visit'}
                 </Text>
               </Pressable>
             </View>
@@ -1328,4 +1443,3 @@ export default function PropertyDetailsScreen() {
     </SafeAreaView>
   );
 }
-
