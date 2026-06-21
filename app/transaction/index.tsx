@@ -1,7 +1,7 @@
 import { View, Text, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { useTransaction } from '@/hooks/use-transaction';
 import { TransactionRow } from '@/components/transcations/transaction-row';
-import { HeaderShell, HeaderTitle } from '@/components/header';
+import { HeaderNav, HeaderShell } from '@/components/header';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
 
@@ -11,10 +11,9 @@ export default function TransactionsScreen() {
   return (
     <SafeAreaView
         style={[{ flex: 1, backgroundColor: Colors.background }]}
-        edges={['top', 'left', 'right']}
-    >
+        edges={['top', 'left', 'right']}>
         <HeaderShell transparent>
-        <HeaderTitle title="My Transaction" />
+            <HeaderNav title='My Transactions'/>
         </HeaderShell>
 
         {renderContent()}

@@ -13,7 +13,6 @@ import {
   Pressable,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -99,29 +98,32 @@ export default function SearchHomeScreen() {
   const hasResults = projects.length > 0 || properties.length > 0;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <View style={styles.topRow}>
+    <SafeAreaView className="flex-1 bg-background" edges={['left', 'right']}>
+      <View
+        className="px-[18px] pb-[14px] bg-surface border-b border-border"
+        style={{ paddingTop: insets.top + 12 }}
+      >
+        <View className="flex-row items-center gap-3 mb-[14px]">
           <Pressable
-            style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
+            className="w-10 h-10 rounded-full items-center justify-center bg-surfaceMuted active:opacity-80"
             onPress={() => router.back()}
             accessibilityLabel="Go back"
           >
             <Ionicons name="chevron-back" size={22} color={Colors.textPrimary} />
           </Pressable>
 
-          <View style={styles.titleBlock}>
-            <Text style={styles.title}>Search results</Text>
-            <Text style={styles.subtitle} numberOfLines={1}>
+          <View className="flex-1">
+            <Text className="text-xl font-black text-textPrimary">Search results</Text>
+            <Text className="mt-0.5 text-[13px] font-bold text-textSecondary" numberOfLines={1}>
               {routeQuery || 'Enter a search term'}
             </Text>
           </View>
         </View>
 
-        <View style={styles.searchRow}>
+        <View className="min-h-[46px] flex-row items-center gap-2 border border-border rounded-2xl px-[14px] bg-background">
           <Feather name="search" size={16} color={Colors.textMuted} />
           <TextInput
-            style={styles.searchInput}
+            className="flex-1 min-h-[44px] text-sm font-bold text-textPrimary"
             placeholder="Search by title or location"
             placeholderTextColor={Colors.textMuted}
             value={inputValue}
@@ -139,7 +141,7 @@ export default function SearchHomeScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerClassName="pt-4 pb-8"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -149,36 +151,55 @@ export default function SearchHomeScreen() {
         }
       >
         {loading ? (
-          <View style={styles.stateBlock}>
+          <View className="min-h-[360px] items-center justify-center px-7">
             <ActivityIndicator color={Colors.accent} />
-            <Text style={styles.stateText}>Searching listings</Text>
+            <Text className="mt-2 text-sm leading-5 font-bold text-textSecondary text-center">
+              Searching listings
+            </Text>
           </View>
         ) : error ? (
-          <View style={styles.stateBlock}>
+          <View className="min-h-[360px] items-center justify-center px-7">
             <Ionicons name="alert-circle-outline" size={28} color={Colors.error} />
-            <Text style={styles.stateTitle}>Unable to search</Text>
-            <Text style={styles.stateText}>{error}</Text>
-            <Pressable style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]} onPress={handleRefresh}>
-              <Text style={styles.actionText}>Try again</Text>
+            <Text className="mt-3 text-lg font-black text-textPrimary text-center">
+              Unable to search
+            </Text>
+            <Text className="mt-2 text-sm leading-5 font-bold text-textSecondary text-center">
+              {error}
+            </Text>
+            <Pressable
+              className="mt-[18px] px-[18px] py-[11px] rounded-2xl bg-accent active:opacity-80"
+              onPress={handleRefresh}
+            >
+              <Text className="text-white font-black">Try again</Text>
             </Pressable>
           </View>
         ) : !hasResults ? (
-          <View style={styles.stateBlock}>
+          <View className="min-h-[360px] items-center justify-center px-7">
             <Ionicons name="search-outline" size={30} color={Colors.textMuted} />
-            <Text style={styles.stateTitle}>No results found</Text>
-            <Text style={styles.stateText}>Try another project, property, or location.</Text>
+            <Text className="mt-3 text-lg font-black text-textPrimary text-center">
+              No results found
+            </Text>
+            <Text className="mt-2 text-sm leading-5 font-bold text-textSecondary text-center">
+              Try another project, property, or location.
+            </Text>
           </View>
         ) : (
           <>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryText}>{totalProjects} projects</Text>
-              <View style={styles.summaryDot} />
-              <Text style={styles.summaryText}>{totalProperties} properties</Text>
+            <View className="flex-row items-center gap-2 mx-[18px] mb-4">
+              <Text className="text-[13px] font-extrabold text-textSecondary">
+                {totalProjects} projects
+              </Text>
+              <View className="w-1 h-1 rounded-full bg-textMuted" />
+              <Text className="text-[13px] font-extrabold text-textSecondary">
+                {totalProperties} properties
+              </Text>
             </View>
 
             {projects.length > 0 ? (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Projects</Text>
+              <View className="mb-2">
+                <Text className="mx-[18px] mb-2.5 text-lg font-black text-textPrimary">
+                  Projects
+                </Text>
                 {projects.map((project) => (
                   <ProjectCard key={`project-${project.id}`} project={project} />
                 ))}
@@ -186,8 +207,10 @@ export default function SearchHomeScreen() {
             ) : null}
 
             {properties.length > 0 ? (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Properties</Text>
+              <View className="mb-2">
+                <Text className="mx-[18px] mb-2.5 text-lg font-black text-textPrimary">
+                  Properties
+                </Text>
                 {properties.map((property) => (
                   <PropertyCard key={`property-${property.id}`} property={property} />
                 ))}
@@ -199,130 +222,3 @@ export default function SearchHomeScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    paddingHorizontal: 18,
-    paddingBottom: 14,
-    backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 14,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.surfaceMuted,
-  },
-  pressed: {
-    opacity: 0.82,
-  },
-  titleBlock: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: Colors.textPrimary,
-  },
-  subtitle: {
-    marginTop: 2,
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.textSecondary,
-  },
-  searchRow: {
-    minHeight: 46,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    backgroundColor: Colors.background,
-  },
-  searchInput: {
-    flex: 1,
-    minHeight: 44,
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-  },
-  content: {
-    paddingTop: 16,
-    paddingBottom: 32,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginHorizontal: 18,
-    marginBottom: 16,
-  },
-  summaryText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: Colors.textSecondary,
-  },
-  summaryDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.textMuted,
-  },
-  section: {
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    marginHorizontal: 18,
-    marginBottom: 10,
-    fontSize: 18,
-    fontWeight: '900',
-    color: Colors.textPrimary,
-  },
-  stateBlock: {
-    minHeight: 360,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 28,
-  },
-  stateTitle: {
-    marginTop: 12,
-    fontSize: 18,
-    fontWeight: '900',
-    color: Colors.textPrimary,
-    textAlign: 'center',
-  },
-  stateText: {
-    marginTop: 8,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '700',
-    color: Colors.textSecondary,
-    textAlign: 'center',
-  },
-  actionButton: {
-    marginTop: 18,
-    paddingHorizontal: 18,
-    paddingVertical: 11,
-    borderRadius: 14,
-    backgroundColor: Colors.accent,
-  },
-  actionText: {
-    color: Colors.white,
-    fontWeight: '900',
-  },
-});
