@@ -8,12 +8,12 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { createHomeDashboardStyles } from '../../styles/dashboard.styles';
 import { HeaderBrand, HeaderSearchBar, HeaderShell } from '../header';
 import { ErrorScreen } from '../helper/error-project';
-import { DashboardSkeleton } from '../helper/skeleton';
+import { DashboardSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll, FeaturedPropertiesScroll } from './featured-project';
+import { sharedPressedScale } from '@/styles/shared-primitives';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -23,7 +23,6 @@ const QUICK_ACTIONS = [
   { key: 'support', label: 'Support',   icon: 'chatbubble-ellipses-outline'},
 ] as const;
 
-const styles = createHomeDashboardStyles(Colors);
 // const today = new Date().toLocaleDateString('en-PH', {
 //       weekday: 'long',
 //       year: 'numeric',
@@ -33,9 +32,9 @@ const styles = createHomeDashboardStyles(Colors);
 
 const LocationChip = React.memo(({ location }: { location: string }) => {
   return (
-    <View style={styles.locationChip}>
-        <Text style={styles.locationInitialsText}><Ionicons name="location-outline" size={20} color={Colors.textPrimary} /></Text>
-      <Text style={styles.locationChipText}>{location}</Text>
+    <View className="flex-row items-center gap-3 bg-surface rounded-full py-[10px] px-3 border border-border me-3 mb-[15px]">
+        <Text className="text-textPrimary text-[15px] font-black"><Ionicons name="location-outline" size={20} color={Colors.textPrimary} /></Text>
+      <Text className="text-textPrimary text-[14px] font-bold max-w-[140px]">{location}</Text>
     </View>
   );
 });
@@ -76,7 +75,7 @@ export function HomeDashboard() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe} edges={['left', 'right']}>
+      <SafeAreaView className='flex-1 bg-background' edges={['left', 'right']}>
         <DashboardSkeleton paddingTop={insets.top + 18} />
       </SafeAreaView>
     );
@@ -87,7 +86,7 @@ export function HomeDashboard() {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['left', 'right']}>
       <HeaderShell withSafeArea={true}>
         <HeaderBrand user={user} onLogin={handleLoginPress}/>
         <HeaderSearchBar value={search} onChange={setSearch} onSubmit={handleSearchSubmit}/>
@@ -102,38 +101,52 @@ export function HomeDashboard() {
               tintColor={Colors.accentDark}
             />}>
 
-            {/* <Text style={styles.dateText}>{today}</Text> */}
-
              {/* ── Quick Actions ────────────────────────────────────────────── */}
-            <View style={styles.quickActionsRow}>
+            <View className="mx-[18px] flex-row justify-between gap-3 my-2">
               {QUICK_ACTIONS.map((action) => (
                 <Pressable
                   key={action.key}
-                  style={({ pressed }) => [styles.quickAction, pressed && styles.pressed]}
+                  className="flex-1 items-center px-1.5"
+                  style={({ pressed }) => pressed && sharedPressedScale}
                   onPress={handleDiscoverPress}
                 >
-                  <View style={styles.quickActionIconBox}>
+                  <View
+                    className="w-[54px] h-[54px] rounded-[18px] items-center justify-center mb-1.5 border bg-surface border-border"
+                    style={{
+                      shadowColor: '#000',
+                      shadowOpacity: 0.04,
+                      shadowRadius: 6,
+                      shadowOffset: { width: 0, height: 2 },
+                      elevation: 1,
+                    }}
+                  >
                     <Ionicons name={action.icon} size={22} color={Colors.accentDark} />
                   </View>
-                  <Text style={styles.quickActionLabel}>{action.label}</Text>
+                  <Text className="text-[11px] font-semibold text-center tracking-[0.2px] text-textSecondary">
+                    {action.label}
+                  </Text>
                 </Pressable>
               ))}
             </View>
 
             {/* Featured Projects */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Top Projects</Text>
+            <View className="mt-[15px]">
+              <View className="mx-[18px] flex-row justify-between items-center mb-[15px]">
+                <Text className="text-[23px] font-semibold tracking-[-0.7px]">Top Projects</Text>
                 <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
-                  <Text style={styles.linkText}>Explore More</Text>
+                  <Text className="text-[13px] font-extrabold text-accent">
+                    Explore More
+                  </Text>
                 </TouchableOpacity>
               </View>
-              <FeaturedProjectsScroll projects={projects} />
+              <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton/>}>
+                <FeaturedProjectsScroll projects={projects} />
+              </WithRefreshSkeleton>
             </View>
 
             {/* ── Hero ────────────────────────────────────────────────────── */}
-            <View style={styles.section}>
-              <View style={styles.hero}>
+            <View className="mx-[18px] mt-[15px]">
+              <View className="min-h-[260px] rounded-[30px] overflow-hidden px-[22px] pt-[18px] pb-[26px] bg-accentDark">
                 <VideoView
                   player={player}
                   style={StyleSheet.absoluteFillObject}
@@ -141,19 +154,30 @@ export function HomeDashboard() {
                   nativeControls={false}
                 />
 
-                <View style={styles.heroOverlay} />
-                <View style={styles.heroGlow} />
+                <View className="absolute inset-0" style={{ backgroundColor: 'rgba(0, 34, 24, 0.56)' }} />
+                <View className="absolute w-[240px] h-[240px] rounded-[120px] top-[-60px] right-[-50px]" style={{ backgroundColor: 'rgba(79, 196, 122, 0.20)' }} />
 
-                <View style={styles.heroHeader}>
-                  <Pressable style={({ pressed }) => [styles.brandPill, pressed && styles.pressed]}>
-                    <Text style={styles.helpPillText}>Need Help?</Text>
+                <View className="flex-row justify-between items-center">
+                  <Pressable className="bg-surfaceDark px-3 py-2 rounded-full"
+                    style={({ pressed }) => [
+                      { borderColor: 'rgba(255, 255, 255, 0.14)', backgroundColor: 'rgba(0, 23, 28, 0.63)' },
+                      pressed && sharedPressedScale,
+                    ]}>
+                    <Text className="text-white text-[11px] leading-[14px] font-black">
+                      Need Help?
+                    </Text>
                   </Pressable>
                 </View>
 
-                <View style={styles.heroBody}>
-                  <View style={styles.heroCopy}>
-                    <Text style={styles.heroTitle}>Find your next property with confidence.</Text>
-                    <Text style={styles.heroSubtitle}>
+                <View className="flex-row items-end gap-4">
+                  <View className="flex-1">
+                    <Text className="text-[32px] leading-[38px] font-black tracking-[-0.9px] text-textOnDark">
+                      Find your next property with confidence.
+                    </Text>
+                    <Text
+                      className="mt-3 text-[14px] leading-[21px] max-w-[330px]"
+                      style={{ color: 'rgba(255,255,255,0.82)' }}
+                    >
                       Explore verified developments, featured locations, and ready-to-reserve listings.
                     </Text>
                   </View>
@@ -161,20 +185,27 @@ export function HomeDashboard() {
               </View>
             </View>
 
-            <PromotionalCarousel promotionImages={promotionImages} />
-                  
+            <WithRefreshSkeleton refreshing={refreshing} skeleton={<PromotionalCarouselSkeleton />}>
+              <PromotionalCarousel promotionImages={promotionImages} />
+            </WithRefreshSkeleton>
+
             {/* ── Project Locations ────────────────────────────────────────── */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
+            <View className="mx-[18px] mt-[15px]">
+              <View className="flex-row justify-between items-center mb-[15px]">
                 <View>
-                  <Text style={styles.sectionTitle}>Project Locations</Text>
-                  <Text style={styles.sectionSubtitle}>Browse by city and growth area</Text>
+                  <Text className="text-[23px] font-semibold tracking-[-0.7px]">Project Locations</Text>
+                  <Text className="mt-1 text-[13px] font-semibold text-textMuted">
+                    Browse by city and growth area
+                  </Text>
                 </View>
                 <Pressable
-                  style={({ pressed }) => [styles.linkButton, pressed && styles.pressed]}
+                  className="py-1.5"
+                  style={({ pressed }) => pressed && sharedPressedScale}
                   onPress={handleDiscoverPress}
                 >
-                  <Text style={styles.linkText}>Explore</Text>
+                  <Text className="text-[13px] font-extrabold text-accent">
+                    Explore
+                  </Text>
                 </Pressable>
               </View>
               <ScrollView
@@ -189,11 +220,13 @@ export function HomeDashboard() {
             </View>
 
             {/* Featured Properties  */}
-            <View style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Featured Properties</Text>
+            <View className="mt-[15px]">
+              <View className="mx-[18px] flex-row justify-between items-center mb-[15px]">
+                <Text className="text-[23px] font-semibold tracking-[-0.7px]">Featured Properties</Text>
                 <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
-                  <Text style={styles.linkText}>Explore More</Text>
+                  <Text className="text-[13px] font-extrabold text-accent">
+                    Explore More
+                  </Text>
                 </TouchableOpacity>
               </View>
               <FeaturedPropertiesScroll properties={featuredProperties} />

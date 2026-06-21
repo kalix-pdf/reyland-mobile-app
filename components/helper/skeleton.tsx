@@ -2,7 +2,6 @@ import { Colors } from '@/constants/colors';
 import React, { useEffect, useRef } from 'react';
 import { Animated, ScrollView, StatusBar, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { createPropertiesScreenStyles } from '../../styles/dashboard.styles';
 
 interface RefreshSkeletonProps {
   refreshing: boolean;
@@ -127,29 +126,6 @@ function DashboardSectionSkeleton({ cardCount }: { cardCount: number }) {
   );
 }
 
-// Reusable skeletons per section
-export function QuickActionsSkeleton() {
-  return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, gap: 8 }}>
-      {[...Array(4)].map((_, i) => (
-        <View key={i} style={{ alignItems: 'center', gap: 6 }}>
-          <SkeletonBox width={48} height={48} borderRadius={12} />
-          <SkeletonBox width={40} height={10} />
-        </View>
-      ))}
-    </View>
-  );
-}
-
-export function LocationsSkeleton() {
-  return (
-    <View style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 16 }}>
-      {[...Array(4)].map((_, i) => (
-        <SkeletonBox key={i} width={100} height={36} borderRadius={20} />
-      ))}
-    </View>
-  );
-}
 
 export function PromotionalCarouselSkeleton() {
   return (
@@ -170,7 +146,7 @@ export function ProjectCardsSkeleton() {
 }
 
 // __ PROJECT CARD COMPONENT __
-function PropertyCardSkeleton() {
+function ProjectCardSkeleton() {
   return (
     <View style={{ marginHorizontal: 16, marginBottom: 16 }}>
       {/* Image placeholder */}
@@ -190,22 +166,17 @@ function PropertyCardSkeleton() {
 
 const SKELETON_COUNT = 4;
 
-export function PropertiesSkeletonScreen({ styles }: { styles: ReturnType<typeof createPropertiesScreenStyles> }) {
+export function ProjectsSkeletonScreen() {
   return (
-    <View style={styles.root}>
+    <View className="flex-1 bg-background">
       <StatusBar barStyle="dark-content" />
 
-      {/* Fixed header skeleton */}
-      <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.surface }}>
-        <View style={styles.header}>
-          {/* Title */}
+      <SafeAreaView edges={['top']} className="bg-surface">
+        <View className="px-4 pb-3 border-b border-border">
           <SkeletonBox width={130} height={24} borderRadius={6} style={{ marginBottom: 12 }} />
-
-          {/* Search bar */}
           <SkeletonBox width="100%" height={40} borderRadius={10} style={{ marginBottom: 12 }} />
 
-          {/* Filter chips */}
-          <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View className="flex-row gap-2">
             {[40, 72, 80, 48].map((w, i) => (
               <SkeletonBox key={i} width={w} height={28} borderRadius={14} />
             ))}
@@ -213,14 +184,12 @@ export function PropertiesSkeletonScreen({ styles }: { styles: ReturnType<typeof
         </View>
       </SafeAreaView>
 
-      {/* Count row */}
-      <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+      <View className="px-4 py-2.5">
         <SkeletonBox width={140} height={14} borderRadius={4} />
       </View>
 
-      {/* Card skeletons */}
       {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-        <PropertyCardSkeleton key={i} />
+        <ProjectCardSkeleton key={i} />
       ))}
     </View>
   );

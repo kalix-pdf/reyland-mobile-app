@@ -3,7 +3,8 @@ import { Project, Property } from '@/types';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
 import { Href, router } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Shadow } from 'react-native-shadow-2';
 
 interface Props {
   projects: Project[];
@@ -15,41 +16,49 @@ export function FeaturedProjectsScroll({ projects, onPress }: Props) {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerClassName="gap-[9px] pb-4 px-4"
     >
       {projects.map((project) => (
-        <Pressable
-          key={project.id}
-          style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-          onPress={() =>{
-              router.push({
-                pathname: '/project-property/[id]',
-                params: {
-                  id: project.id.toString(),
-                  name: project.project_name,
-                },
-              } as unknown as Href)
-          }}
-        >
-          <Image
-            source={{ uri: project.image_url }}
-            style={styles.image}
-            contentFit="cover"
-            cachePolicy="memory-disk"
-            transition={200}
-          />
-          <View style={styles.info}>
-            <Text style={styles.name} numberOfLines={1}>
-              {project.project_name}
-            </Text>
-            <View style={styles.locationRow}>
-              <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
-              <Text style={styles.location} numberOfLines={1}>
-                {project.location}
+        <Shadow
+            key={project.id}
+            distance={12}
+            startColor="rgba(0,0,0,0.10)"
+            endColor="rgba(0,0,0,0)"
+            offset={[-5, 6]}
+            style={{ borderRadius: 24 }}>
+          
+            <Pressable key={project.id} className="w-[180px] rounded-[18px] bg-white"
+              onPress={() =>{
+                  router.push({
+                    pathname: '/project-property/[id]',
+                    params: {
+                      id: project.id.toString(),
+                      name: project.project_name,
+                    },
+                  } as unknown as Href)
+              }}
+            >
+            <Image
+              source={{ uri: project.image_url }}
+              style={{ borderRadius: 18, width: '100%', height: 160 }}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              transition={200}
+            />
+            <View className="py-[14px] px-[10px] gap-[3px]">
+              <Text className="capitalize text-[16px] font-semibold tracking-[-0.8px]" numberOfLines={1}>
+                {project.project_name}
               </Text>
+              <View className="flex-row items-center gap-[3px]">
+                <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
+                <Text className="text-[14px] text-textMuted flex-1" numberOfLines={1}>
+                  {project.location}
+                </Text>
+              </View>
             </View>
-          </View>
-        </Pressable>
+          </Pressable>
+        </Shadow>
+        
       ))}
     </ScrollView>
   );
@@ -80,114 +89,61 @@ export function FeaturedPropertiesScroll({ properties }: FeaturedPropertiesProps
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}
+      contentContainerClassName="gap-[9px] pb-4 px-4"
     >
       {properties.map((property) => {
         const location = property.project?.location?.trim() || 'Location unavailable';
         const totalPrice = property.total_price ?? Number(property.price ?? 0) * Number(property.area ?? 0);
 
         return (
-          <Pressable
+          <Shadow
             key={property.id}
-            style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-            onPress={() =>
-              router.push({
-                pathname: '/property/[id]',
-                params: { id: property.id.toString() },
-              } as unknown as Href)
-            }
-          >
-            <Image
-              source={{ uri: property.image_url }}
-              style={styles.image}
-              contentFit="cover"
-              cachePolicy="memory-disk"
-              transition={200}
-            />
-            <View style={styles.statusPill}>
-              <Text style={styles.statusText}>{STATUS_LABELS[property.status] ?? 'Available'}</Text>
-            </View>
-            <View style={styles.info}>
-              <Text style={styles.price}>{formatPrice(totalPrice)}</Text>
-              <Text style={styles.name} numberOfLines={1}>
-                {property.title}
-              </Text>
-              <View style={styles.locationRow}>
-                <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
-                <Text style={styles.location} numberOfLines={1}>
-                  {location}
+            distance={12}
+            startColor="rgba(0,0,0,0.10)"
+            endColor="rgba(0,0,0,0)"
+            offset={[-5, 6]}
+            style={{ borderRadius: 24 }}
+            >
+            
+            <Pressable
+              key={property.id}
+              className="w-[180px] rounded-[18px] bg-white"
+            
+              onPress={() =>
+                router.push({
+                  pathname: '/property/[id]',
+                  params: { id: property.id.toString() },
+                } as unknown as Href)
+              }
+            >
+              <Image
+                source={{ uri: property.image_url }}
+                style={{ borderRadius: 18, width: '100%', height: 160 }}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={200}
+              />
+              <View className="absolute top-[10px] left-[10px] px-[10px] py-[5px] rounded-full bg-[#001722]/[0.74]">
+                <Text className="text-white text-[11px] font-black">
+                  {STATUS_LABELS[property.status] ?? 'Available'}
                 </Text>
               </View>
-            </View>
-          </Pressable>
+              <View className="py-[14px] px-[10px] gap-[3px]">
+                <Text className="text-accent text-[16px] font-black">{formatPrice(totalPrice)}</Text>
+                <Text className="capitalize text-[16px] font-semibold tracking-[-0.8px]" numberOfLines={1}>
+                  {property.title}
+                </Text>
+                <View className="flex-row items-center gap-[3px]">
+                  <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
+                  <Text className="text-[14px] text-textMuted flex-1" numberOfLines={1}>
+                    {location}
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          </Shadow>
         );
       })}
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  scrollContent: {
-    gap: 17,
-    paddingBottom: 16, 
-    paddingRight: 4,   
-  },
-  card: {
-    width: 180,
-    borderRadius: 18,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 2, height: 10 },
-    shadowOpacity: 0.10,
-    elevation: 10,            
-  },
-  pressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.97 }],
-  },
-  image: {
-    borderRadius: 18,
-    width: '100%',
-    height: 160,
-  },
-  statusPill: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: 'rgba(0, 23, 28, 0.74)',
-  },
-  statusText: {
-    color: Colors.white,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  info: {
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-    gap: 3,
-  },
-  price: {
-    color: Colors.accent,
-    fontSize: 16,
-    fontWeight: '900',
-  },
-  name: {
-    textTransform: 'capitalize',
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: -0.8,
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-  },
-  location: {
-    fontSize: 14,
-    color: Colors.textMuted,
-    flex: 1,
-  },
-});

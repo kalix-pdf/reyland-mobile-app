@@ -15,7 +15,7 @@ export function PromotionalCarousel({ promotionImages }: PromotionalCarouselProp
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <View style={styles.promoSection}>
+    <View className='mt-[25px] mb-2.5'>
       <ReanimatedCarousel
         loop
         autoPlay
@@ -35,7 +35,7 @@ export function PromotionalCarousel({ promotionImages }: PromotionalCarouselProp
             setActiveIndex(Math.round(absoluteProgress) % promotionImages.length);
         }}
         renderItem={({ item }) => (
-          <Pressable style={styles.promoCard}>
+          <Pressable className="h-[130px] px-4">
             <Image
               source={{ uri: item.image_url }}
               style={styles.promoImage}
@@ -72,22 +72,9 @@ export function PromotionalCarousel({ promotionImages }: PromotionalCarouselProp
 }
 
 const styles = StyleSheet.create({
-  promoSection: {
-    marginTop: 25,
-    marginBottom: 10,
-  },
-
-  promoCard: {
-    width,
-    height: 130,
-    paddingHorizontal: 16,
-  },
-
   promoImage: {
     width: '100%',
     height: '100%',
     borderRadius: 24,
   },
 });
-
-  

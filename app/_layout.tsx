@@ -1,3 +1,4 @@
+import "../global.css";
 import { AuthProvider } from '@/context/auth-context';
 import { AppThemeProvider, useAppTheme } from '@/context/theme-context';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
@@ -43,6 +44,7 @@ function RootNavigator() {
           <Stack.Screen name="change-phone" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="change-password" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="affiliate" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="transaction" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="property/[id]" />
           <Stack.Screen name="project-property/[id]" />
           <Stack.Screen name="search-home-screen" />

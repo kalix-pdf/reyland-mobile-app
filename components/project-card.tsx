@@ -3,8 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image } from 'expo-image';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../constants/colors';
+import { Pressable, Text, View } from 'react-native';
+import AppColors from '@/tailwind.colors';
 
 type Props = {
   project: Project;
@@ -17,7 +17,7 @@ function ProjectCard({ project }: Props) {
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      className="bg-surface rounded-[20px] mx-[18px] mb-3.5 border border-border shadow-sm overflow-hidden active:opacity-90 active:scale-[0.985]"
       onPress={() =>
         router.push({
           pathname: '/project-property/[id]',
@@ -28,52 +28,54 @@ function ProjectCard({ project }: Props) {
         })
       }
     >
-      <Image source={{ uri: project.image_url }}
-        contentFit='cover'
+      <Image
+        source={{ uri: project.image_url }}
+        contentFit="cover"
         transition={200}
-        priority={'low'}
-        cachePolicy={'memory-disk'}
-        style={styles.image} />
+        priority="low"
+        cachePolicy="memory-disk"
+        style={{ backgroundColor: AppColors.border, aspectRatio: 16 / 9}}
+      />
 
-      <View style={styles.badgeRow}>
+      <View className="absolute top-3.5 left-3.5 right-3.5 flex-row justify-between gap-2">
         {project.is_featured ? (
-          <View style={styles.featuredBadge}>
-            <Ionicons name="star" size={11} color={Colors.accent} />
-            <Text style={styles.featuredText}>Featured</Text>
+          <View className="flex-row items-center gap-1 px-[11px] py-1.5 rounded-full bg-tag">
+            <Ionicons name="star" size={11} color={AppColors.accent} />
+            <Text className="text-accent text-[11px] font-black">Featured</Text>
           </View>
         ) : null}
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.titleRow}>
-          <View style={styles.titleBlock}>
-            <Text style={styles.title} numberOfLines={2}>
+      <View className="p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="flex-1">
+            <Text className="text-lg leading-[23px] font-black text-textPrimary" numberOfLines={2}>
               {project.project_name}
             </Text>
-            <View style={styles.addressRow}>
-              <Ionicons name="location-outline" size={14} color={Colors.accent} />
-              <Text style={styles.address} numberOfLines={1}>
+            <View className="flex-row items-center gap-1 mt-2 mb-3.5">
+              <Ionicons name="location-outline" size={14} color={AppColors.accent} />
+              <Text className="flex-1 text-[13px] font-semibold text-textSecondary" numberOfLines={1}>
                 {location}
               </Text>
             </View>
           </View>
 
-          <View style={styles.openButton}>
-            <Ionicons name="chevron-forward" size={18} color={Colors.accent} />
+          <View className="w-[34px] h-[34px] rounded-full items-center justify-center bg-tag">
+            <Ionicons name="chevron-forward" size={18} color={AppColors.accent} />
           </View>
         </View>
 
-        <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <Ionicons name="calendar-outline" size={14} color={Colors.textSecondary} />
-            <Text style={styles.metaText} numberOfLines={1}>
+        <View className="flex-row items-center pt-3 border-t border-border">
+          <View className="flex-1 flex-row items-center justify-center gap-[5px]">
+            <Ionicons name="calendar-outline" size={14} color={AppColors.textSecondary} />
+            <Text className="flex-shrink text-xs font-bold text-textSecondary" numberOfLines={1}>
               {completionLabel}
             </Text>
           </View>
-          <View style={styles.metaDivider} />
-          <View style={styles.metaItem}>
-            <Ionicons name="home-outline" size={14} color={Colors.textSecondary} />
-            <Text style={styles.metaText}>View properties</Text>
+          <View className="w-px h-4 mx-2 bg-border" />
+          <View className="flex-1 flex-row items-center justify-center gap-[5px]">
+            <Ionicons name="home-outline" size={14} color={AppColors.textSecondary} />
+            <Text className="text-xs font-bold text-textSecondary">View properties</Text>
           </View>
         </View>
       </View>
@@ -82,116 +84,3 @@ function ProjectCard({ project }: Props) {
 }
 
 export default React.memo(ProjectCard);
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    marginHorizontal: 18,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
-    overflow: 'hidden',
-  },
-  pressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.985 }],
-  },
-  image: {
-    width: '100%',
-    height: 190,
-    backgroundColor: Colors.border,
-  },
-  badgeRow: {
-    position: 'absolute',
-    top: 14,
-    left: 14,
-    right: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  featuredBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: Colors.tag,
-  },
-  featuredText: {
-    color: Colors.accent,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  content: {
-    padding: 16,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  titleBlock: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 18,
-    lineHeight: 23,
-    fontWeight: '900',
-    color: Colors.textPrimary,
-  },
-  openButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.tag,
-  },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 8,
-    marginBottom: 14,
-  },
-  address: {
-    flex: 1,
-    fontSize: 13,
-    color: Colors.textSecondary,
-    fontWeight: '600',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  metaItem: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-  },
-  metaText: {
-    flexShrink: 1,
-    fontSize: 12,
-    color: Colors.textSecondary,
-    fontWeight: '700',
-  },
-  metaDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: Colors.border,
-    marginHorizontal: 8,
-  },
-});

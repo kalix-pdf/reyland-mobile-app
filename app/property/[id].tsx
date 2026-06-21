@@ -40,12 +40,11 @@ import {
   fetchActivePropertySiteVisit,
   SiteVisitApiError,
 } from '@/services/site-visits/site-visit.api';
-import {
-  CAROUSEL_HEIGHT,
-  propertyDetailsStyles as styles,
-  PROPERTY_SCREEN_WIDTH as width,
-} from '@/styles/property.styles';
+import { Dimensions } from 'react-native';
 
+const PROPERTY_SCREEN_WIDTH = Dimensions.get('window').width;
+const CAROUSEL_HEIGHT = 450;
+const PICKER_OPTION_HEIGHT = 42;
 
 const STATUS_LABELS: Record<number, string> = {
   0: 'Available',
@@ -75,7 +74,6 @@ const MONTH_OPTIONS = [
 const TIME_PERIOD_OPTIONS = ['AM', 'PM'];
 const HOUR_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
 const MINUTE_OPTIONS = Array.from({ length: 12 }, (_, index) => index * 5);
-const PICKER_OPTION_HEIGHT = 42;
 
 type VisitDateParts = {
   month: number;
@@ -381,9 +379,11 @@ export default function PropertyDetailsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.stateContainer}>
+      <SafeAreaView className="flex-1 items-center justify-center px-7 bg-background">
         <ActivityIndicator size="large" color={Colors.accent} />
-        <Text style={styles.stateText}>Loading property details...</Text>
+        <Text className="mt-3 text-textSecondary text-sm leading-[21px] font-semibold text-center">
+          Loading property details...
+        </Text>
       </SafeAreaView>
     );
   }
@@ -395,7 +395,6 @@ export default function PropertyDetailsScreen() {
   const statusLabel = STATUS_LABELS[property.status] ?? 'Available';
   const lotTypeLabel = LOT_TYPE_LABELS[property.lot_type] ?? 'Regular Lot';
   const location = property.project?.location?.trim() || 'Location unavailable';
-  // const projectName = property.project?.project_name?.trim() || 'Reyland property';
   const category = property.category?.trim() || 'Property';
   const totalPrice = property.total_price ?? property.price;
   const yearsToPay = Number(property.years_to_pay ?? 0);
@@ -585,16 +584,16 @@ export default function PropertyDetailsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
 
       <HeaderShell transparent>
         <HeaderNav title='Property Details' rightAction={<HomeAction />} />
       </HeaderShell>
       <ScrollView
-        style={styles.scroll}
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerClassName="pb-[60px]"
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -604,12 +603,12 @@ export default function PropertyDetailsScreen() {
           />
         }
       >
-        <View style={styles.carouselSection}>
+        <View className="pt-1 pb-3.5">
           <ReanimatedCarousel
             loop={galleryImages.length > 1}
             autoPlay={galleryImages.length > 1}
             autoPlayInterval={3000}
-            width={width}
+            width={PROPERTY_SCREEN_WIDTH}
             height={CAROUSEL_HEIGHT}
             data={galleryImages}
             withAnimation={{
@@ -624,10 +623,12 @@ export default function PropertyDetailsScreen() {
               setActiveImage(Math.round(absoluteProgress) % galleryImages.length);
             }}
             renderItem={({ item }) => (
-              <Pressable style={styles.carouselCard}>
+              <Pressable
+                style={{ width: PROPERTY_SCREEN_WIDTH, height: CAROUSEL_HEIGHT }}
+              >
                 <Image
                   source={{ uri: item.image_url }}
-                  style={styles.carouselImage}
+                  style={{ backgroundColor: Colors.border, width: '100%', height: '100%'}}
                   contentFit="cover"
                   cachePolicy="memory-disk"
                   transition={220}
@@ -636,20 +637,24 @@ export default function PropertyDetailsScreen() {
             )}
           />
 
-          <View style={styles.carouselMeta}>
-            <View style={styles.imageCountPill}>
-              <Ionicons name="images-outline" size={14} color={Colors.white} />
-              <Text style={styles.imageCountText}>
+          <View className="min-h-7 flex-row items-center justify-center mt-2.5">
+            <View className="absolute left-[15px] flex-row items-center gap-[5px] px-2.5 py-1.5 rounded-full bg-primary">
+              <Ionicons name="images-outline" size={14} color={Colors.textOnDark} />
+              <Text className="text-textOnDark text-[11px] font-black">
                 {activeImage + 1}/{Math.max(galleryImages.length, 1)}
               </Text>
             </View>
 
             {galleryImages.length > 1 ? (
-              <View style={styles.dots}>
+              <View className="flex-row items-center justify-center gap-1.5">
                 {galleryImages.map((image, index) => (
                   <View
                     key={image.id}
-                    style={[styles.dot, activeImage === index && styles.activeDot]}
+                    className={
+                      activeImage === index
+                        ? 'w-[22px] h-2 rounded-full bg-tagText'
+                        : 'w-2 h-2 rounded-full bg-[#D9D9D9]'
+                    }
                   />
                 ))}
               </View>
@@ -657,57 +662,57 @@ export default function PropertyDetailsScreen() {
           </View>
         </View>
 
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryTop}>
-            <View style={styles.summaryCopy}>
-              <View style={styles.badgeRow}>
-                <View style={styles.categoryBadge}>
-                  <Text style={styles.categoryText}>{category}</Text>
+        <View className="mx-[15px] p-4 rounded-[22px] bg-surface border border-border shadow-sm" style={{ shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 14 }}>
+          <View className="flex-row items-start gap-3.5">
+            <View className="flex-1 min-w-0">
+              <View className="flex-row flex-wrap gap-2 mb-3">
+                <View className="px-[11px] py-1.5 rounded-full bg-tag">
+                  <Text className="text-tagText text-[11px] font-black">{category}</Text>
                 </View>
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusText}>{statusLabel}</Text>
+                <View className="px-[11px] py-1.5 rounded-full bg-primary">
+                  <Text className="text-textOnDark text-[11px] font-black">{statusLabel}</Text>
                 </View>
               </View>
 
-              <Text style={styles.priceLabel}>Total price</Text>
-              <Text style={styles.price}>{formatCurrency(totalPrice)}</Text>
-              <Text style={styles.title}>{property.title}</Text>
+              <Text className="text-textMuted text-xs font-extrabold mb-[3px]">Total price</Text>
+              <Text className="text-accent text-[27px] font-black">{formatCurrency(totalPrice)}</Text>
+              <Text className="mt-[7px] text-textPrimary text-xl leading-[27px] font-black">{property.title}</Text>
             </View>
 
-            <View style={styles.sidePanel}>
+            <View className="w-[86px] min-h-[106px] items-center justify-center p-2.5 rounded-[18px] bg-background border border-border">
               <Ionicons name="resize-outline" size={20} color={Colors.accent} />
-              <Text style={styles.sideValue}>{formatNumber(property.area)}</Text>
-              <Text style={styles.sideLabel}>sqm</Text>
+              <Text className="mt-2 text-textPrimary text-[17px] font-black">{formatNumber(property.area)}</Text>
+              <Text className="mt-0.5 text-textMuted text-[11px] font-extrabold">sqm</Text>
             </View>
           </View>
 
-          <View style={styles.locationRow}>
-            <View style={styles.locationIcon}>
+          <View className="mt-3.5 flex-row items-start gap-[9px] pt-3.5 border-t border-border">
+            <View className="w-[30px] h-[30px] rounded-full items-center justify-center bg-tag">
               <Ionicons name="location-outline" size={16} color={Colors.accent} />
             </View>
-            <Text style={styles.location} numberOfLines={2}>{location}</Text>
+            <Text className="flex-1 text-textSecondary text-sm leading-5 font-bold" numberOfLines={2}>{location}</Text>
           </View>
         </View>
 
-        <View style={styles.statsRow}>
+        <View className="flex-row gap-2.5 mx-[15px] mt-3.5">
           <StatItem icon="map-outline" label="Lot Type" value={lotTypeLabel} />
           <StatItem icon="pricetag-outline" label="Lot" value={property.lot || 'N/A'} />
           <StatItem icon="calendar-outline" label="Completion" value={property.date_completed || 'TBA'} />
         </View>
 
         <Section title="Payment Plan">
-          <View style={styles.paymentCard}>
-            <View style={styles.monthlyBlock}>
-              <View style={styles.monthlyIcon}>
-                <Ionicons name="wallet-outline" size={22} color={Colors.white} />
+          <View className="overflow-hidden rounded-[22px] bg-surface border border-border">
+            <View className="min-h-[96px] flex-row items-center gap-3.5 p-4 bg-primary">
+              <View className="w-[46px] h-[46px] rounded-[23px] items-center justify-center bg-textOnDark/[0.14]">
+                <Ionicons name="wallet-outline" size={22} color={Colors.textOnDark} />
               </View>
-              <View style={styles.monthlyCopy}>
-                <Text style={styles.monthlyLabel}>Estimated monthly installment</Text>
-                <Text style={styles.monthlyValue}>{formatCurrencyOrFallback(property.monthly_installment)}</Text>
+              <View className="flex-1 min-w-0">
+                <Text className="text-textOnDark/70 text-xs font-extrabold">Estimated monthly installment</Text>
+                <Text className="mt-[5px] text-textOnDark text-[23px] font-black">{formatCurrencyOrFallback(property.monthly_installment)}</Text>
               </View>
             </View>
 
-            <View style={styles.breakdownList}>
+            <View className="px-4">
               <BreakdownRow label="Down payment (Installment)" value={formatCurrencyOrFallback(property.installment_down_payment)} />
               <BreakdownRow
                 label="Payment term"
@@ -720,13 +725,16 @@ export default function PropertyDetailsScreen() {
 
         {amenities.length > 0 ? (
           <Section title="Amenities">
-            <View style={styles.amenitiesCard}>
+            <View className="flex-row flex-wrap gap-2.5 p-3.5 rounded-[22px] bg-surface border border-border">
               {amenities.map((amenity) => (
-                <View key={amenity} style={styles.amenityChip}>
-                  <View style={styles.amenityIcon}>
-                    <Ionicons name="checkmark" size={13} color={Colors.white} />
+                <View
+                  key={amenity}
+                  className="min-h-[42px] max-w-full flex-row items-center gap-2 px-3 py-2.5 rounded-2xl bg-tag border border-accent/[0.16]"
+                >
+                  <View className="w-5 h-5 rounded-full items-center justify-center bg-accent">
+                    <Ionicons name="checkmark" size={13} color={Colors.textOnDark} />
                   </View>
-                  <Text style={styles.amenityText} numberOfLines={2}>{amenity}</Text>
+                  <Text className="shrink text-tagText text-[13px] leading-[18px] font-extrabold" numberOfLines={2}>{amenity}</Text>
                 </View>
               ))}
             </View>
@@ -735,12 +743,14 @@ export default function PropertyDetailsScreen() {
 
         {property.short_description ? (
           <Section title="Overview">
-            <Text style={styles.description}>{property.short_description}</Text>
+            <Text className="p-4 rounded-[20px] bg-surface border border-border text-textSecondary text-sm leading-[23px] font-semibold">
+              {property.short_description}
+            </Text>
           </Section>
         ) : null}
       </ScrollView>
 
-      <View style={styles.actionBar}>
+      <View className="flex-row gap-2.5 px-[15px] pt-3 pb-[50px] bg-surface border-t border-border">
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={
@@ -764,21 +774,21 @@ export default function PropertyDetailsScreen() {
             setInquiryVisible(true);
           }}
           disabled={checkingInquiry}
-          style={({ pressed }) => [
-            styles.secondaryAction,
-            hasActiveInquiry && styles.activeInquiryAction,
-            checkingInquiry && styles.disabledButton,
-            pressed && styles.pressed,
-          ]}
-          >
-          <Ionicons
-            name={hasActiveInquiry ? 'checkmark-circle-outline' : 'chatbubble-ellipses-outline'}
-            size={18}
-            color={Colors.accent}
-          />
-          <Text style={styles.secondaryActionText}>
-            {checkingInquiry ? 'Checking...' : hasActiveInquiry ? 'Inquiry Sent' : 'Inquire Now'}
-          </Text>
+          className={`flex-1 min-h-[52px] flex-row items-center justify-center gap-2 rounded-2xl border border-accent bg-surface ${hasActiveInquiry ? 'bg-tag' : ''} ${checkingInquiry ? 'opacity-[0.72]' : ''}`}
+        >
+          {({ pressed }) => (
+            <>
+              <Ionicons
+                name={hasActiveInquiry ? 'checkmark-circle-outline' : 'chatbubble-ellipses-outline'}
+                size={18}
+                color={Colors.accent}
+                style={pressed ? { opacity: 0.78 } : undefined}
+              />
+              <Text className="text-accent text-sm font-black" style={pressed ? { opacity: 0.78 } : undefined}>
+                {checkingInquiry ? 'Checking...' : hasActiveInquiry ? 'Inquiry Sent' : 'Inquire Now'}
+              </Text>
+            </>
+          )}
         </Pressable>
 
         <Pressable
@@ -799,18 +809,14 @@ export default function PropertyDetailsScreen() {
             setScheduleVisitVisible(true);
           }}
           disabled={checkingSiteVisit}
-          style={({ pressed }) => [
-            styles.primaryAction,
-            checkingSiteVisit && styles.disabledButton,
-            pressed && !checkingSiteVisit && styles.pressed,
-          ]}
+          className={`flex-[1.1] min-h-[52px] flex-row items-center justify-center gap-2 rounded-2xl bg-accent ${checkingSiteVisit ? 'opacity-[0.72]' : ''}`}
         >
           <Ionicons
             name={hasActiveSiteVisit ? 'checkmark-circle-outline' : 'calendar-outline'}
             size={18}
-            color={Colors.white}
+            color={Colors.textOnDark}
           />
-          <Text style={styles.primaryActionText}>
+          <Text className="text-textOnDark text-sm font-black">
             {checkingSiteVisit ? 'Checking...' : hasActiveSiteVisit ? 'Visit Requested' : 'Schedule Visit'}
           </Text>
         </Pressable>
@@ -826,20 +832,20 @@ export default function PropertyDetailsScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.modalRoot}
+          className="flex-1 justify-end"
         >
-          <Pressable style={styles.modalBackdrop} onPress={() => setInquiryVisible(false)} />
+          <Pressable className="absolute inset-0 bg-black/[0.42]" onPress={() => setInquiryVisible(false)} />
 
-          <View style={styles.inquirySheet}>
-            <View style={styles.sheetHandle} />
+          <View className="max-h-[88%] pt-2.5 px-[15px] pb-[30px] rounded-t-[26px] bg-surface">
+            <View className="self-center w-11 h-[5px] rounded-full bg-border mb-4" />
 
-            <View style={styles.inquiryHeader}>
-              <View style={styles.inquiryIcon}>
+            <View className="flex-row items-center gap-3 mb-4">
+              <View className="w-[42px] h-[42px] rounded-[21px] items-center justify-center bg-tag">
                 <Ionicons name="chatbubble-ellipses-outline" size={20} color={Colors.accent} />
               </View>
-              <View style={styles.inquiryHeaderCopy}>
-                <Text style={styles.inquiryTitle}>Inquire about this property</Text>
-                <Text style={styles.inquirySubtitle} numberOfLines={1}>
+              <View className="flex-1 min-w-0">
+                <Text className="text-textPrimary text-lg font-black">Inquire about this property</Text>
+                <Text className="mt-[3px] text-textSecondary text-[13px] font-bold" numberOfLines={1}>
                   {property.title}
                 </Text>
               </View>
@@ -848,7 +854,7 @@ export default function PropertyDetailsScreen() {
                 accessibilityLabel="Close inquiry form"
                 hitSlop={10}
                 onPress={() => setInquiryVisible(false)}
-                style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}
+                className="w-9 h-9 rounded-full items-center justify-center bg-background active:opacity-[0.78]"
               >
                 <Ionicons name="close" size={20} color={Colors.textMuted} />
               </Pressable>
@@ -857,7 +863,7 @@ export default function PropertyDetailsScreen() {
             <ScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.inquiryForm}
+              contentContainerClassName="gap-3 pb-2"
             >
               <InquiryField
                 label="Full name"
@@ -887,22 +893,18 @@ export default function PropertyDetailsScreen() {
                 onChangeText={setInquiryMessage}
                 placeholder="Tell us what you want to know"
                 multiline
-                inputStyle={styles.messageInput}
+                style={{ minHeight: 108, textAlignVertical: 'top' }}
               />
             </ScrollView>
 
-            <View style={styles.inquiryActions}>
+            <View className="flex-row gap-2.5 pt-3.5">
               <Pressable
                 accessibilityRole="button"
                 onPress={() => setInquiryVisible(false)}
                 disabled={submittingInquiry}
-                style={({ pressed }) => [
-                  styles.cancelInquiryButton,
-                  pressed && styles.pressed,
-                  submittingInquiry && styles.disabledButton,
-                ]}
+                className={`flex-1 min-h-[50px] items-center justify-center rounded-2xl border border-border bg-surface active:opacity-[0.78] ${submittingInquiry ? 'opacity-[0.72]' : ''}`}
               >
-                <Text style={styles.cancelInquiryText}>Cancel</Text>
+                <Text className="text-textSecondary text-sm font-black">Cancel</Text>
               </Pressable>
 
               <Pressable
@@ -910,22 +912,12 @@ export default function PropertyDetailsScreen() {
                 accessibilityState={{ disabled: inquirySubmitDisabled }}
                 onPress={inquirySubmitDisabled ? undefined : handleSubmitInquiry}
                 disabled={inquirySubmitDisabled}
-                style={({ pressed }) => [
-                  styles.submitInquiryButton,
-                  inquirySubmitDisabled && styles.submitInquiryButtonDisabled,
-                  inquirySubmitDisabled && styles.disabledButton,
-                  pressed && !inquirySubmitDisabled && styles.pressed,
-                ]}
+                className={`flex-[1.35] min-h-[50px] items-center justify-center rounded-2xl ${inquirySubmitDisabled ? 'bg-border opacity-[0.72]' : 'bg-accent active:opacity-[0.78]'}`}
               >
                 {submittingInquiry ? (
-                  <ActivityIndicator size="small" color={Colors.white} />
+                  <ActivityIndicator size="small" color={Colors.textOnDark} />
                 ) : (
-                  <Text
-                    style={[
-                      styles.submitInquiryText,
-                      inquirySubmitDisabled && styles.submitInquiryTextDisabled,
-                    ]}
-                  >
+                  <Text className={`text-sm font-black ${inquirySubmitDisabled ? 'text-textMuted' : 'text-textOnDark'}`}>
                     Submit Inquiry
                   </Text>
                 )}
@@ -945,20 +937,20 @@ export default function PropertyDetailsScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.modalRoot}
+          className="flex-1 justify-end"
         >
-          <Pressable style={styles.modalBackdrop} onPress={() => setScheduleVisitVisible(false)} />
+          <Pressable className="absolute inset-0 bg-black/[0.42]" onPress={() => setScheduleVisitVisible(false)} />
 
-          <View style={styles.scheduleSheet}>
-            <View style={styles.sheetHandle} />
+          <View className="max-h-[90%] pt-2.5 px-[15px] pb-[30px] rounded-t-[26px] bg-surface">
+            <View className="self-center w-11 h-[5px] rounded-full bg-border mb-4" />
 
-            <View style={styles.inquiryHeader}>
-              <View style={styles.scheduleIcon}>
+            <View className="flex-row items-center gap-3 mb-4">
+              <View className="w-[42px] h-[42px] rounded-[21px] items-center justify-center bg-tag">
                 <Ionicons name="calendar-outline" size={20} color={Colors.accent} />
               </View>
-              <View style={styles.inquiryHeaderCopy}>
-                <Text style={styles.inquiryTitle}>Schedule a Visit</Text>
-                <Text style={styles.inquirySubtitle} numberOfLines={1}>
+              <View className="flex-1 min-w-0">
+                <Text className="text-textPrimary text-lg font-black">Schedule a Visit</Text>
+                <Text className="mt-[3px] text-textSecondary text-[13px] font-bold" numberOfLines={1}>
                   {property.title}
                 </Text>
               </View>
@@ -967,7 +959,7 @@ export default function PropertyDetailsScreen() {
                 accessibilityLabel="Close schedule visit form"
                 hitSlop={10}
                 onPress={() => setScheduleVisitVisible(false)}
-                style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}
+                className="w-9 h-9 rounded-full items-center justify-center bg-background active:opacity-[0.78]"
               >
                 <Ionicons name="close" size={20} color={Colors.textMuted} />
               </Pressable>
@@ -976,61 +968,45 @@ export default function PropertyDetailsScreen() {
             <ScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.scheduleForm}
+              contentContainerClassName="gap-3.5 pb-2"
             >
-              <View style={styles.visitHero}>
-                <View style={styles.visitHeroIcon}>
-                  <Ionicons name="location-outline" size={20} color={Colors.white} />
+              <View className="min-h-[82px] flex-row items-center gap-[13px] p-3.5 rounded-2xl bg-primary">
+                <View className="w-[42px] h-[42px] rounded-[21px] items-center justify-center bg-textOnDark/[0.14]">
+                  <Ionicons name="location-outline" size={20} color={Colors.textOnDark} />
                 </View>
-                <View style={styles.visitHeroCopy}>
-                  <Text style={styles.visitHeroLabel}>Preferred site visit</Text>
-                  <Text style={styles.visitHeroText} numberOfLines={2}>
+                <View className="flex-1 min-w-0">
+                  <Text className="text-textOnDark/70 text-xs font-extrabold">Preferred site visit</Text>
+                  <Text className="mt-1 text-textOnDark text-sm leading-5 font-black" numberOfLines={2}>
                     {location}
                   </Text>
                 </View>
               </View>
 
-              <View style={styles.schedulePickerRow}>
-                <View style={styles.schedulePickerField}>
-                  <Text style={styles.inputLabel}>Preferred date</Text>
+              <View className="flex-row gap-2.5">
+                <View className="flex-1 gap-[7px]">
+                  <Text className="text-textSecondary text-xs font-black">Preferred date</Text>
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Select preferred visit date"
                     onPress={openDatePicker}
-                    style={({ pressed }) => [
-                      styles.schedulePickerInput,
-                      pressed && styles.pressed,
-                    ]}
+                    className="min-h-[50px] flex-row items-center justify-between gap-2 px-3.5 py-3 rounded-2xl border border-border bg-background active:opacity-[0.78]"
                   >
-                    <Text
-                      style={[
-                        styles.schedulePickerInputText,
-                        !visitDate && styles.schedulePickerPlaceholder,
-                      ]}
-                    >
+                    <Text className={`flex-1 text-[14px] font-extrabold ${visitDate ? 'text-textPrimary' : 'text-textMuted'}`}>
                       {visitDate || 'Select date'}
                     </Text>
                     <Ionicons name="calendar-outline" size={18} color={Colors.textMuted} />
                   </Pressable>
                 </View>
 
-                <View style={styles.schedulePickerField}>
-                  <Text style={styles.inputLabel}>Preferred time</Text>
+                <View className="flex-1 gap-[7px]">
+                  <Text className="text-textSecondary text-xs font-black">Preferred time</Text>
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Select preferred visit time"
                     onPress={openTimePicker}
-                    style={({ pressed }) => [
-                      styles.schedulePickerInput,
-                      pressed && styles.pressed,
-                    ]}
+                    className="min-h-[50px] flex-row items-center justify-between gap-2 px-3.5 py-3 rounded-2xl border border-border bg-background active:opacity-[0.78]"
                   >
-                    <Text
-                      style={[
-                        styles.schedulePickerInputText,
-                        !visitTime && styles.schedulePickerPlaceholder,
-                      ]}
-                    >
+                    <Text className={`flex-1 text-[14px] font-extrabold ${visitTime ? 'text-textPrimary' : 'text-textMuted'}`}>
                       {visitTime || 'Select time'}
                     </Text>
                     <Ionicons name="time-outline" size={18} color={Colors.textMuted} />
@@ -1038,7 +1014,7 @@ export default function PropertyDetailsScreen() {
                 </View>
               </View>
 
-              <View style={styles.scheduleDivider} />
+              <View className="h-px bg-border" />
 
               <InquiryField
                 label="Full name"
@@ -1068,20 +1044,17 @@ export default function PropertyDetailsScreen() {
                 onChangeText={setVisitNotes}
                 placeholder="Add companions, timing details, or questions"
                 multiline
-                inputStyle={styles.visitNotesInput}
+                style={{ minHeight: 108, textAlignVertical: 'top' }}
               />
             </ScrollView>
 
-            <View style={styles.inquiryActions}>
+            <View className="flex-row gap-2.5 pt-3.5">
               <Pressable
                 accessibilityRole="button"
                 onPress={() => setScheduleVisitVisible(false)}
-                style={({ pressed }) => [
-                  styles.cancelInquiryButton,
-                  pressed && styles.pressed,
-                ]}
+                className="flex-1 min-h-[50px] items-center justify-center rounded-2xl border border-border bg-surface active:opacity-[0.78]"
               >
-                <Text style={styles.cancelInquiryText}>Cancel</Text>
+                <Text className="text-textSecondary text-sm font-black">Cancel</Text>
               </Pressable>
 
               <Pressable
@@ -1089,19 +1062,9 @@ export default function PropertyDetailsScreen() {
                 accessibilityState={{ disabled: scheduleVisitDisabled }}
                 onPress={scheduleVisitDisabled ? undefined : handleRequestVisit}
                 disabled={scheduleVisitDisabled}
-                style={({ pressed }) => [
-                  styles.submitInquiryButton,
-                  scheduleVisitDisabled && styles.submitInquiryButtonDisabled,
-                  scheduleVisitDisabled && styles.disabledButton,
-                  pressed && !scheduleVisitDisabled && styles.pressed,
-                ]}
+                className={`flex-[1.35] min-h-[50px] items-center justify-center rounded-2xl ${scheduleVisitDisabled ? 'bg-border opacity-[0.72]' : 'bg-accent active:opacity-[0.78]'}`}
               >
-                <Text
-                  style={[
-                    styles.submitInquiryText,
-                    scheduleVisitDisabled && styles.submitInquiryTextDisabled,
-                  ]}
-                >
+                <Text className={`text-sm font-black ${scheduleVisitDisabled ? 'text-textMuted' : 'text-textOnDark'}`}>
                   {submittingVisit ? 'Requesting...' : 'Request Visit'}
                 </Text>
               </Pressable>
@@ -1117,25 +1080,28 @@ export default function PropertyDetailsScreen() {
         statusBarTranslucent
         onRequestClose={() => setSchedulePickerVisible(null)}
       >
-        <View style={styles.schedulePickerModalRoot}>
+        <View className="flex-1 items-center justify-center p-7">
           <Pressable
-            style={styles.schedulePickerBackdrop}
+            className="absolute inset-0 bg-black/[0.35]"
             onPress={() => setSchedulePickerVisible(null)}
           />
 
-          <View style={styles.schedulePickerCard}>
-            <Text style={styles.schedulePickerTitle}>
+          <View
+            className="w-full max-w-[360px] p-[22px] rounded-3xl bg-surface"
+            style={{ shadowColor: Colors.primary, shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.16, shadowRadius: 24, elevation: 8 }}
+          >
+            <Text className="text-textPrimary text-lg font-extrabold mb-[18px]">
               {schedulePickerVisible === 'date' ? 'Select date' : 'Select time'}
             </Text>
 
             {schedulePickerVisible === 'date' ? (
-              <View style={styles.schedulePickerColumns}>
-                <View style={styles.schedulePickerColumnFrame}>
-                  <View style={styles.schedulePickerSelectionFrame} />
+              <View className="min-h-[178px] flex-row gap-2.5">
+                <View className="flex-1 h-[178px] overflow-hidden rounded-2xl bg-background">
+                  <View className="absolute left-0 right-0 top-[68px] h-[42px] border-t-[1.5px] border-b-[1.5px] border-accent bg-accent/[0.07]" />
                   <ScrollView
                     ref={monthPickerRef}
-                    style={styles.schedulePickerColumn}
-                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    className="flex-1 max-h-[178px]"
+                    contentContainerClassName="py-[68px]"
                     showsVerticalScrollIndicator={false}
                     snapToInterval={PICKER_OPTION_HEIGHT}
                     decelerationRate="fast"
@@ -1160,13 +1126,14 @@ export default function PropertyDetailsScreen() {
                             handleDraftDateChange({ month: index });
                             scrollPickerColumnToIndex(monthPickerRef, index);
                           }}
-                          style={styles.schedulePickerOption}
+                          className="h-[42px] items-center justify-center"
                         >
                           <Text
-                            style={[
-                              styles.schedulePickerOptionText,
-                              selected && styles.schedulePickerOptionTextSelected,
-                            ]}
+                            className={
+                              selected
+                                ? 'text-textPrimary text-[16px] font-black text-center'
+                                : 'text-textMuted text-[15px] font-bold text-center'
+                            }
                           >
                             {month}
                           </Text>
@@ -1176,12 +1143,12 @@ export default function PropertyDetailsScreen() {
                   </ScrollView>
                 </View>
 
-                <View style={styles.schedulePickerColumnFrame}>
-                  <View style={styles.schedulePickerSelectionFrame} />
+                <View className="flex-1 h-[178px] overflow-hidden rounded-2xl bg-background">
+                  <View className="absolute left-0 right-0 top-[68px] h-[42px] border-t-[1.5px] border-b-[1.5px] border-accent bg-accent/[0.07]" />
                   <ScrollView
                     ref={dayPickerRef}
-                    style={styles.schedulePickerColumn}
-                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    className="flex-1 max-h-[178px]"
+                    contentContainerClassName="py-[68px]"
                     showsVerticalScrollIndicator={false}
                     snapToInterval={PICKER_OPTION_HEIGHT}
                     decelerationRate="fast"
@@ -1206,13 +1173,14 @@ export default function PropertyDetailsScreen() {
                             handleDraftDateChange({ day });
                             scrollPickerColumnToIndex(dayPickerRef, day - 1);
                           }}
-                          style={styles.schedulePickerOption}
+                          className="h-[42px] items-center justify-center"
                         >
                           <Text
-                            style={[
-                              styles.schedulePickerOptionText,
-                              selected && styles.schedulePickerOptionTextSelected,
-                            ]}
+                            className={
+                              selected
+                                ? 'text-textPrimary text-[16px] font-black text-center'
+                                : 'text-textMuted text-[15px] font-bold text-center'
+                            }
                           >
                             {day}
                           </Text>
@@ -1222,12 +1190,12 @@ export default function PropertyDetailsScreen() {
                   </ScrollView>
                 </View>
 
-                <View style={styles.schedulePickerColumnFrame}>
-                  <View style={styles.schedulePickerSelectionFrame} />
+                <View className="flex-1 h-[178px] overflow-hidden rounded-2xl bg-background">
+                  <View className="absolute left-0 right-0 top-[68px] h-[42px] border-t-[1.5px] border-b-[1.5px] border-accent bg-accent/[0.07]" />
                   <ScrollView
                     ref={yearPickerRef}
-                    style={styles.schedulePickerColumn}
-                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    className="flex-1 max-h-[178px]"
+                    contentContainerClassName="py-[68px]"
                     showsVerticalScrollIndicator={false}
                     snapToInterval={PICKER_OPTION_HEIGHT}
                     decelerationRate="fast"
@@ -1251,13 +1219,14 @@ export default function PropertyDetailsScreen() {
                             handleDraftDateChange({ year });
                             scrollPickerColumnToIndex(yearPickerRef, index);
                           }}
-                          style={styles.schedulePickerOption}
+                          className="h-[42px] items-center justify-center"
                         >
                           <Text
-                            style={[
-                              styles.schedulePickerOptionText,
-                              selected && styles.schedulePickerOptionTextSelected,
-                            ]}
+                            className={
+                              selected
+                                ? 'text-textPrimary text-[16px] font-black text-center'
+                                : 'text-textMuted text-[15px] font-bold text-center'
+                            }
                           >
                             {year}
                           </Text>
@@ -1268,13 +1237,13 @@ export default function PropertyDetailsScreen() {
                 </View>
               </View>
             ) : (
-              <View style={styles.schedulePickerColumns}>
-                <View style={styles.schedulePickerColumnFrame}>
-                  <View style={styles.schedulePickerSelectionFrame} />
+              <View className="min-h-[178px] flex-row gap-2.5">
+                <View className="flex-1 h-[178px] overflow-hidden rounded-2xl bg-background">
+                  <View className="absolute left-0 right-0 top-[68px] h-[42px] border-t-[1.5px] border-b-[1.5px] border-accent bg-accent/[0.07]" />
                   <ScrollView
                     ref={hourPickerRef}
-                    style={styles.schedulePickerColumn}
-                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    className="flex-1 max-h-[178px]"
+                    contentContainerClassName="py-[68px]"
                     showsVerticalScrollIndicator={false}
                     snapToInterval={PICKER_OPTION_HEIGHT}
                     decelerationRate="fast"
@@ -1300,13 +1269,14 @@ export default function PropertyDetailsScreen() {
                             setDraftVisitTimeParts((current) => ({ ...current, hour }));
                             scrollPickerColumnToIndex(hourPickerRef, hour - 1);
                           }}
-                          style={styles.schedulePickerOption}
+                          className="h-[42px] items-center justify-center"
                         >
                           <Text
-                            style={[
-                              styles.schedulePickerOptionText,
-                              selected && styles.schedulePickerOptionTextSelected,
-                            ]}
+                            className={
+                              selected
+                                ? 'text-textPrimary text-[16px] font-black text-center'
+                                : 'text-textMuted text-[15px] font-bold text-center'
+                            }
                           >
                             {hour}
                           </Text>
@@ -1316,12 +1286,12 @@ export default function PropertyDetailsScreen() {
                   </ScrollView>
                 </View>
 
-                <View style={styles.schedulePickerColumnFrame}>
-                  <View style={styles.schedulePickerSelectionFrame} />
+                <View className="flex-1 h-[178px] overflow-hidden rounded-2xl bg-background">
+                  <View className="absolute left-0 right-0 top-[68px] h-[42px] border-t-[1.5px] border-b-[1.5px] border-accent bg-accent/[0.07]" />
                   <ScrollView
                     ref={minutePickerRef}
-                    style={styles.schedulePickerColumn}
-                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    className="flex-1 max-h-[178px]"
+                    contentContainerClassName="py-[68px]"
                     showsVerticalScrollIndicator={false}
                     snapToInterval={PICKER_OPTION_HEIGHT}
                     decelerationRate="fast"
@@ -1348,13 +1318,14 @@ export default function PropertyDetailsScreen() {
                             setDraftVisitTimeParts((current) => ({ ...current, minute }));
                             scrollPickerColumnToIndex(minutePickerRef, index);
                           }}
-                          style={styles.schedulePickerOption}
+                          className="h-[42px] items-center justify-center"
                         >
                           <Text
-                            style={[
-                              styles.schedulePickerOptionText,
-                              selected && styles.schedulePickerOptionTextSelected,
-                            ]}
+                            className={
+                              selected
+                                ? 'text-textPrimary text-[16px] font-black text-center'
+                                : 'text-textMuted text-[15px] font-bold text-center'
+                            }
                           >
                             {String(minute).padStart(2, '0')}
                           </Text>
@@ -1364,12 +1335,12 @@ export default function PropertyDetailsScreen() {
                   </ScrollView>
                 </View>
 
-                <View style={styles.schedulePickerColumnFrame}>
-                  <View style={styles.schedulePickerSelectionFrame} />
+                <View className="flex-1 h-[178px] overflow-hidden rounded-2xl bg-background">
+                  <View className="absolute left-0 right-0 top-[68px] h-[42px] border-t-[1.5px] border-b-[1.5px] border-accent bg-accent/[0.07]" />
                   <ScrollView
                     ref={periodPickerRef}
-                    style={styles.schedulePickerColumn}
-                    contentContainerStyle={styles.schedulePickerColumnContent}
+                    className="flex-1 max-h-[178px]"
+                    contentContainerClassName="py-[68px]"
                     showsVerticalScrollIndicator={false}
                     snapToInterval={PICKER_OPTION_HEIGHT}
                     decelerationRate="fast"
@@ -1396,13 +1367,14 @@ export default function PropertyDetailsScreen() {
                             setDraftVisitTimeParts((current) => ({ ...current, period }));
                             scrollPickerColumnToIndex(periodPickerRef, index);
                           }}
-                          style={styles.schedulePickerOption}
+                          className="h-[42px] items-center justify-center"
                         >
                           <Text
-                            style={[
-                              styles.schedulePickerOptionText,
-                              selected && styles.schedulePickerOptionTextSelected,
-                            ]}
+                            className={
+                              selected
+                                ? 'text-textPrimary text-[16px] font-black text-center'
+                                : 'text-textMuted text-[15px] font-bold text-center'
+                            }
                           >
                             {period}
                           </Text>
@@ -1414,27 +1386,21 @@ export default function PropertyDetailsScreen() {
               </View>
             )}
 
-            <View style={styles.schedulePickerActions}>
+            <View className="flex-row justify-end gap-[18px] mt-[18px]">
               <Pressable
                 accessibilityRole="button"
                 onPress={() => setSchedulePickerVisible(null)}
-                style={({ pressed }) => [
-                  styles.schedulePickerAction,
-                  pressed && styles.pressed,
-                ]}
+                className="min-h-9 justify-center px-1 active:opacity-[0.78]"
               >
-                <Text style={styles.schedulePickerCancelText}>Cancel</Text>
+                <Text className="text-textSecondary text-sm font-extrabold">Cancel</Text>
               </Pressable>
 
               <Pressable
                 accessibilityRole="button"
                 onPress={handleConfirmSchedulePicker}
-                style={({ pressed }) => [
-                  styles.schedulePickerAction,
-                  pressed && styles.pressed,
-                ]}
+                className="min-h-9 justify-center px-1 active:opacity-[0.78]"
               >
-                <Text style={styles.schedulePickerConfirmText}>Confirm</Text>
+                <Text className="text-accent text-sm font-black">Confirm</Text>
               </Pressable>
             </View>
           </View>

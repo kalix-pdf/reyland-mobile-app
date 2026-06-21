@@ -14,6 +14,7 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "components/home/discover.tsx",
-    "app/(tabs)/discover.TBD"
+    "app/(tabs)/discover.TBD",
+    "nativewind-env.d.ts"
   ]
 }

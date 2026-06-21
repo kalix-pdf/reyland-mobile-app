@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { createChangePasswordStyles } from '../../styles/profile.styles';
+import { HeaderNav, HeaderShell } from '../header';
 
 type InputConfig = {
   key: string;
@@ -36,18 +36,11 @@ type ChangePersonalInfoViewProps = {
 
 type Field = 'primary' | 'confirm' | 'password';
 
-export function ChangePersonalInfoView({
-  title,
-  currentLabel,
-  currentValue,
-  inputs,
-  subtitle = 'Update your account information and confirm your password before saving.',
-  submitLabel = 'Save',
-  loadingLabel = 'Saving...',
-  onSubmit,
-}: ChangePersonalInfoViewProps) {
+export function ChangePersonalInfoView({title, currentLabel, currentValue,
+  inputs, subtitle = 'Update your account information and confirm your password before saving.',
+  submitLabel = 'Save', loadingLabel = 'Saving...', onSubmit }: ChangePersonalInfoViewProps) {
+  
   const { colors } = useAppTheme();
-  const styles = createChangePasswordStyles(colors);
   const primaryInput = inputs[0];
   const confirmInput = inputs[1];
   const isEmailChange = primaryInput?.key === 'email';
@@ -159,39 +152,32 @@ export function ChangePersonalInfoView({
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
-      <KeyboardAvoidingView style={styles.keyboardView} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [styles.backButton, pressed && styles.buttonPressed]}
-            hitSlop={10}
-            disabled={isLoading}
-          >
-            <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-          </Pressable>
-        </View>
+    <SafeAreaView className='flex-1 bg-surface' edges={['top', 'left', 'right', 'bottom']}>
+      <KeyboardAvoidingView className='flex-1' behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <HeaderShell >
+          <HeaderNav title='Change Personal Information' />
+        </HeaderShell>
 
         <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.content}
+          className='flex-1'
+          contentContainerClassName='px-5 p-6'
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
+          <Text className='text-2xl font-semibold text-textPrimary mb-2'>{title}</Text>
+          <Text className='text-sm leading-5 text-textSecondary mb-[22px]'>{subtitle}</Text>
 
           <AuthMessage type="error" message={error} />
           <AuthMessage type="success" message={successMessage} />
 
-          <View style={styles.currentValueSection}>
-            <Text style={styles.currentValueLabel}>{currentLabel}</Text>
-            <View style={styles.currentValueBox}>
-              <Text style={styles.currentValue}>{currentValue || 'Not provided'}</Text>
+          <View className='mb-[22px] gap-2'>
+            <Text className='text-[13px] font-bold text-textPrimary'>{currentLabel}</Text>
+            <View className='min-h-[58px] rounded-lg border border-border bg-surface px-4 justify-center'>
+              <Text className='text-sm font-bold text-textPrimary uppercase'>{currentValue || 'Not provided'}</Text>
             </View>
           </View>
 
-          <View style={styles.inputArea}>
+          <View className='gap-0.5'>
             <AuthInput
               label={`New ${fieldName}`}
               icon={(color) => <Feather name={isEmailChange ? 'mail' : isPhoneChange ? 'phone' : 'user'} size={20} color={color} />}
@@ -245,9 +231,8 @@ export function ChangePersonalInfoView({
                   <Pressable
                     onPress={() => setPasswordVisible((current) => !current)}
                     hitSlop={8}
-                    style={styles.eyeButton}
-                    disabled={isLoading}
-                  >
+                    className='w-[34px] h-[34px] items-center justify-center mr-1'
+                    disabled={isLoading}>
                     <Ionicons name={passwordVisible ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
                   </Pressable>
                 )}
@@ -274,23 +259,21 @@ export function ChangePersonalInfoView({
           </View>
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View className='px-5 pb-[26px] pt-3 bg-surface'>
           <Pressable
-            style={({ pressed }) => [
-              styles.saveButton,
-              pressed && canSubmit && !isLoading && styles.buttonPressed,
-              (onSubmit ? !canSubmit || isLoading : isLoading) && styles.saveButtonDisabled,
-            ]}
             onPress={handleSubmit}
             disabled={onSubmit ? !canSubmit || isLoading : isLoading}
+            className={`min-h-[56px] rounded-[21px] items-center justify-center bg-accent mb-1.5 active:opacity-50 ${
+              (onSubmit ? !canSubmit || isLoading : isLoading) ? 'opacity-75' : ''
+            }`}
           >
             {isLoading ? (
-              <View style={styles.saveButtonLoadingRow}>
+              <View className='flex-row items-center gap-2.5'>
                 <ActivityIndicator color={colors.white} size="small" />
-                <Text style={styles.saveButtonText}>{loadingLabel}</Text>
+                <Text className='text-[15px] font-bold text-white'>{loadingLabel}</Text>
               </View>
             ) : (
-              <Text style={styles.saveButtonText}>{submitLabel}</Text>
+              <Text className='text-[15px] font-bold text-white'>{submitLabel}</Text>
             )}
           </Pressable>
         </View>

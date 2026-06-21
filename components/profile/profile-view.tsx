@@ -5,12 +5,15 @@ import { Href, router } from 'expo-router';
 import React, { ReactNode } from 'react';
 import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { createProfileViewStyles } from '../../styles/profile.styles';
 import { HeaderShell, HeaderTitle } from '../header';
 import { getInitials } from './get-initials';
 
+// Tiny className joiner, swap for `clsx`/`twMerge` if you already use one
+function cn(...classes: (string | false | null | undefined)[]) {
+  return classes.filter(Boolean).join(' ');
+}
+
 type RowProps = {
-  styles: ReturnType<typeof createProfileViewStyles>;
   colors: ReturnType<typeof useAppTheme>['colors'];
   icon: ReactNode;
   label: string;
@@ -22,30 +25,20 @@ type RowProps = {
   onPress?: () => void;
 };
 
-function Row({
-  styles,
-  colors,
-  icon,
-  label,
-  value,
-  danger = false,
-  showArrow = true,
-  isLast = false,
-  right,
-  onPress,
-}: RowProps) {
+function Row({ colors, icon, label, value, danger = false, showArrow = true, isLast = false, right, onPress }: RowProps) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.row, isLast && styles.rowLast, pressed && styles.rowPressed]}
-    >
-      <View style={[styles.rowIconWrap, danger && styles.rowIconWrapDanger]}>{icon}</View>
+    <Pressable onPress={onPress}
+      className={cn('flex-row items-center px-5 py-[15px] gap-3.5', isLast && 
+        'border-b-0', 'active:opacity-50')}>
+      <View className={cn('w-[34px] h-[34px] rounded-[10px] items-center justify-center', danger 
+        && 'bg-errorBackground')}>{icon}</View>
 
-      <Text style={[styles.rowLabel, danger && styles.rowLabelDanger]}>{label}</Text>
+      <Text className={cn('flex-1 text-[15px] font-medium text-textPrimary', danger 
+        && 'text-error')}>{label}</Text>
 
       {right ?? (
         <>
-          {value ? <Text style={styles.rowValue}>{value}</Text> : null}
+          {value ? <Text className='text-[13px] text-textMuted'>{value}</Text> : null}
           {showArrow && !danger ? <Ionicons name="chevron-forward" size={16} color={colors.textMuted} /> : null}
         </>
       )}
@@ -55,7 +48,6 @@ function Row({
 
 export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, refreshOffset = 0 }: ViewProfileProps) {
   const { colors } = useAppTheme();
-  const styles = createProfileViewStyles(colors);
 
   const initials = getInitials(user.name);
   const isVerified = user.status !== 0;
@@ -68,7 +60,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+    <SafeAreaView className='flex-1 bg-background' edges={['top', 'left', 'right']}>
       {/* Fixed header */}
       <HeaderShell transparent>
         <HeaderTitle title='Account' />
@@ -77,7 +69,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
       <ScrollView
         contentInsetAdjustmentBehavior="never"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerClassName='pb-10'
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -88,36 +80,36 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
         }
       >
         {/* Profile strip */}
-        <View style={styles.profileCard}>
+        <View className="flex-row items-center gap-3.5 px-5 py-5 mt-2.5">
           {/* Avatar */}
-          <View style={styles.avatar}>
+          <View className="w-[75px] h-[75px] rounded-[35px] bg-primary items-center justify-center overflow-hidden">
             {user.avatar ? (
-              <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
+              <Image source={{ uri: user.avatar }} className="w-full h-full" />
             ) : (
-              <Text style={styles.avatarText}>{initials}</Text>
+              <Text className="text-white font-semibold text-xl">{initials}</Text>
             )}
           </View>
 
           <Image
             source={require('@/assets/images/logo_transparent_without_text_bg.png')}
-            style={styles.heroBrandMarkPrimary}
+            className='absolute w-[440px] h-[440px] -top-[30px] -right-[128px] opacity-[0.12] rotate-1'
             resizeMode="contain"
           />
 
           {/* Info */}
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user.name}</Text>
-            {user.email ? <Text style={styles.profileEmail}>{user.email}</Text> : null}
-            {user.phone ? <Text style={styles.profilePhone}>{user.phone}</Text> : null}
+          <View className="flex-1 gap-0.5">
+            <Text className="text-xl font-bold text-textPrimary tracking-[-0.2px]">{user.name}</Text>
+            {user.email ? <Text className="text-sm text-textSecondary">{user.email}</Text> : null}
+            {user.phone ? <Text className="text-sm text-textSecondary">{user.phone}</Text> : null}
 
-            <View style={styles.badge}>
+            <View className="flex-row items-center gap-1 mt-1">
               {isVerified ? (
                 <>
                   <Ionicons name="checkmark-circle" size={13} color={colors.accent} />
-                  <Text style={styles.badgeText}>Verified</Text>
+                  <Text className="text-base font-bold">Verified</Text>
                 </>
               ) : (
-                <Text style={styles.pendingText}>Pending Approval</Text>
+                <Text className="text-base font-bold text-error">Pending Approval</Text>
               )}
             </View>
           </View>
@@ -126,7 +118,6 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
         {user.status !== 0 && (
           <>
             <Row
-              styles={styles}
               colors={colors}
               icon={<Feather name="user" size={17} color={colors.accent} />}
               label="Personal Information"
@@ -134,7 +125,6 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             />
 
             <Row
-              styles={styles}
               colors={colors}
               icon={<Feather name="users" size={17} color={colors.accent} />}
               label="Affiliate Program"
@@ -143,16 +133,14 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             />
 
             <Row
-              styles={styles}
               colors={colors}
               icon={<Feather name="users" size={17} color={colors.accent} />}
               label="Transactions"
-              onPress={() => alert("My Transaction")}
+              onPress={() => router.push('/transaction')}
               isLast
             />
 
             <Row
-              styles={styles}
               colors={colors}
               icon={<Ionicons name="help-circle-outline" size={18} color={colors.accent} />}
               label="About Reyland PH"
@@ -160,7 +148,6 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             />
 
             <Row
-              styles={styles}
               colors={colors}
               icon={<MaterialCommunityIcons name="shield-lock-outline" size={18} color={colors.accent} />}
               label="Privacy Policy"
@@ -168,7 +155,6 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             />
 
             <Row
-              styles={styles}
               colors={colors}
               icon={<Ionicons name="document-text-outline" size={18} color={colors.accent} />}
               label="Terms of Service"
@@ -177,7 +163,6 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             />
 
             <Row
-              styles={styles}
               colors={colors}
               icon={<Ionicons name="document-text-outline" size={18} color={colors.accent} />}
               label="Contact Us"
@@ -186,39 +171,16 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
             />
 
             <Row
-              styles={styles}
               colors={colors}
               icon={<Ionicons name="star-outline" size={18} color={colors.accent} />}
               label="Rate the App"
               onPress={() => Alert.alert('Rate App')}
             />
-
-            {/* Preferences */}
-            {/* <Section styles={styles}>
-              <ToggleRow
-                styles={styles}
-                colors={colors}
-                icon={<Ionicons name="notifications-outline" size={18} color={colors.accent} />}
-                label="Push Notifications"
-                value={notifications}
-                onValueChange={setNotifications}
-              />
-              <ToggleRow
-                styles={styles}
-                colors={colors}
-                icon={<Ionicons name="moon-outline" size={18} color={colors.accent} />}
-                label="Dark Mode"
-                value={isDarkMode}
-                onValueChange={toggleDarkMode}
-                isLast
-              />
-            </Section> */}
           </>
         )}
 
         {/* Account Actions */}
         <Row
-          styles={styles}
           colors={colors}
           icon={<Feather name="log-out" size={17} color={colors.error} />}
           label="Log Out"
@@ -226,18 +188,8 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
           danger
           showArrow={false}
         />
-        {/* <Row
-            styles={styles}
-            colors={colors}
-            icon={<Feather name="trash-2" size={17} color={colors.error} />}
-            label="Delete Account"
-            onPress={handleDeleteAccount}
-            danger
-            showArrow={false}
-            isLast
-          /> */}
 
-        <Text style={styles.version}>Reyland v1.0.0</Text>
+        <Text className='text-center text-textMuted text-xs font-semibold mt-8'>Reyland v1.0.0</Text>
       </ScrollView>
     </SafeAreaView>
   );

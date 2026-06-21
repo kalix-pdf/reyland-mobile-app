@@ -11,7 +11,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { clearCachedUser, setCachedUser } from '../../services/auth/auth-session'
 import { deleteAccount } from '../../services/user/delete-account.api'
 import { updateAvatar } from '../../services/user/update-avatar.api'
-import { createPersonalInformationStyles } from '../../styles/profile.styles'
 import { HeaderNav, HeaderShell, HomeAction } from '../header'
 import { getInitials } from './get-initials'
 import { getPhoneValue } from './phone-value'
@@ -29,22 +28,26 @@ function InformationField({ label, value, onPress, editable = true}: {
   isLast?: boolean
 }) {
   const { colors } = useAppTheme()
-  const styles = createPersonalInformationStyles(colors)
 
   return (
-    <View style={[styles.fieldRow]}>
-      <View style={styles.fieldContent}>
-        <Text style={styles.fieldLabel}>{label}</Text>
-        <Text style={styles.fieldValue}>{value }</Text>
+    <View className='min-h-[66px] flex-row items-center gap-3 py-3.5'>
+      <View className='flex-1 gap-[5px]'>
+        <Text className='text-xs font-semibold text-textMuted'>{label}</Text>
+        <Text className='text-[15px] font-bold text-textPrimary leading-5'>{value}</Text>
       </View>
       {editable ? (
-        <Pressable
-          onPress={onPress}
-          style={({ pressed }) => [styles.editAction, pressed && styles.buttonPressed]}
-          hitSlop={8}
-        >
-          <Text style={styles.editActionText} numberOfLines={1}>{`Change ${label}`}</Text>
-          <Feather name="edit" size={14} color={colors.accent} />
+        <Pressable onPress={onPress} hitSlop={8}>
+          {({ pressed }) => (
+            <View className={`min-h-[32px] max-w-[180px] px-2.5 rounded-2xl flex-row items-center justify-center gap-1.5 bg-surfaceMuted ${
+                pressed ? 'opacity-60' : ''
+              }`}>
+              <Text
+                className='shrink text-xs font-semibold text-accent'
+                numberOfLines={1}
+              >{`Change ${label}`}</Text>
+              <Feather name="edit" size={14} color={colors.accent} />
+            </View>
+          )}
         </Pressable>
       ) : null}
     </View>
@@ -54,7 +57,6 @@ function InformationField({ label, value, onPress, editable = true}: {
 export function PersonalInformationView({ user }: PersonalInformationViewProps) {
   const { colors } = useAppTheme()
   const { setUser } = useAuth()
-  const styles = createPersonalInformationStyles(colors)
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const [isDeletingAccount, setIsDeletingAccount] = useState(false)
   const [selectedAvatar, setSelectedAvatar] = useState<ImagePicker.ImagePickerAsset | null>(null)
@@ -160,45 +162,41 @@ const handleConfirmAvatarUpload = async () => {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView className='flex-1 bg-background' edges={['top', 'left', 'right', 'bottom']}>
       <HeaderShell transparent>
         <HeaderNav title='Personal Information' rightAction={<HomeAction />}/>
       </HeaderShell>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <View style={styles.profileSummary}>
-          <View style={styles.avatar}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName='px-5 pb-10'>
+        <View className='items-center my-6'>
+          <View className='w-[104px] h-[104px] rounded-[52px] bg-primary items-center justify-center overflow-hidden mb-2.5 border-2 border-surface'>
             {user.avatar ? (
-              <Image source={{ uri: user.avatar }} style={styles.avatarImage} />
+              <Image source={{ uri: user.avatar }} className='w-full h-full' />
             ) : (
-              <Text style={styles.avatarText}>{initials}</Text>
+              <Text className='text-white text-[28px] font-bold'>{initials}</Text>
             )}
           </View>
 
-          <Pressable
-            onPress={handleChangePhoto}
-            disabled={isUploadingAvatar}
-            style={({ pressed }) => [
-              styles.changePhotoButton,
-              pressed && !isUploadingAvatar && styles.buttonPressed,
-              isUploadingAvatar && styles.buttonDisabled,
-            ]}
-          >
+          <Pressable onPress={handleChangePhoto}
+            disabled={isUploadingAvatar} className={`min-h-[28px] px-2.5 rounded-[14px] flex-row items-center justify-center gap-[5px] bg-surfaceMuted mb-[18px] active:opacity-60 ${
+              isUploadingAvatar ? 'opacity-50' : ''}`}>
             {isUploadingAvatar ? (
               <ActivityIndicator size="small" color={colors.accent} />
             ) : (
               <Feather name="edit" size={11} color={colors.accent} />
             )}
-            <Text style={styles.changePhotoText}>
+            <Text className='text-xs font-extrabold text-accent'>
               {isUploadingAvatar ? 'Uploading...' : 'Change Photo'}
             </Text>
           </Pressable>
 
-          <Text style={styles.displayName}>{user.name}</Text>
-          <Text style={styles.displayEmail}>{user.email}</Text>
+          <Text className='text-xl font-extrabold text-textPrimary text-center uppercase mb-2'>
+            {user.name}</Text>
+          <Text className='text-sm text-textSecondary text-center'>
+            {user.email} </Text>
         </View>
 
-        <View style={styles.infoPanel}>
+        <View className='w-full'>
           <InformationField label="Full Name" value={user.name} onPress={() => router.push('/change-full-name')} />
           <InformationField label="Email" value={user.email} onPress={() => router.push('/change-email')} />
           <InformationField label="Phone Number" value={phoneNumber} onPress={() => router.push('/change-phone')}/>
@@ -211,61 +209,48 @@ const handleConfirmAvatarUpload = async () => {
           />
         </View>
 
-        <Pressable
-          onPress={handleDeleteAccount}
-          style={({ pressed }) => [styles.deleteButton, pressed && styles.buttonPressed]}
-        >
+        <Pressable onPress={handleDeleteAccount} 
+        className='min-h-[54px] mt-6 rounded-[21px] border border-errorBorder bg-errorBackground flex-row items-center justify-center gap-2 active:opacity-60'>
           <Feather name="trash-2" size={18} color={colors.error} />
-          <Text style={styles.deleteButtonText}>Delete Account</Text>
+          <Text className='text-[15px] font-extrabold text-error'>Delete Account</Text>
         </Pressable>
       </ScrollView>
 
-      <Modal
-        visible={!!selectedAvatar}
-        transparent
-        animationType="fade"
+      <Modal visible={!!selectedAvatar}
+        transparent animationType="fade"
         onRequestClose={() => {
           if (!isUploadingAvatar) setSelectedAvatar(null)
-        }}
-      >
-        <View style={styles.previewOverlay}>
-          <View style={styles.previewCard}>
-            <Text style={styles.previewTitle}>Preview Photo</Text>
+        }}>
+        <View className='flex-1 items-center justify-center px-5 bg-[rgba(17,24,39,0.62)]'>
+          <View className='w-full max-w-[360px] rounded-lg bg-surface p-[18px] items-center border border-border'>
+            <Text className='text-lg font-extrabold text-textPrimary mb-3.5'>Preview Photo</Text>
 
             {selectedAvatar?.uri ? (
-              <Image source={{ uri: selectedAvatar.uri }} style={styles.previewImage} />
+              <Image source={{ uri: selectedAvatar.uri }} className='w-[188px] h-[188px] rounded-[94px] bg-surfaceMuted mb-3.5' />
             ) : null}
 
-            <Text style={styles.previewText}>
+            <Text className='text-sm leading-5 text-textSecondary text-center mb-[18px]'>
               Use this cropped image as your profile photo?
             </Text>
 
-            <View style={styles.previewActions}>
-              <Pressable
-                onPress={() => setSelectedAvatar(null)}
+            <View className='w-full flex-row gap-2.5'>
+              <Pressable onPress={() => setSelectedAvatar(null)}
                 disabled={isUploadingAvatar}
-                style={({ pressed }) => [
-                  styles.previewCancelButton,
-                  pressed && !isUploadingAvatar && styles.buttonPressed,
-                  isUploadingAvatar && styles.buttonDisabled,
-                ]}
-              >
-                <Text style={styles.previewCancelText}>Cancel</Text>
+                className={`flex-1 min-h-[46px] rounded-lg border border-border bg-surface items-center justify-center active:opacity-60 ${
+                  isUploadingAvatar ? 'opacity-50' : ''
+                }`}>
+                <Text className='text-sm font-extrabold text-textPrimary'>Cancel</Text>
               </Pressable>
 
-              <Pressable
-                onPress={handleConfirmAvatarUpload}
+              <Pressable onPress={handleConfirmAvatarUpload}
                 disabled={isUploadingAvatar}
-                style={({ pressed }) => [
-                  styles.previewConfirmButton,
-                  pressed && !isUploadingAvatar && styles.buttonPressed,
-                  isUploadingAvatar && styles.buttonDisabled,
-                ]}
-              >
+                className={`flex-1 min-h-[46px] rounded-lg bg-accent items-center justify-center active:opacity-60 ${
+                  isUploadingAvatar ? 'opacity-50' : ''
+                }`}>
                 {isUploadingAvatar ? (
                   <ActivityIndicator size="small" color={colors.background} />
                 ) : (
-                  <Text style={styles.previewConfirmText}>Use Photo</Text>
+                  <Text className='text-sm font-extrabold text-background'>Use Photo</Text>
                 )}
               </Pressable>
             </View>
@@ -273,18 +258,15 @@ const handleConfirmAvatarUpload = async () => {
         </View>
       </Modal>
 
-      <Modal
-        visible={deleteConfirmation}
-        transparent
-        animationType="fade"
+      <Modal visible={deleteConfirmation}
+        transparent animationType="fade"
         onRequestClose={() => {
           handleCloseDeleteConfirmation()
-        }}
-      >
-        <View style={styles.previewOverlay}>
-          <View style={styles.previewCard}>
-            <Text style={styles.previewTitle}>Delete Account</Text>
-            <Text style={styles.previewText}>
+        }}>
+        <View className='flex-1 items-center justify-center px-5 bg-[rgba(17,24,39,0.62)]'>
+          <View className='w-full max-w-[360px] rounded-lg bg-surface p-[18px] items-center border border-border'>
+            <Text className='text-lg font-extrabold text-textPrimary mb-3.5'>Delete Account</Text>
+            <Text className='text-sm leading-5 text-textSecondary text-center mb-[18px]'>
               This action is permanent. Type DELETE to confirm you want to continue.
             </Text>
 
@@ -296,35 +278,29 @@ const handleConfirmAvatarUpload = async () => {
               autoCapitalize="characters"
               autoCorrect={false}
               editable={!isDeletingAccount}
-              style={styles.previewInput}
+              className='w-full min-h-[48px] rounded-lg border border-border bg-surface px-3.5 text-sm font-extrabold text-textPrimary mb-3.5 text-center'
             />
 
-            <View style={styles.previewActions}>
+            <View className='w-full flex-row gap-2.5'>
               <Pressable
                 onPress={handleCloseDeleteConfirmation}
                 disabled={isDeletingAccount}
-                style={({ pressed }) => [
-                  styles.previewCancelButton,
-                  pressed && !isDeletingAccount && styles.buttonPressed,
-                  isDeletingAccount && styles.buttonDisabled,
-                ]}
-              >
-                <Text style={styles.previewCancelText}>Cancel</Text>
+                className={`flex-1 min-h-[46px] rounded-lg border border-border bg-surface items-center justify-center active:opacity-60 ${
+                  isDeletingAccount ? 'opacity-50' : ''
+                }`}>
+                <Text className='text-sm font-extrabold text-textPrimary'>Cancel</Text>
               </Pressable>
 
               <Pressable
                 onPress={handleConfirmDeleteAccount}
                 disabled={!canConfirmDelete || isDeletingAccount}
-                style={({ pressed }) => [
-                  styles.previewDangerButton,
-                  pressed && canConfirmDelete && !isDeletingAccount && styles.buttonPressed,
-                  (!canConfirmDelete || isDeletingAccount) && styles.buttonDisabled,
-                ]}
-              >
+                className={`flex-1 min-h-[46px] rounded-lg bg-errorBackground border border-errorBorder items-center justify-center active:opacity-50 ${
+                  !canConfirmDelete || isDeletingAccount ? 'opacity-60' : ''
+                }`}>
                 {isDeletingAccount ? (
                   <ActivityIndicator size="small" color={colors.error} />
                 ) : (
-                  <Text style={styles.previewDangerText}>Delete</Text>
+                  <Text className='text-sm font-extrabold text-error'>Delete</Text>
                 )}
               </Pressable>
             </View>

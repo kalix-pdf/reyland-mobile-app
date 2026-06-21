@@ -8,10 +8,8 @@ import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { createProfileScreenStyles } from '../../styles/profile.styles';
 
 export default function ProfileScreen() {
-  const styles = createProfileScreenStyles(Colors);
   const { user, isLoading, logout, setUser } = useAuth();
   const isLoggingOut = useRef(false);
   const insets = useSafeAreaInsets();
@@ -66,9 +64,9 @@ export default function ProfileScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.centered}>
+      <SafeAreaView className="flex-1 justify-center items-center gap-3 bg-background">
         <ActivityIndicator size="large" color={Colors.accent} />
-        <Text style={styles.loadingText}>{isLoggingOut.current ? 'Signing out...' : 'Loading profile...'}</Text>
+        <Text className='text-sm text-textSecondary'>{isLoggingOut.current ? 'Signing out...' : 'Loading profile...'}</Text>
       </SafeAreaView>
     );
   }

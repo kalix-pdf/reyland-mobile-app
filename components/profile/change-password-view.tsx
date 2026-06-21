@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { createChangePasswordStyles } from '../../styles/profile.styles';
+import { HeaderNav, HeaderShell } from '../header';
 
 type ChangePasswordViewProps = {
   onSubmit: (currentPassword: string, password: string) => Promise<{ success: boolean; message?: string }>;
@@ -16,8 +16,6 @@ type PasswordField = 'current' | 'new' | 'confirm';
 
 export function ChangePasswordView({ onSubmit }: ChangePasswordViewProps) {
   const { colors } = useAppTheme();
-  const styles = createChangePasswordStyles(colors);
-
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -82,7 +80,7 @@ export function ChangePasswordView({ onSubmit }: ChangePasswordViewProps) {
     <Pressable
       onPress={() => toggleVisible(field)}
       hitSlop={8}
-      style={styles.eyeButton}
+      className='w-[34px] h-[34px] items-center justify-center mr-1'
       disabled={isLoading}
     >
       <Ionicons name={visible[field] ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
@@ -123,32 +121,25 @@ export function ChangePasswordView({ onSubmit }: ChangePasswordViewProps) {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
-      <KeyboardAvoidingView style={styles.keyboardView} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [styles.backButton, pressed && styles.buttonPressed]}
-            hitSlop={10}
-            disabled={isLoading}
-          >
-            <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
-          </Pressable>
-        </View>
+    <SafeAreaView className='flex-1 bg-surface' edges={['top', 'left', 'right', 'bottom']}>
+      <KeyboardAvoidingView className='flex-1' behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <HeaderShell >
+          <HeaderNav title='Change Password' />
+        </HeaderShell>
 
         <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.content}
+          className='flex-1'
+          contentContainerClassName='px-5 p-6'
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>Change Password</Text>
-          <Text style={styles.subtitle}>Enter your current password, then choose a new one for your account.</Text>
+          <Text className='text-2xl font-semibold text-textPrimary mb-2'>Change Password</Text>
+          <Text className='text-sm leading-5 text-textSecondary mb-[22px]'>Enter your current password, then choose a new one for your account.</Text>
 
           <AuthMessage type="error" message={error} />
           <AuthMessage type="success" message={successMessage} />
 
-          <View style={styles.inputArea}>
+          <View className='gap-0.5'>
             <AuthInput
               label="Current Password"
               icon={(color) => <Feather name="lock" size={20} color={color} />}
@@ -219,31 +210,29 @@ export function ChangePasswordView({ onSubmit }: ChangePasswordViewProps) {
             />
           </View>
 
-          <View style={styles.passwordChecklist}>
-            <Text style={styles.passwordChecklistTitle}>Password requirements</Text>
-            <Text style={styles.passwordChecklistItem}>At least 6 characters</Text>
-            <Text style={styles.passwordChecklistItem}>Different from your current password</Text>
-            <Text style={styles.passwordChecklistItem}>Confirmed before saving</Text>
+          <View className='mt-2.5 p-3.5 rounded-lg border border-border bg-surfaceMuted gap-1.5'>
+            <Text className=''>Password requirements</Text>
+            <Text className='text-[13px] font-extrabold text-textPrimary mb-0.5'>At least 6 characters</Text>
+            <Text className='text-[13px] leading-[18px] text-textSecondary'>Different from your current password</Text>
+            <Text className='text-[13px] leading-[18px] text-textSecondary'>Confirmed before saving</Text>
           </View>
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View className='px-5 pb-[26px] pt-3 bg-surface'>
           <Pressable
-            style={({ pressed }) => [
-              styles.saveButton,
-              pressed && canSubmit && !isLoading && styles.buttonPressed,
-              (!canSubmit || isLoading) && styles.saveButtonDisabled,
-            ]}
             onPress={handleSubmit}
             disabled={!canSubmit || isLoading}
+            className={`min-h-[56px] rounded-[21px] items-center justify-center bg-accent mb-1.5 active:opacity-50 ${
+              !canSubmit || isLoading ? 'opacity-75' : ''
+            }`}
           >
             {isLoading ? (
-              <View style={styles.saveButtonLoadingRow}>
+              <View className='flex-row items-center gap-2.5'>
                 <ActivityIndicator color={colors.white} size="small" />
-                <Text style={styles.saveButtonText}>Saving password...</Text>
+                <Text className='text-[15px] font-bold text-white'>Saving password...</Text>
               </View>
             ) : (
-              <Text style={styles.saveButtonText}>Save Password</Text>
+              <Text className='text-[15px] font-bold text-white'>Save Password</Text>
             )}
           </Pressable>
         </View>

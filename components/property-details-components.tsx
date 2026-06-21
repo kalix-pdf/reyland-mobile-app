@@ -4,8 +4,6 @@ import type { ComponentProps, ReactNode } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { propertyDetailsStyles as styles } from '@/styles/property.styles';
-
 export function PropertyStateScreen({
   icon,
   title,
@@ -16,22 +14,24 @@ export function PropertyStateScreen({
   message: string;
 }) {
   return (
-    <SafeAreaView style={styles.stateContainer}>
+    <SafeAreaView className="flex-1 items-center justify-center px-7 bg-background">
       <Ionicons
         name={icon}
         size={36}
         color={icon === 'alert-circle-outline' ? Colors.error : Colors.textMuted}
       />
-      <Text style={styles.stateTitle}>{title}</Text>
-      <Text style={styles.stateText}>{message}</Text>
+      <Text className="mt-3 text-textPrimary text-xl font-black text-center">{title}</Text>
+      <Text className="mt-2 text-textSecondary text-sm leading-[21px] font-semibold text-center">
+        {message}
+      </Text>
     </SafeAreaView>
   );
 }
 
 export function PropertySection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+    <View className="mx-[15px] mt-[18px]">
+      <Text className="mb-3 text-textPrimary text-lg font-black">{title}</Text>
       {children}
     </View>
   );
@@ -47,14 +47,14 @@ export function PropertyStatItem({
   value: string;
 }) {
   return (
-    <View style={styles.statItem}>
-      <View style={styles.statIcon}>
+    <View className="flex-1 min-h-[98px] items-center justify-center p-2.5 rounded-[18px] bg-surface border border-border">
+      <View className="w-[34px] h-[34px] rounded-[17px] items-center justify-center bg-tag mb-[7px]">
         <Ionicons name={icon} size={18} color={Colors.accent} />
       </View>
-      <Text style={styles.statValue} numberOfLines={1}>
+      <Text className="max-w-full text-textPrimary text-[13px] font-black" numberOfLines={1}>
         {value}
       </Text>
-      <Text style={styles.statLabel}>{label}</Text>
+      <Text className="mt-1 text-textMuted text-[11px] font-extrabold">{label}</Text>
     </View>
   );
 }
@@ -69,26 +69,30 @@ export function PropertyBreakdownRow({
   last?: boolean;
 }) {
   return (
-    <View style={[styles.breakdownRow, last && styles.lastRow]}>
-      <Text style={styles.breakdownLabel}>{label}</Text>
-      <Text style={styles.breakdownValue}>{value}</Text>
+    <View
+      className={`min-h-[52px] flex-row items-center justify-between gap-3.5 ${
+        last ? 'border-b-0' : 'border-b border-border'
+      }`}
+    >
+      <Text className="flex-1 text-textSecondary text-[13px] font-bold">{label}</Text>
+      <Text className="text-textPrimary text-sm font-black text-right">{value}</Text>
     </View>
   );
 }
 
 type InquiryFieldProps = ComponentProps<typeof TextInput> & {
   label: string;
-  inputStyle?: ComponentProps<typeof TextInput>['style'];
+  inputClassName?: string;
 };
 
-export function PropertyInquiryField({ label, inputStyle, ...props }: InquiryFieldProps) {
+export function PropertyInquiryField({ label, inputClassName, ...props }: InquiryFieldProps) {
   return (
-    <View style={styles.inputGroup}>
-      <Text style={styles.inputLabel}>{label}</Text>
+    <View className="gap-[7px]">
+      <Text className="text-textSecondary text-xs font-black">{label}</Text>
       <TextInput
         {...props}
         placeholderTextColor={Colors.textMuted}
-        style={[styles.input, inputStyle]}
+        className={`min-h-[48px] px-3.5 py-3 rounded-2xl border border-border bg-background text-textPrimary text-sm font-bold ${inputClassName ?? ''}`}
       />
     </View>
   );

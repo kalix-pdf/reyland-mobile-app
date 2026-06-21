@@ -2,9 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Href, useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../constants/colors';
+import { Pressable, Text, View } from 'react-native';
 import { Property } from '../types/property.types';
+
+// Resolved hex values pulled from tailwind.colors so non-NativeWind APIs
+// (Ionicons color prop) stay in sync with the theme.
+const AppColors = require('../tailwind.colors');
 
 type Props = {
   property: Property;
@@ -31,7 +34,7 @@ function PropertyCard({ property }: Props) {
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      className="bg-surface rounded-[20px] mx-[18px] mb-3.5 border border-border overflow-hidden active:opacity-90 active:scale-[0.985]"
       onPress={() =>
         router.push({
           pathname: '/property/[id]',
@@ -41,52 +44,65 @@ function PropertyCard({ property }: Props) {
         } as unknown as Href)
       }
     >
-      <Image source={{ uri: property.image_url }} 
+      <Image
+        source={{ uri: property.image_url }}
         transition={200}
         priority={'normal'}
-        contentFit='cover'
+        contentFit="cover"
         cachePolicy={'memory-disk'}
-        style={styles.image} />
+        style={{ backgroundColor: AppColors.border, aspectRatio: 16 / 9}}
+      />
 
-      <View style={styles.badgeRow}>
-        {/* <View style={[styles.badge, property.category === 'For Rent' ? styles.rentBadge : styles.saleBadge]}>
-          <Text style={[styles.badgeText, property.category === 'For Rent' ? styles.rentBadgeText : styles.saleBadgeText]}>
-          </Text>
+      <View className="absolute top-3.5 left-3.5 right-3.5 flex-row justify-between gap-2">
+        {/* <View className={property.category === 'For Rent' ? 'px-3 py-1.5 rounded-full bg-rentBadge' : 'px-3 py-1.5 rounded-full bg-saleBadge'}>
+          <Text className={property.category === 'For Rent' ? 'text-[11px] font-black text-rentBadgeText' : 'text-[11px] font-black text-saleBadgeText'}>
             {property.category}
+          </Text>
         </View> */}
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>{statusLabel}</Text>
+        <View className="px-3 py-1.5 rounded-full bg-black/[0.74]">
+          <Text className="text-white text-[11px] font-black">{statusLabel}</Text>
         </View>
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.titleRow}>
-          <View style={styles.titleBlock}>
-            <Text style={styles.price}>{formatPrice(totalPrice)}</Text>
-            <Text style={styles.title} numberOfLines={2}>
+      <View className="p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="flex-1">
+            <Text className="text-xl font-black text-accent mb-1">{formatPrice(totalPrice)}</Text>
+            <Text className="text-lg font-black text-textPrimary leading-[23px]" numberOfLines={2}>
               {property.title}
             </Text>
           </View>
-          <View style={styles.openButton}>
-            <Ionicons name="chevron-forward" size={18} color={Colors.accent} />
+          <View className="w-[34px] h-[34px] rounded-full items-center justify-center bg-tag">
+            <Ionicons name="chevron-forward" size={18} color={AppColors.accent} />
           </View>
         </View>
-        <View style={styles.addressRow}>
-          <Ionicons name="location-outline" size={14} color={Colors.accent} />
-          <Text style={styles.address} numberOfLines={1}>
+
+        <View className="flex-row items-center gap-1 mt-2 mb-3.5">
+          <Ionicons name="location-outline" size={14} color={AppColors.accent} />
+          <Text className="flex-1 text-[13px] text-textSecondary font-semibold" numberOfLines={1}>
             {location}
           </Text>
         </View>
 
-        <View style={styles.specs}>
-          <View style={styles.spec}>
-            <Ionicons name="bed-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{property.units} Units</Text>
+        <View className="flex-row items-center pt-3 border-t border-border">
+          <View className="flex-row items-center flex-1 justify-center">
+            <Ionicons
+              name="bed-outline"
+              size={14}
+              color={AppColors.textSecondary}
+              style={{ marginRight: 5 }}
+            />
+            <Text className="text-xs text-textSecondary font-semibold">{property.units} Units</Text>
           </View>
-          <View style={styles.specDivider} />
-          <View style={styles.spec}>
-            <Ionicons name="resize-outline" size={14} color={Colors.textSecondary} style={styles.specIcon} />
-            <Text style={styles.specText}>{property.area} sqm</Text>
+          <View className="w-px h-4 bg-border mx-2" />
+          <View className="flex-row items-center flex-1 justify-center">
+            <Ionicons
+              name="resize-outline"
+              size={14}
+              color={AppColors.textSecondary}
+              style={{ marginRight: 5 }}
+            />
+            <Text className="text-xs text-textSecondary font-semibold">{property.area} sqm</Text>
           </View>
         </View>
       </View>
@@ -95,122 +111,3 @@ function PropertyCard({ property }: Props) {
 }
 
 export default React.memo(PropertyCard);
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.surface,
-    borderRadius: 20,
-    marginHorizontal: 18,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
-    overflow: 'hidden',
-  },
-  pressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.985 }],
-  },
-  image: {
-    width: '100%',
-    height: 190,
-    backgroundColor: Colors.border,
-  },
-  badgeRow: {
-    position: 'absolute',
-    top: 14,
-    left: 14,
-    right: 14,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  statusBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: 'rgba(0, 23, 28, 0.74)',
-  },
-  statusText: {
-    color: Colors.white,
-    fontSize: 11,
-    fontWeight: '900',
-  },
-  rentBadge: { backgroundColor: Colors.rentBadge },
-  saleBadge: { backgroundColor: Colors.saleBadge },
-  badgeText: { fontSize: 11, fontWeight: '900' },
-  rentBadgeText: { color: Colors.rentBadgeText },
-  saleBadgeText: { color: Colors.saleBadgeText },
-  content: { padding: 16 },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  titleBlock: {
-    flex: 1,
-  },
-  price: {
-    fontSize: 21,
-    fontWeight: '900',
-    color: Colors.accent,
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: Colors.textPrimary,
-    lineHeight: 23,
-  },
-  openButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: Colors.tag,
-  },
-  addressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 8,
-    marginBottom: 14,
-  },
-  address: {
-    flex: 1,
-    fontSize: 13,
-    color: Colors.textSecondary,
-    fontWeight: '600',
-  },
-  specs: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
-  spec: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-  specIcon: { marginRight: 5 },
-  specText: { fontSize: 12, color: Colors.textSecondary, fontWeight: '600' },
-  specDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: Colors.border,
-    marginHorizontal: 8,
-  },
-});
