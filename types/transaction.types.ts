@@ -16,7 +16,4 @@ export interface Transaction {
   user_profiles: User;
   due_date: string;
   total_price: number;
-//   price?: number;
-//   area?: number;
-//   installment?: number;
 }

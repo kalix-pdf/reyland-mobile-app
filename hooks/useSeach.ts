@@ -39,25 +39,19 @@ export interface UseSearchReturn<TResult> {
   clear: () => void;
 }
 
-export function useSearch<TResult>({
-  debounceMs = 2000,
-  onSearch,
-  localData,
-}: UseSearchOptions<TResult>): UseSearchReturn<TResult> {
+export function useSearch<TResult>({debounceMs = 1000,onSearch, localData }: UseSearchOptions<TResult>): UseSearchReturn<TResult> {
   const [inputValue, setInputValueState] = useState('');
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<TResult[]>(localData);
+  // Only holds server results now — no longer mirrors localData.
+  const [serverResults, setServerResults] = useState<TResult[] | null>(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (!query) {
-      setResults(localData);
-    }
-  }, [localData, query]);
+  // Derived, not stateful: always in sync with localData/query in the SAME render.
+  const results = query ? (serverResults ?? localData) : localData;
 
   useEffect(() => {
     return () => {
@@ -77,15 +71,11 @@ export function useSearch<TResult>({
       setSearching(true);
 
       try {
-        const serverResults = await onSearch(trimmedQuery, controller.signal);
+        const serverResultsData = await onSearch(trimmedQuery, controller.signal);
 
         if (controller.signal.aborted) return;
 
-        if (serverResults !== null) {
-          setResults(serverResults);
-        } else {
-          setResults(localData);
-        }
+        setServerResults(serverResultsData ?? null);
       } catch (err: unknown) {
         if (controller.signal.aborted) return;
 
@@ -98,7 +88,7 @@ export function useSearch<TResult>({
         }
       }
     },
-    [onSearch, localData],
+    [onSearch],
   );
 
   const setInputValue = useCallback(
@@ -114,7 +104,7 @@ export function useSearch<TResult>({
       if (!trimmed) {
         abortRef.current?.abort();
         setQuery('');
-        setResults(localData);
+        setServerResults(null);
         setSearching(false);
         setSearchError(null);
         return;
@@ -126,7 +116,7 @@ export function useSearch<TResult>({
         runSearch(trimmed);
       }, debounceMs);
     },
-    [debounceMs, localData, runSearch],
+    [debounceMs, runSearch],
   );
 
   const clear = useCallback(() => {
@@ -134,10 +124,10 @@ export function useSearch<TResult>({
     abortRef.current?.abort();
     setInputValueState('');
     setQuery('');
-    setResults(localData);
+    setServerResults(null);
     setSearching(false);
     setSearchError(null);
-  }, [localData]);
+  }, []);
 
   return {
     inputValue,
