@@ -17,6 +17,7 @@ import { HeaderNav, HeaderSearchBar, HeaderShell } from '@/components/header';
 import PropertyCard from '@/components/property-card';
 import { useProjectProperties } from '@/hooks/useProjectProperties';
 import type { Property } from '@/types/property.types';
+import { ErrorScreen } from '@/components/helper/error-project';
 
 // Resolved hex values pulled from tailwind.colors so non-NativeWind APIs
 // (ActivityIndicator color, StatusBar backgroundColor, Ionicons color) stay in sync.
@@ -208,7 +209,8 @@ export default function ProjectPropertiesScreen() {
   }
 
   if (error) {
-    return renderFeedback('cloud-offline-outline', 'Unable to load properties', error, 'Try again', retry);
+    return <ErrorScreen message='Unable to load properties' onRetry={retry} />
+    // return renderFeedback('cloud-offline-outline', 'Unable to load properties', error, 'Try again', retry);
   }
 
   return (

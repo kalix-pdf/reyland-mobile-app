@@ -12,13 +12,13 @@ export function ErrorScreen({ message, onRetry }: Props) {
     <View style={styles.root}>
       <View style={styles.banner}>
         <Ionicons name="wifi-outline" size={16} color="#A32D2D" />
-        <Text style={styles.bannerText}>{message}</Text>
+        <Text style={styles.bannerText}>{message}adwdwa</Text>
       </View>
       <View style={styles.body}>
         <View style={styles.iconCircle}>
           <Ionicons name="cloud-offline-outline" size={32} color="#A32D2D" />
         </View>
-        <Text style={styles.title}>Couldn&apos;t connect to the internet :(</Text>
+        <Text style={styles.title}>{message} :(</Text>
         <Text style={styles.subtitle}>
           Check your connection and try again. The data will appear here once it loads.
         </Text>
@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     fontWeight: '500',
-    color: Colors.accent,
     textAlign: 'center',
   },
   subtitle: {

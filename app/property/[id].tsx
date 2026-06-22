@@ -1,5 +1,5 @@
 import { HeaderNav, HeaderShell, HomeAction } from '@/components/header';
-import { DateTimePickerModal, InquiryModal, PropertyActionBar, PropertyAmenities, PropertyHeaderCard,
+import { InquiryModal, PropertyActionBar, PropertyAmenities, PropertyHeaderCard,
   PropertyImageCarousel, PropertyOverview, PropertyPaymentPlan, PropertyQuickStats, ScheduleVisitModal } from '@/components/property-details';
 import { PropertyStateScreen as StateScreen } from '@/components/property-details/property-details'
 import { useAuth } from '@/context/auth-context';
@@ -65,7 +65,7 @@ export default function PropertyDetailsScreen() {
       <StateScreen
         icon="home-outline"
         title="Property not found"
-        message="The listing may have been removed or is no longer available."
+        message="Check your Internet Connection. The listing may have been removed or is no longer available."
       />
     );
   }
@@ -224,6 +224,7 @@ export default function PropertyDetailsScreen() {
         onChangeMessage={inquiry.setters.setMessage}
         isSubmitDisabled={inquiry.isSubmitDisabled}
         isSubmitting={inquiry.submitting}
+        formError={inquiry.formError}
         onSubmit={handleSubmitInquiry}
         onClose={() => setInquiryModalVisible(false)}
       />

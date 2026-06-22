@@ -23,6 +23,7 @@ type InquiryModalProps = {
   onChangeMessage: (value: string) => void;
   isSubmitDisabled: boolean;
   isSubmitting: boolean;
+  formError: { type: 'network' | 'server' | 'validation'; message: string } | null;
   onSubmit: () => void;
   onClose: () => void;
 };
@@ -37,6 +38,7 @@ export function InquiryModal({
   onChangeMessage,
   isSubmitDisabled,
   isSubmitting,
+  formError,
   onSubmit,
   onClose,
 }: InquiryModalProps) {
@@ -106,6 +108,25 @@ export function InquiryModal({
             />
           </ScrollView>
 
+          {formError && (
+          <View className="flex-row items-start gap-2 mt-3 px-3.5 py-3 rounded-xl bg-red-50 border border-red-100">
+            <Ionicons
+              name={formError.type === 'network' ? 'cloud-offline-outline' : 'alert-circle-outline'}
+              size={18}
+              color="#DC2626"
+              style={{ marginTop: 1 }}
+            />
+            <View className="flex-1 min-w-0">
+              <Text className="text-red-700 text-[13px] font-black leading-[18px]">
+                {formError.type === 'network' ? "Connection problem" : "Couldn't send inquiry"}
+              </Text>
+              <Text className="text-red-600 text-xs font-semibold mt-0.5 leading-[16px]">
+                {formError.message}
+              </Text>
+            </View>
+          </View>
+        )}
+
           <View className="flex-row gap-2.5 pt-3.5">
             <Pressable
               accessibilityRole="button"
@@ -131,7 +152,7 @@ export function InquiryModal({
                 <ActivityIndicator size="small" color={Colors.textOnDark} />
               ) : (
                 <Text className={`text-sm font-black ${isSubmitDisabled ? 'text-textMuted' : 'text-textOnDark'}`}>
-                  Submit Inquiry
+                  {formError ? 'Try Again' : 'Submit Inquiry'}
                 </Text>
               )}
             </Pressable>

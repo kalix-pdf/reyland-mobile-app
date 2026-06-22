@@ -7,6 +7,8 @@ import {
 } from '@/services/inquiries/inquiry.api';
 import { isValidPhMobilePhone } from '@/utils/property-details.utils';
 
+type FormError = { type: 'network' | 'server' | 'validation'; message: string } | null;
+
 type UseInquiryFormArgs = {
   propertyId: number;
   propertyTitle: string;
@@ -19,6 +21,8 @@ type UseInquiryFormArgs = {
 type SubmitOutcome =
   | { status: 'success' }
   | { status: 'already_active' }
+  | { status: 'network_error'; message: string }
+  | { status: 'server_error'; message: string }
   | { status: 'error'; message: string };
 
 export function useInquiryForm({
@@ -37,6 +41,7 @@ export function useInquiryForm({
   const [submitting, setSubmitting] = useState(false);
   const [checkingActiveInquiry, setCheckingActiveInquiry] = useState(false);
   const [hasActiveInquiry, setHasActiveInquiry] = useState(false);
+  const [formError, setFormError] = useState<FormError>(null);
 
   // Re-seed defaults when the signed-in user or property title becomes available/changes.
   useEffect(() => {
@@ -85,17 +90,25 @@ export function useInquiryForm({
     submitting || trimmedName.length === 0 || trimmedPhone.length === 0 || phoneIsInvalid;
 
   const submit = async (): Promise<SubmitOutcome> => {
+    setFormError(null); // clear stale error on retry
+
     if (!trimmedName) {
-      return { status: 'error', message: 'Please enter your name so our team knows who to contact.' };
+      const err = { type: 'validation' as const, message: 'Please enter your name so our team knows who to contact.' };
+      setFormError(err);
+      return { status: 'error', message: err.message };
     }
     if (!trimmedPhone) {
-      return { status: 'error', message: 'Please enter your mobile number.' };
+      const err = { type: 'validation' as const, message: 'Please enter your mobile number.' };
+      setFormError(err);
+      return { status: 'error', message: err.message };
     }
     if (phoneIsInvalid) {
-      return {
-        status: 'error',
+      const err = {
+        type: 'validation' as const,
         message: 'Please enter a valid Philippine mobile number like 09171234567 or +639171234567.',
       };
+      setFormError(err);
+      return { status: 'error', message: err.message };
     }
 
     try {
@@ -117,10 +130,21 @@ export function useInquiryForm({
         return { status: 'already_active' };
       }
 
-      return {
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Please try again in a moment.',
-      };
+      if (error instanceof InquiryApiError) {
+        const err = { type: 'server' as const, message: error.message || 'Something went wrong on our end. Please try again.' };
+        setFormError(err);
+        return { status: 'server_error', message: err.message };
+      }
+
+      if (error instanceof TypeError) {
+        const err = { type: 'network' as const, message: 'No internet connection. Please check your network and try again.' };
+        setFormError(err);
+        return { status: 'network_error', message: err.message };
+      }
+
+      const err = { type: 'server' as const, message: error instanceof Error ? error.message : 'Please try again in a moment.' };
+      setFormError(err);
+      return { status: 'error', message: err.message };
     } finally {
       setSubmitting(false);
     }
@@ -134,6 +158,8 @@ export function useInquiryForm({
     hasActiveInquiry,
     isSubmitDisabled,
     phoneIsInvalid,
+    formError,
+    clearError: () => setFormError(null),
     submit,
   };
 }
