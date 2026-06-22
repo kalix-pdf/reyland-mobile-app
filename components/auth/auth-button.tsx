@@ -1,7 +1,4 @@
-import { useAppTheme } from '@/context/theme-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import { createAuthComponentStyles } from '../../styles/auth.styles';
 
 type AuthButtonProps = {
   title: string;
@@ -18,36 +15,26 @@ export function AuthButton({
   disabled = false,
   onPress,
 }: AuthButtonProps) {
-  const { colors } = useAppTheme();
-  const styles = createAuthComponentStyles(colors);
-
   const isDisabled = disabled || loading;
 
   return (
     <Pressable
+      className="rounded-full overflow-hidden bg-primary min-h-[52px] items-center justify-center"
       style={({ pressed }) => [
-        styles.button,
-        pressed && !isDisabled && styles.buttonPressed,
-        isDisabled && styles.buttonDisabled,
+        pressed && !isDisabled && { opacity: 0.9, transform: [{ scale: 0.985 }] },
+        isDisabled && { opacity: 0.75 },
       ]}
       onPress={onPress}
       disabled={isDisabled}
     >
-      <LinearGradient
-        colors={[colors.accent, colors.accentDark, colors.primary]}
-        start={{ x: 0, y: 0.5 }}
-        end={{ x: 1, y: 0.5 }}
-        style={styles.buttonFill}
-      >
-        {loading ? (
-          <View style={styles.buttonLoadingRow}>
-            <ActivityIndicator color={colors.white} size="small" />
-            <Text style={styles.buttonText}>{loadingTitle}</Text>
-          </View>
-        ) : (
-          <Text style={styles.buttonText}>{title}</Text>
-        )}
-      </LinearGradient>
+      {loading ? (
+        <View className="flex-row items-center gap-2">
+          <ActivityIndicator color="white" size="small" />
+          <Text className="text-white text-[15px] font-black">{loadingTitle}</Text>
+        </View>
+      ) : (
+        <Text className="text-white text-[15px] font-black">{title}</Text>
+      )}
     </Pressable>
   );
 }

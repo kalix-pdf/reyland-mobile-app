@@ -2,8 +2,7 @@ import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, Tabs } from 'expo-router';
-import { Text, View } from 'react-native';
-import { createTabLayoutStyles } from '../../styles/navigation.styles';
+import { Platform, Text, View } from 'react-native';
 
 const TAB_SCREENS = [
   {
@@ -33,7 +32,6 @@ const TAB_SCREENS = [
 ] as const;
 
 export default function TabLayout() {
-  const styles = createTabLayoutStyles(Colors);
   const { user } = useAuth();
 
   if (!user) {
@@ -50,9 +48,29 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.accent,
         tabBarInactiveTintColor: Colors.textMuted,
 
-        tabBarStyle: styles.tabBar,
-        tabBarItemStyle: styles.tabBarItem,
-        tabBarLabelStyle: styles.tabBarLabel,
+        // tabBarStyle/tabBarItemStyle/tabBarLabelStyle are consumed by the
+        // navigator config, not rendered as className-able elements, so
+        // they stay as style objects — values now sourced from tailwind.colors.js
+        tabBarStyle: {
+          height: Platform.OS === 'ios' ? 92 : 78,
+          paddingTop: 10,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+          paddingHorizontal: 14,
+          backgroundColor: Colors.surface,
+          borderTopWidth: 0,
+          shadowColor: Colors.primary,
+          shadowOpacity: 0.12,
+          shadowRadius: 22,
+          shadowOffset: { width: 0, height: -8 },
+          elevation: 10,
+        },
+        tabBarItemStyle: {
+          borderRadius: 22,
+          paddingTop: 2,
+        },
+        tabBarLabelStyle: {
+          marginTop: 4,
+        },
 
         tabBarHideOnKeyboard: true,
       }}
@@ -73,7 +91,12 @@ export default function TabLayout() {
               </View>
             ),
             tabBarLabel: ({ color, focused }) => (
-              <Text style={[styles.tabLabelText, { color }, focused && styles.tabLabelTextActive]}>{title}</Text>
+              <Text
+                className={`text-[11px] font-bold tracking-[0.1px] ${focused ? 'font-black' : ''}`}
+                style={{ color }}
+              >
+                {title}
+              </Text>
             ),
           }}
         />

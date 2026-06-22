@@ -9,7 +9,7 @@ export default function IndexScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
+      <View className='flex-1 items-center justify-center'>
         <ActivityIndicator size="large" color="#008812" />
       </View>
     );
@@ -25,11 +25,3 @@ export default function IndexScreen() {
     </DashboardProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  centered: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

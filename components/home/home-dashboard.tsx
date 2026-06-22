@@ -140,7 +140,7 @@ export function HomeDashboard() {
                 </TouchableOpacity>
               </View>
               <WithRefreshSkeleton refreshing={refreshing} skeleton={<ProjectCardsSkeleton/>}>
-                <FeaturedProjectsScroll projects={projects} />
+                <FeaturedProjectsScroll user={user} projects={projects} />
               </WithRefreshSkeleton>
             </View>
 
@@ -229,7 +229,7 @@ export function HomeDashboard() {
                   </Text>
                 </TouchableOpacity>
               </View>
-              <FeaturedPropertiesScroll properties={featuredProperties} />
+              <FeaturedPropertiesScroll user={user} properties={featuredProperties} />
             </View>
 
       </ScrollView>

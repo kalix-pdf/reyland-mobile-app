@@ -2,11 +2,9 @@ import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput } from '@/components/auth/auth-input';
 import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
-import { useAppTheme } from '@/context/theme-context';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { createLoginFormStyles } from '../../styles/auth.styles';
 
 type LoginFormProps = {
   onLogin: (
@@ -14,25 +12,11 @@ type LoginFormProps = {
     password: string,
   ) => { success: boolean; message?: string } | Promise<{ success: boolean; message?: string }>;
   onForgotPassword?: () => void;
-  // onGoogleLogin: () => void;
-  // onLoadingGoogleOuth: boolean;
-  // onLoadingFacebookOuth: boolean;
-  // onFacebookLogin?: () => void;
   onCreateAccount?: () => void;
 };
 
-export function LoginForm({
-  onLogin,
-  onForgotPassword,
-  // onGoogleLogin,
-  // onLoadingGoogleOuth,
-  // onLoadingFacebookOuth,
-  // onFacebookLogin,
-  onCreateAccount,
-}: LoginFormProps) {
-  const { colors } = useAppTheme();
-  const styles = createLoginFormStyles(colors);
 
+export function LoginForm({onLogin, onForgotPassword, onCreateAccount}: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -110,14 +94,14 @@ export function LoginForm({
 
   return (
     <AuthScreen heroTitle={`Welcome\nBack`}>
-      <Text style={styles.title}>Sign In</Text>
-      <Text style={styles.subtitleDefault}>
+      <Text className="text-2xl text-center font-bold text-textPrimary">Sign In</Text>
+      <Text className="text-sm text-center text-textSecondary mt-1 mb-5 leading-5">
         Sign in to continue browsing verified listings, saved properties, and your latest activity.
       </Text>
 
       <AuthMessage type="error" message={loginError} />
 
-      <View style={styles.inputAreaDefault}>
+      <View className="gap-4">
         <AuthInput
           label="Email"
           icon={(color) => <MaterialCommunityIcons name="email-outline" size={20} color={color} />}
@@ -145,7 +129,7 @@ export function LoginForm({
             <Pressable
               onPress={() => setShowPassword((current) => !current)}
               hitSlop={8}
-              style={styles.eyeButton}
+              className="p-1"
               disabled={isLoading}
             >
               <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
@@ -170,22 +154,29 @@ export function LoginForm({
         />
       </View>
 
-      <View style={styles.optionsRow}>
-        <Pressable style={styles.rememberRow} onPress={() => setRememberMe((current) => !current)} hitSlop={8}>
-          <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-            {rememberMe ? <Ionicons name="checkmark" size={13} color={colors.white} /> : null}
+      <View className="flex-row justify-between items-center mt-1.5 mb-3.5">
+        <Pressable
+          className="flex-row items-center gap-1.5"
+          onPress={() => setRememberMe((current) => !current)}
+          hitSlop={8}
+        >
+          <View
+            className={`w-[18px] h-[18px] rounded-[4px] border items-center justify-center ${
+              rememberMe ? 'bg-accent border-accent' : 'bg-surface border-border'
+            }`}
+          >
+            {rememberMe ? <Ionicons name="checkmark" size={13} color="white" /> : null}
           </View>
 
-          <Text style={styles.rememberText}>Remember Me</Text>
+          <Text className="text-sm font-semibold text-textSecondary">Remember Me</Text>
         </Pressable>
 
-        <Pressable style={styles.forgotLinkRow} onPress={handleForgotPassword} hitSlop={8}>
-          <Text style={styles.forgotLinkLabel}>Forgot password?</Text>
-          <Text style={styles.forgotLinkText}> Reset it here</Text>
+        <Pressable className="flex-row items-center ml-3" onPress={handleForgotPassword} hitSlop={8}>
+          <Text className="text-sm font-black text-accent">Forgot password?</Text>
         </Pressable>
       </View>
 
-      <View style={styles.buttonWrapTop4}>
+      <View className="mt-2">
         <AuthButton
           title="SIGN IN"
           loadingTitle="Signing in..."
@@ -195,57 +186,11 @@ export function LoginForm({
         />
       </View>
 
-      {/* <View style={styles.dividerRow}>
-        <View style={styles.divider} />
-        <Text style={styles.dividerText}>Or Continue With</Text>
-        <View style={styles.divider} />
-      </View>
-
-      <View style={styles.socialButtons}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.socialButton,
-            pressed && !isLoading && !onLoadingFacebookOuth && styles.socialButtonPressed,
-            onLoadingFacebookOuth && styles.socialButtonPressed,
-          ]}
-          onPress={handleFacebookLogin}
-          disabled={isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
-          accessibilityLabel="Sign-in with Google"
-          accessibilityRole="button"
-        >
-          {onLoadingFacebookOuth ? (
-            <ActivityIndicator size="small" color="#4285F4" />
-          ) : (
-            <Ionicons name="logo-facebook" size={22} color={colors.facebook} />
-          )}
-          <Text style={styles.socialButtonText}>{onLoadingFacebookOuth ? 'Signing in...' : 'Facebook'}</Text>
-        </Pressable>
-
-        <Pressable
-          style={({ pressed }) => [
-            styles.socialButton,
-            pressed && !isLoading && !onLoadingGoogleOuth && styles.socialButtonPressed,
-            onLoadingGoogleOuth && styles.socialButtonPressed,
-          ]}
-          onPress={handleGoogleLogin}
-          disabled={isLoading || onLoadingFacebookOuth || onLoadingGoogleOuth}
-          accessibilityLabel="Sign-in with Google"
-          accessibilityRole="button"
-        >
-          {onLoadingGoogleOuth ? (
-            <ActivityIndicator size="small" color="#4285F4" />
-          ) : (
-            <Image source={require('@/assets/images/google-logo.png')} style={styles.googleIcon} />
-          )}
-          <Text style={styles.socialButtonText}>{onLoadingGoogleOuth ? 'Signing in...' : 'Google'}</Text>
-        </Pressable>
-      </View> */}
-
-      <View style={styles.accountFooterRowSpacious}>
-        <Text style={styles.accountText}>Don’t have an account?</Text>
+      <View className="flex-row justify-center items-center mt-6">
+        <Text className="text-textSecondary">Don’t have an account?</Text>
 
         <Pressable onPress={handleCreateAccount} hitSlop={8}>
-          <Text style={styles.accountLink}> Sign Up</Text>
+          <Text className="font-bold text-accent"> Sign Up</Text>
         </Pressable>
       </View>
     </AuthScreen>

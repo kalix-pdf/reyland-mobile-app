@@ -208,6 +208,7 @@ export default function PropertyDetailsScreen() {
         checkingInquiry={inquiry.checkingActiveInquiry}
         hasActiveInquiry={inquiry.hasActiveInquiry}
         onPressInquire={handlePressInquire}
+        user={user}
         checkingSiteVisit={siteVisit.checkingActiveVisit}
         hasActiveSiteVisit={siteVisit.hasActiveVisit}
         onPressScheduleVisit={handlePressScheduleVisit}

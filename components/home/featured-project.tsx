@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors';
-import { Project, Property } from '@/types';
+import { Project, Property, User } from '@/types';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
 import { Href, router } from 'expo-router';
@@ -8,10 +8,11 @@ import { Shadow } from 'react-native-shadow-2';
 
 interface Props {
   projects: Project[];
+  user: User | null;
   onPress?: (project: Project) => void;
 }
 
-export function FeaturedProjectsScroll({ projects, onPress }: Props) {
+export function FeaturedProjectsScroll({ projects, user, onPress }: Props) {
   return (
     <ScrollView
       horizontal
@@ -28,16 +29,18 @@ export function FeaturedProjectsScroll({ projects, onPress }: Props) {
             style={{ borderRadius: 24 }}>
           
             <Pressable key={project.id} className="w-[180px] rounded-[18px] bg-white"
-              onPress={() =>{
-                  router.push({
-                    pathname: '/project-property/[id]',
-                    params: {
-                      id: project.id.toString(),
-                      name: project.project_name,
-                    },
-                  } as unknown as Href)
-              }}
-            >
+              onPress={() => { if (!user) {
+                router.push('/welcome');
+              } else {
+                router.push({
+                  pathname: '/project-property/[id]',
+                  params: {
+                    id: project.id.toString(),
+                    name: project.project_name,
+                  },
+                } as unknown as Href)
+              }
+              }}>
             <Image
               source={{ uri: project.image_url }}
               style={{ borderRadius: 18, width: '100%', height: 160 }}
@@ -66,6 +69,7 @@ export function FeaturedProjectsScroll({ projects, onPress }: Props) {
 
 interface FeaturedPropertiesProps {
   properties: Property[];
+  user: User | null;
 }
 
 const STATUS_LABELS: Record<Property['status'], string> = {
@@ -84,7 +88,7 @@ function formatPrice(value?: number | null) {
   return `₱${price.toLocaleString()}`;
 }
 
-export function FeaturedPropertiesScroll({ properties }: FeaturedPropertiesProps) {
+export function FeaturedPropertiesScroll({ properties, user }: FeaturedPropertiesProps) {
   return (
     <ScrollView
       horizontal
@@ -109,13 +113,15 @@ export function FeaturedPropertiesScroll({ properties }: FeaturedPropertiesProps
               key={property.id}
               className="w-[180px] rounded-[18px] bg-white"
             
-              onPress={() =>
+              onPress={() => { if (!user) {
+                router.push('/welcome');
+              } else {
                 router.push({
                   pathname: '/property/[id]',
                   params: { id: property.id.toString() },
                 } as unknown as Href)
               }
-            >
+            }}>
               <Image
                 source={{ uri: property.image_url }}
                 style={{ borderRadius: 18, width: '100%', height: 160 }}

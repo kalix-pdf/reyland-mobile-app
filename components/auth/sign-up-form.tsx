@@ -2,11 +2,9 @@ import { AuthButton } from '@/components/auth/auth-button';
 import { AuthInput } from '@/components/auth/auth-input';
 import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
-import { useAppTheme } from '@/context/theme-context';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { createSignUpFormStyles } from '../../styles/auth.styles';
 
 type SignUpFormProps = {
   onSignUp: (
@@ -15,10 +13,6 @@ type SignUpFormProps = {
     password: string,
   ) => { success: boolean; message?: string } | Promise<{ success: boolean; message?: string }>;
   onLogin?: () => void;
-  // onGoogleSignUp?: () => void;
-  // onFacebookSignUp?: () => void;
-  // isGoogleLoading?: boolean;
-  // isFacebookLoading?: boolean;
 };
 
 const isValidName = (value: string) => {
@@ -33,14 +27,7 @@ const isValidPassword = (value: string) => {
   return value.length >= 6;
 };
 
-export function SignUpForm({
-  onSignUp,
-  onLogin,
- 
-}: SignUpFormProps) {
-  const { colors } = useAppTheme();
-  const styles = createSignUpFormStyles(colors);
-
+export function SignUpForm({onSignUp, onLogin}: SignUpFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -119,14 +106,6 @@ export function SignUpForm({
         : '';
 
   const termsError = shouldValidateTerms && !acceptTerms ? 'Please accept the terms to continue.' : '';
-  // const shouldEnableScroll =
-  //   Boolean(signUpSuccess) ||
-  //   Boolean(signUpError) ||
-  //   Boolean(nameError) ||
-  //   Boolean(emailError) ||
-  //   Boolean(passwordError) ||
-  //   Boolean(confirmPasswordError) ||
-  //   Boolean(termsError);
 
   const handleSignUp = async () => {
     if (isLoading) return;
@@ -228,9 +207,9 @@ export function SignUpForm({
   };
 
   return (
-    <AuthScreen heroTitle={`Create Your\nAccount`}>
-      <Text style={styles.title}>Create Account</Text>
-      <Text style={styles.subtitleCompact}>
+    <AuthScreen heroTitle={`Let's Find \nYour Home`}>
+      <Text className="text-2xl font-black text-center text-textPrimary mb-1.5">Create Account</Text>
+      <Text className="text-base leading-[18px] text-center font-semibold text-textSecondary mb-4 min-h-[40px]">
         Create your profile to save listings, track favorites, and continue across devices.
       </Text>
 
@@ -239,7 +218,7 @@ export function SignUpForm({
 
       {!hasCompletedSignUp ? (
         <>
-          <View style={styles.inputAreaTight}>
+          <View className="gap-2.5">
             <AuthInput
               label="Full Name"
               icon={(color) => <Feather name="user" size={20} color={color} />}
@@ -286,7 +265,7 @@ export function SignUpForm({
                 <Pressable
                   onPress={() => setShowPassword((current) => !current)}
                   hitSlop={8}
-                  style={styles.eyeButton}
+                  className="pl-2.5"
                   disabled={isLoading}
                 >
                   <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
@@ -309,13 +288,17 @@ export function SignUpForm({
               editable={!isLoading}
             />
 
-            <View style={styles.passwordHintRow}>
+            <View className="flex-row items-center gap-2 -mt-1 ml-4">
               <Ionicons
                 name={isValidPassword(password) ? 'checkmark-circle' : 'information-circle-outline'}
                 size={15}
-                color={isValidPassword(password) ? colors.success : colors.textMuted}
+                className={isValidPassword(password) ? 'text-success' : 'text-textMuted'}
               />
-              <Text style={[styles.passwordHintText, isValidPassword(password) && styles.passwordHintTextSuccess]}>
+              <Text
+                className={`text-xs font-semibold ${
+                  isValidPassword(password) ? 'text-success' : 'text-textMuted'
+                }`}
+              >
                 Use at least 6 characters.
               </Text>
             </View>
@@ -327,7 +310,7 @@ export function SignUpForm({
                 <Pressable
                   onPress={() => setShowConfirmPassword((current) => !current)}
                   hitSlop={8}
-                  style={styles.eyeButton}
+                  className="pl-2.5"
                   disabled={isLoading}
                 >
                   <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
@@ -352,44 +335,50 @@ export function SignUpForm({
             />
 
             {isConfirmPasswordReady && !confirmPasswordError ? (
-              <View style={styles.matchRow}>
-                <Ionicons name="checkmark-circle" size={15} color={colors.success} />
-                <Text style={styles.matchText}>Passwords match.</Text>
+              <View className="flex-row items-center gap-2 -mt-1 ml-4">
+                <Ionicons name="checkmark-circle" size={15} className="text-success" />
+                <Text className="text-xs font-bold text-success">Passwords match.</Text>
               </View>
             ) : null}
           </View>
 
           <Pressable
-            style={styles.termsRow}
+            className="flex-row items-start gap-2 mt-2 mb-1"
             onPress={() => {
               setAcceptTerms((current) => !current);
               setTermsTouched(true);
             }}
             hitSlop={8}
           >
-            <View style={[styles.checkbox, acceptTerms && styles.checkboxChecked]}>
-              {acceptTerms ? <Ionicons name="checkmark" size={13} color={colors.white} /> : null}
+            <View
+              className={`w-4 h-4 rounded-[4px] border items-center justify-center mt-0.5 ${
+                acceptTerms ? 'bg-accent border-accent' : 'border-borderDark'
+              }`}
+            >
+              {acceptTerms ? <Ionicons name="checkmark" size={13} color="white" /> : null}
             </View>
 
-            <Text style={styles.termsText}>
-              I agree to the <Text style={styles.termsLink}>Terms</Text> and{' '}
-              <Text style={styles.termsLink}>Privacy Policy</Text>
+            <Text className="flex-1 leading-[18px] font-semibold text-textSecondary">
+              I agree to the <Text className="font-black text-accent">Terms</Text> and{' '}
+              <Text className="font-black text-accent">Privacy Policy</Text>
             </Text>
           </Pressable>
 
-          {termsError ? <Text style={styles.termsErrorText}>{termsError}</Text> : null}
+          {termsError ? (
+            <Text className="text-xs font-bold text-error mb-2 ml-6">{termsError}</Text>
+          ) : null}
         </>
       ) : (
-        <View style={styles.successPanel}>
-          <Text style={styles.successTitle}>Check Your Inbox</Text>
-          <Text style={styles.successSubtitle}>
+        <View className="mt-2 mb-1 px-1 py-2 items-start rounded-3xl border border-border bg-surface">
+          <Text className="text-2xl font-black text-textPrimary mb-2 px-3.5">Check Your Inbox</Text>
+          <Text className="text-[13px] leading-5 font-semibold text-left text-textSecondary px-3.5 pb-2">
             Your account has been created. Open the confirmation email we sent you to verify your address and finish
             setting up access.
           </Text>
         </View>
       )}
 
-      <View style={styles.buttonWrapTop6}>
+      <View className="w-full mt-1.5">
         <AuthButton
           title={hasCompletedSignUp ? 'BACK TO SIGN IN' : 'SIGN UP'}
           loadingTitle={hasCompletedSignUp ? 'Opening sign in...' : 'Creating account...'}
@@ -402,11 +391,11 @@ export function SignUpForm({
       </View>
 
       {!hasCompletedSignUp ? (
-        <View style={styles.accountFooterRow}>
-          <Text style={styles.accountText}>Already have an account?</Text>
+        <View className="flex-row items-center justify-center mt-5">
+          <Text className="text-base font-semibold text-textMuted">Already have an account?</Text>
 
           <Pressable onPress={handleLogin} hitSlop={8}>
-            <Text style={styles.accountLink}> Sign in</Text>
+            <Text className="text-base font-black text-accent"> Sign in</Text>
           </Pressable>
         </View>
       ) : null}

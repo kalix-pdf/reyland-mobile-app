@@ -1,14 +1,10 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-
-import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { completeOAuthSignIn } from '@/services/auth/complete-oauth-sign-in';
-import { createAuthCallbackStyles } from '../../styles/navigation.styles';
 
 export default function AuthCallbackScreen() {
-  const styles = createAuthCallbackStyles(Colors);
   const { access_token, refresh_token, flow } = useLocalSearchParams<{
     access_token?: string;
     refresh_token?: string;
@@ -72,9 +68,9 @@ export default function AuthCallbackScreen() {
   }, [access_token, flow, refresh_token, router, setUser]);
 
   return (
-    <View style={styles.container}>
+    <View className='flex-1 align-center justify-center gap-[12px] p-[24px] bg-background'>
       <ActivityIndicator size="large" />
-      <Text style={styles.text}>
+      <Text className='text-gray-600 text-base'>
         {flow === 'password-reset'
           ? 'Opening password reset...'
           : flow === 'email-change-confirmed' || flow === 'email-confirmed'

@@ -6,7 +6,6 @@ import { useAppTheme } from '@/context/theme-context';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { createResetPasswordFormStyles } from '../../styles/auth.styles';
 
 type ResetPasswordFormProps = {
   onSubmit: (password: string) => Promise<{ success: boolean; message?: string }>;
@@ -15,7 +14,6 @@ type ResetPasswordFormProps = {
 
 export function ResetPasswordForm({ onSubmit, onBackToLogin }: ResetPasswordFormProps) {
   const { colors } = useAppTheme();
-  const styles = createResetPasswordFormStyles(colors);
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -82,15 +80,15 @@ export function ResetPasswordForm({ onSubmit, onBackToLogin }: ResetPasswordForm
 
   return (
     <AuthScreen heroTitle={`Choose a\nNew Password`}>
-      <Text style={styles.title}>Set New Password</Text>
-      <Text style={styles.subtitleDefault}>
+      <Text className="text-textPrimary text-2xl font-extrabold">Set New Password</Text>
+      <Text className="text-textSecondary text-sm font-medium leading-5 mt-2">
         Create a new password for your account. Once saved, you’ll be signed in automatically.
       </Text>
 
       <AuthMessage type="error" message={error} />
       <AuthMessage type="success" message={successMessage} />
 
-      <View style={styles.inputAreaDefault}>
+      <View className="gap-3 mt-4">
         <AuthInput
           label="New Password"
           icon={(color) => <Feather name="lock" size={20} color={color} />}
@@ -98,7 +96,7 @@ export function ResetPasswordForm({ onSubmit, onBackToLogin }: ResetPasswordForm
             <Pressable
               onPress={() => setShowPassword((current) => !current)}
               hitSlop={8}
-              style={styles.eyeButton}
+              className="p-1"
               disabled={isLoading}
             >
               <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
@@ -135,7 +133,7 @@ export function ResetPasswordForm({ onSubmit, onBackToLogin }: ResetPasswordForm
             <Pressable
               onPress={() => setShowConfirmPassword((current) => !current)}
               hitSlop={8}
-              style={styles.eyeButton}
+              className="p-1"
               disabled={isLoading}
             >
               <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={21} color={color} />
@@ -167,7 +165,7 @@ export function ResetPasswordForm({ onSubmit, onBackToLogin }: ResetPasswordForm
         />
       </View>
 
-      <View style={styles.buttonWrap}>
+      <View className="mt-5">
         <AuthButton
           title="Save New Password"
           loadingTitle="Saving password..."
@@ -177,16 +175,28 @@ export function ResetPasswordForm({ onSubmit, onBackToLogin }: ResetPasswordForm
         />
       </View>
 
-      <View style={styles.passwordChecklist}>
-        <Text style={styles.passwordChecklistTitle}>Use a password you can remember</Text>
-        <Text style={styles.passwordChecklistItem}>At least 6 characters</Text>
-        <Text style={styles.passwordChecklistItem}>Avoid reusing an old password</Text>
-        <Text style={styles.passwordChecklistItem}>Mix letters, numbers, or symbols if possible</Text>
+      <View className="mt-4 gap-2 px-4 py-3.5 rounded-[20px] border border-border bg-background">
+        <Text className="text-textPrimary text-[13px] font-extrabold">
+          Use a password you can remember
+        </Text>
+        <Text className="text-textSecondary text-xs leading-[18px] font-semibold">
+          At least 6 characters
+        </Text>
+        <Text className="text-textSecondary text-xs leading-[18px] font-semibold">
+          Avoid reusing an old password
+        </Text>
+        <Text className="text-textSecondary text-xs leading-[18px] font-semibold">
+          Mix letters, numbers, or symbols if possible
+        </Text>
       </View>
 
-      <Pressable style={styles.backButton} onPress={onBackToLogin} hitSlop={8}>
+      <Pressable
+        className="flex-row items-center justify-center gap-1.5 mt-5"
+        onPress={onBackToLogin}
+        hitSlop={8}
+      >
         <Ionicons name="arrow-back" size={16} color={colors.accent} />
-        <Text style={styles.backButtonText}>Back to Login</Text>
+        <Text className="text-accent text-sm font-bold">Back to Login</Text>
       </Pressable>
     </AuthScreen>
   );
