@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-
+import type { SchedulePickerKind, VisitDateParts, VisitTimeParts } from '@/types/property-details.types';
 import { Colors } from '@/constants/colors';
 import { PropertyInquiryField as InquiryField } from '@/components/property-details/property-details';
+import { DateTimePickerModal } from './DateTimePickerModal';
 
 type ScheduleVisitModalProps = {
   visible: boolean;
@@ -26,6 +27,15 @@ type ScheduleVisitModalProps = {
   isSubmitting: boolean;
   onSubmit: () => void;
   onClose: () => void;
+
+  // NEW — picker state/handlers, passed through to DateTimePickerModal
+  activePicker: SchedulePickerKind;
+  draftDate: VisitDateParts;
+  draftTime: VisitTimeParts;
+  onChangeDraftDate: (next: Partial<VisitDateParts>) => void;
+  onChangeDraftTime: (next: Partial<VisitTimeParts>) => void;
+  onConfirmPicker: () => void;
+  onCancelPicker: () => void;
 };
 
 export function ScheduleVisitModal({
@@ -46,6 +56,13 @@ export function ScheduleVisitModal({
   isSubmitting,
   onSubmit,
   onClose,
+  activePicker,
+  draftDate,
+  draftTime,
+  onChangeDraftDate,
+  onChangeDraftTime,
+  onConfirmPicker,
+  onCancelPicker,
 }: ScheduleVisitModalProps) {
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
@@ -191,6 +208,15 @@ export function ScheduleVisitModal({
             </Pressable>
           </View>
         </View>
+        <DateTimePickerModal
+          visible={activePicker}
+          draftDate={draftDate}
+          draftTime={draftTime}
+          onChangeDraftDate={onChangeDraftDate}
+          onChangeDraftTime={onChangeDraftTime}
+          onConfirm={onConfirmPicker}
+          onCancel={onCancelPicker}
+        />
       </KeyboardAvoidingView>
     </Modal>
   );

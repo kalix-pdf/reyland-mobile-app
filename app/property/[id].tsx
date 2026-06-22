@@ -229,38 +229,36 @@ export default function PropertyDetailsScreen() {
       />
 
       <ScheduleVisitModal
-        visible={scheduleVisitModalVisible}
-        propertyTitle={property.title}
-        location={location}
-        contactValues={{
-          name: inquiry.values.name,
-          email: inquiry.values.email,
-          phone: inquiry.values.phone,
-        }}
-        onChangeName={inquiry.setters.setName}
-        onChangeEmail={inquiry.setters.setEmail}
-        onChangePhone={inquiry.setters.setPhone}
-        notes={siteVisit.notes}
-        onChangeNotes={siteVisit.setNotes}
-        visitDateLabel={schedulePicker.visitDateLabel}
-        visitTimeLabel={schedulePicker.visitTimeLabel}
-        onPressDate={schedulePicker.openDatePicker}
-        onPressTime={schedulePicker.openTimePicker}
-        isSubmitDisabled={scheduleVisitSubmitDisabled}
-        isSubmitting={siteVisit.submitting}
-        onSubmit={handleSubmitSiteVisit}
-        onClose={() => setScheduleVisitModalVisible(false)}
-      />
-
-      <DateTimePickerModal
-        visible={schedulePicker.activePicker}
-        draftDate={schedulePicker.draftDate}
-        draftTime={schedulePicker.draftTime}
-        onChangeDraftDate={schedulePicker.updateDraftDate}
-        onChangeDraftTime={schedulePicker.updateDraftTime}
-        onConfirm={schedulePicker.confirmPicker}
-        onCancel={schedulePicker.cancelPicker}
-      />
+      visible={scheduleVisitModalVisible}
+      propertyTitle={property.title}
+      location={location}
+      contactValues={{
+        name: inquiry.values.name,
+        email: inquiry.values.email,
+        phone: inquiry.values.phone,
+      }}
+      onChangeName={inquiry.setters.setName}
+      onChangeEmail={inquiry.setters.setEmail}
+      onChangePhone={inquiry.setters.setPhone}
+      notes={siteVisit.notes}
+      onChangeNotes={siteVisit.setNotes}
+      visitDateLabel={schedulePicker.visitDateLabel}
+      visitTimeLabel={schedulePicker.visitTimeLabel}
+      onPressDate={schedulePicker.openDatePicker}
+      onPressTime={schedulePicker.openTimePicker}
+      isSubmitDisabled={scheduleVisitSubmitDisabled}
+      isSubmitting={siteVisit.submitting}
+      onSubmit={handleSubmitSiteVisit}
+      onClose={() => setScheduleVisitModalVisible(false)}
+      activePicker={schedulePicker.activePicker}
+      draftDate={schedulePicker.draftDate}
+      draftTime={schedulePicker.draftTime}
+      onChangeDraftDate={schedulePicker.updateDraftDate}
+      onChangeDraftTime={schedulePicker.updateDraftTime}
+      onConfirmPicker={schedulePicker.confirmPicker}
+      onCancelPicker={schedulePicker.cancelPicker}
+    />
+     
     </SafeAreaView>
   );
 }
