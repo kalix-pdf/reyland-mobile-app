@@ -1,3 +1,4 @@
+// components/transactions/TransactionRow.tsx
 import { View, Text, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,11 +43,11 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
   const router = useRouter();
   const statusStyle = STATUS_STYLES[transaction.status] ?? STATUS_STYLES.pending;
   const typeLabel = TYPE_LABELS[transaction.type] ?? `Type ${transaction.type}`;
-  const payment_type = PAYMENT_TYPE_LABELS[transaction.payment_type] ?? `Payment Type ${transaction.payment_type}`
+  const paymentType = PAYMENT_TYPE_LABELS[transaction.payment_type] ?? `Payment Type ${transaction.payment_type}`;
 
   return (
     <Pressable
-      // onPress={() => router.push(`/transactions/${transaction.id}`)}
+      onPress={() => router.push(`/transaction/${transaction.id}/payment-records`)}
       className="flex-row items-center justify-between px-4 py-3 border-b border-gray-100 active:bg-gray-50"
     >
       <View className="flex-1 pr-3">
@@ -54,7 +55,7 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
           Property: {transaction.property.title}
         </Text>
         <Text className="text-gray-500 mt-0.5" numberOfLines={1}>
-          {payment_type}
+          {paymentType}
         </Text>
         <View className="flex-row items-center mt-1">
           <Text className="text-gray-500">{typeLabel}</Text>

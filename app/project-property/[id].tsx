@@ -209,7 +209,13 @@ export default function ProjectPropertiesScreen() {
   }
 
   if (error) {
-    return <ErrorScreen message='Unable to load properties' onRetry={retry} />
+    return (
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor={AppColors.background} />
+        {renderHeader()}
+        <ErrorScreen message='Unable to load properties' onRetry={retry} />
+      </SafeAreaView>
+    ); 
     // return renderFeedback('cloud-offline-outline', 'Unable to load properties', error, 'Try again', retry);
   }
 

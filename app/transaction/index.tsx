@@ -4,6 +4,7 @@ import { TransactionRow } from '@/components/transcations/transaction-row';
 import { HeaderNav, HeaderShell } from '@/components/header';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/colors';
+import { ErrorScreen } from '@/components/helper/error-project';
 
 export default function TransactionsScreen() {
   const { transactions, loading, refreshing, error, hasMore, loadMore, refresh } = useTransaction();
@@ -22,7 +23,7 @@ export default function TransactionsScreen() {
 
   function renderContent() {
     // Initial loading state (no data yet)
-    if (loading && transactions.length === 0) {
+    if (loading && transactions.length === 0 || refreshing) {
         return (
         <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" />
@@ -32,11 +33,7 @@ export default function TransactionsScreen() {
 
     // Error state
     if (error && transactions.length === 0) {
-        return (
-        <View className="flex-1 items-center justify-center px-6">
-            <Text className="text-red-500 text-center">{error}</Text>
-        </View>
-        );
+        return <ErrorScreen message='Failed to load Transactions' onRetry={refresh} />
     }
 
     // Empty state — fetch succeeded but no transactions

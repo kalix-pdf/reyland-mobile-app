@@ -15,6 +15,7 @@ import { useInquiryForm } from '@/hooks/property_details/useInquiryForm';
 import { useProperty } from '@/hooks/useProperty';
 import { useSchedulePicker } from '@/hooks/property_details/useSchedulePicker';
 import { useSiteVisitForm } from '@/hooks/property_details/useSiteVisitForm';
+import { ErrorScreen } from '@/components/helper/error-project';
 
 export default function PropertyDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -49,7 +50,7 @@ export default function PropertyDetailsScreen() {
     );
   }
 
-  if (loading) {
+  if (loading || refreshing) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center px-7 bg-background">
         <ActivityIndicator size="large" color={Colors.accent} />
@@ -62,12 +63,19 @@ export default function PropertyDetailsScreen() {
 
   if (!property) {
     return (
-      <StateScreen
-        icon="home-outline"
-        title="Property not found"
-        message="Check your Internet Connection. The listing may have been removed or is no longer available."
-      />
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
+        <HeaderShell transparent>
+          <HeaderNav title="Property Details" rightAction={<HomeAction />} />
+        </HeaderShell>
+        <ErrorScreen message='Property not found' onRetry={refresh}/>
+      </SafeAreaView>
     );
+    // <StateScreen
+    //   icon="home-outline"
+    //   title="Property not found"
+    //   message="Check your Internet Connection. The listing may have been removed or is no longer available."
+    // />
   }
 
   const statusLabel = PROPERTY_STATUS_LABELS[property.status] ?? 'Available';

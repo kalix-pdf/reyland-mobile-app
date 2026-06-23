@@ -17,3 +17,30 @@ export interface Transaction {
   due_date: string;
   total_price: number;
 }
+
+export type InstallmentPayment = {
+    id: number;
+    transaction_id: number;
+    amount_paid: number;
+    payment_date: string;
+    payment_method: string;
+    reference_no: string;
+    notes: string;
+    recorded_by: string;
+    created_at: string;
+}
+
+export type InstallmentSummary = {
+    total_price: number;
+    initial_amount_paid: number;
+    due_date: string;
+    years_to_pay: number | null;
+    total_paid: number;
+    payment_balance: number;
+    monthly_installment: number | null;
+}
+
+export type FetchInstallmentResponseData = {
+    payments: InstallmentPayment[];
+    summary: InstallmentSummary;
+}
