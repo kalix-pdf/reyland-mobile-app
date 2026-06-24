@@ -121,7 +121,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
               colors={colors}
               icon={<Feather name="user" size={17} color={colors.accent} />}
               label="Personal Information"
-              onPress={() => router.push('/personal-information')}
+              onPress={() => router.push('/profile/personal-information')}
             />
 
             <Row

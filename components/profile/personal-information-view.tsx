@@ -197,14 +197,14 @@ const handleConfirmAvatarUpload = async () => {
         </View>
 
         <View className='w-full'>
-          <InformationField label="Full Name" value={user.name} onPress={() => router.push('/change-full-name')} />
-          <InformationField label="Email" value={user.email} onPress={() => router.push('/change-email')} />
-          <InformationField label="Phone Number" value={phoneNumber} onPress={() => router.push('/change-phone')}/>
+          <InformationField label="Full Name" value={user.name} onPress={() => router.push('/profile/change-full-name')} />
+          <InformationField label="Email" value={user.email} onPress={() => router.push('/profile/change-email')} />
+          <InformationField label="Phone Number" value={phoneNumber} onPress={() => router.push('/profile/change-phone')}/>
           <InformationField label="Role" value={user.role === 0 ? 'Buyer' : 'Investor'} editable={false} />
           <InformationField
             label="Password"
             value="••••••••"
-            onPress={() => router.push('/change-password')}
+            onPress={() => router.push('/profile/change-password')}
             // isLast
           />
         </View>
