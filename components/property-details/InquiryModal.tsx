@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -10,8 +12,8 @@ import {
   View,
 } from 'react-native';
 
-import { Colors } from '@/constants/colors';
 import { PropertyInquiryField as InquiryField } from '@/components/property-details/property-details';
+import { Colors } from '@/constants/colors';
 
 type InquiryModalProps = {
   visible: boolean;
@@ -42,9 +44,42 @@ export function InquiryModal({
   onSubmit,
   onClose,
 }: InquiryModalProps) {
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const shouldScrollAfterKeyboardRef = useRef(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+
+      if (shouldScrollAfterKeyboardRef.current) {
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 80);
+      }
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+      shouldScrollAfterKeyboardRef.current = false;
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const scrollFocusedFieldIntoView = () => {
+    shouldScrollAfterKeyboardRef.current = true;
+
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 300);
+  };
+
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1 justify-end">
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 justify-end">
         <Pressable className="absolute inset-0 bg-black/[0.42]" onPress={onClose} />
 
         <View className="max-h-[88%] pt-2.5 px-[15px] pb-[30px] rounded-t-[26px] bg-surface">
@@ -72,9 +107,11 @@ export function InquiryModal({
           </View>
 
           <ScrollView
+            ref={scrollViewRef}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             contentContainerClassName="gap-3 pb-2"
+            contentContainerStyle={{ paddingBottom: keyboardVisible ? 220 : 8 }}
           >
             <InquiryField
               label="Full name"
@@ -97,6 +134,7 @@ export function InquiryModal({
               onChangeText={onChangePhone}
               placeholder="09xx xxx xxxx"
               keyboardType="phone-pad"
+              onFocus={scrollFocusedFieldIntoView}
             />
             <InquiryField
               label="Message"
@@ -104,6 +142,7 @@ export function InquiryModal({
               onChangeText={onChangeMessage}
               placeholder="Tell us what you want to know"
               multiline
+              onFocus={scrollFocusedFieldIntoView}
               style={{ minHeight: 108, textAlignVertical: 'top' }}
             />
           </ScrollView>

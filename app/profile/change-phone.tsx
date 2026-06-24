@@ -2,7 +2,7 @@ import { ChangePersonalInfoView } from '@/components/profile/change-personal-inf
 import { getPhoneValue } from '@/components/profile/phone-value';
 import { useAuth } from '@/context/auth-context';
 import { setCachedUser } from '@/services/auth/auth-session';
-import { updatePhoneNumber } from '../services/user/update-phone.api';
+import { updatePhoneNumber } from '@/services/user/update-phone.api';
 
 export default function ChangePhoneScreen() {
   const { setUser, user } = useAuth();

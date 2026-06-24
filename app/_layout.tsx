@@ -33,22 +33,23 @@ function RootNavigator() {
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="auth/callback" />
-          <Stack.Screen name="login" />
-          <Stack.Screen name="sign-up" />
-          <Stack.Screen name="forgot-password" />
+          <Stack.Screen name="(auth)/auth/callback" />
+          <Stack.Screen name="(auth)/login" />
+          <Stack.Screen name="(auth)/sign-up" />
+          <Stack.Screen name="(auth)/forgot-password" />
+          <Stack.Screen name="(auth)/reset-password" />
           <Stack.Screen name="investor-signup" />
-          <Stack.Screen name="personal-information" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="change-full-name" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="change-email" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="change-phone" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="change-password" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="affiliate" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="transaction" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="transactions/[id]/payment-records" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="profile/personal-information" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="profile/change-full-name" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="profile/change-email" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="profile/change-phone" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="profile/change-password" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="affiliate/index" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="transaction/index" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="transaction/[id]/payment-records" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="property/[id]" />
           <Stack.Screen name="project-property/[id]" />
-          <Stack.Screen name="search-home-screen" />
+          <Stack.Screen name="search-home-screen/index" />
         </Stack>
 
         <StatusBar style={isDarkMode ? 'light' : 'dark'} backgroundColor="transparent" translucent />

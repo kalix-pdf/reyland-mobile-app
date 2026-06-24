@@ -1,8 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import type { SchedulePickerKind, VisitDateParts, VisitTimeParts } from '@/types/property-details.types';
-import { Colors } from '@/constants/colors';
 import { PropertyInquiryField as InquiryField } from '@/components/property-details/property-details';
+import { Colors } from '@/constants/colors';
+import type { SchedulePickerKind, VisitDateParts, VisitTimeParts } from '@/types/property-details.types';
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useRef, useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { DateTimePickerModal } from './DateTimePickerModal';
 
 type ScheduleVisitModalProps = {
@@ -64,9 +65,42 @@ export function ScheduleVisitModal({
   onConfirmPicker,
   onCancelPicker,
 }: ScheduleVisitModalProps) {
+  const scrollViewRef = useRef<ScrollView | null>(null);
+  const shouldScrollAfterKeyboardRef = useRef(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+
+      if (shouldScrollAfterKeyboardRef.current) {
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 80);
+      }
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+      shouldScrollAfterKeyboardRef.current = false;
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  const scrollFocusedFieldIntoView = () => {
+    shouldScrollAfterKeyboardRef.current = true;
+
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 300);
+  };
+
   return (
     <Modal visible={visible} transparent animationType="slide" statusBarTranslucent onRequestClose={onClose}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1 justify-end">
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 justify-end">
         <Pressable className="absolute inset-0 bg-black/[0.42]" onPress={onClose} />
 
         <View className="max-h-[90%] pt-2.5 px-[15px] pb-[30px] rounded-t-[26px] bg-surface">
@@ -94,9 +128,11 @@ export function ScheduleVisitModal({
           </View>
 
           <ScrollView
+            ref={scrollViewRef}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
             contentContainerClassName="gap-3.5 pb-2"
+            contentContainerStyle={{ paddingBottom: keyboardVisible ? 220 : 8 }}
           >
             <View className="min-h-[82px] flex-row items-center gap-[13px] p-3.5 rounded-2xl bg-primary">
               <View className="w-[42px] h-[42px] rounded-[21px] items-center justify-center bg-textOnDark/[0.14]">
@@ -173,6 +209,7 @@ export function ScheduleVisitModal({
               onChangeText={onChangePhone}
               placeholder="09xx xxx xxxx"
               keyboardType="phone-pad"
+              onFocus={scrollFocusedFieldIntoView}
             />
             <InquiryField
               label="Notes for the visit"
@@ -180,6 +217,7 @@ export function ScheduleVisitModal({
               onChangeText={onChangeNotes}
               placeholder="Add companions, timing details, or questions"
               multiline
+              onFocus={scrollFocusedFieldIntoView}
               style={{ minHeight: 108, textAlignVertical: 'top' }}
             />
           </ScrollView>

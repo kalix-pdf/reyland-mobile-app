@@ -1,7 +1,7 @@
 import { registerUser } from '@/services/auth/auth-register';
 import { AuthApiError } from '@/services/auth/auth-shared';
 import { router } from 'expo-router';
-import { SignUpForm } from '../components/auth/sign-up-form';
+import { SignUpForm } from '@/components/auth/sign-up-form';
 
 export default function SignUpScreen() {
   const handleSignUp = async (
