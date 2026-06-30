@@ -1,5 +1,14 @@
-import React, { ReactNode, useState } from 'react';
-import { Image, KeyboardAvoidingView, Platform, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import React, { ReactElement, ReactNode, useState } from 'react';
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  RefreshControlProps,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type AuthScreenProps = {
@@ -9,6 +18,7 @@ type AuthScreenProps = {
   scrollEnabled?: boolean;
   heroContent?: ReactNode;
   panelVariant?: 'sheet' | 'transparent';
+  refreshControl?: ReactElement<RefreshControlProps>;
 };
 
 // Source image's intrinsic aspect ratio (width / height) and the
@@ -18,7 +28,14 @@ const HERO_BG_WIDTH_RATIO = 1.55; // image is wider than the hero container, by 
 const HERO_BG_TOP_OFFSET_RATIO = - 100 / 560;
 const HERO_BG_RIGHT_OFFSET_RATIO = -96 / 560;
 
-export function AuthScreen({ heroTitle, children, layoutDensity = 'default', scrollEnabled = false, heroContent }: AuthScreenProps) {
+export function AuthScreen({
+  heroTitle,
+  children,
+  layoutDensity = 'default',
+  scrollEnabled = false,
+  heroContent,
+  refreshControl,
+}: AuthScreenProps) {
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const [heroWidth, setHeroWidth] = useState(windowWidth);
@@ -53,6 +70,7 @@ export function AuthScreen({ heroTitle, children, layoutDensity = 'default', scr
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         scrollEnabled={scrollEnabled}
+        refreshControl={refreshControl}
       >
         <View className="flex-1">
           <View

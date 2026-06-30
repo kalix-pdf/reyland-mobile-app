@@ -65,6 +65,7 @@ export function PersonalInformationView({ user }: PersonalInformationViewProps) 
   const initials = getInitials(user.name)
   const phone = getPhoneValue(user.phone)
   const phoneNumber = phone ?? 'Not provided'
+  const roleLabel = user.role === 1 ? 'Investor' : user.role === 2 ? 'Pending Investor' : 'Buyer'
   const canConfirmDelete = deleteConfirmValue.trim().toUpperCase() === 'DELETE'
 
 const handleChangePhoto = async () => {
@@ -200,7 +201,7 @@ const handleConfirmAvatarUpload = async () => {
           <InformationField label="Full Name" value={user.name} onPress={() => router.push('/profile/change-full-name')} />
           <InformationField label="Email" value={user.email} onPress={() => router.push('/profile/change-email')} />
           <InformationField label="Phone Number" value={phoneNumber} onPress={() => router.push('/profile/change-phone')}/>
-          <InformationField label="Role" value={user.role === 0 ? 'Buyer' : 'Investor'} editable={false} />
+          <InformationField label="Role" value={roleLabel} editable={false} />
           <InformationField
             label="Password"
             value="••••••••"
