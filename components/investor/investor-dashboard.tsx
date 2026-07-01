@@ -4,9 +4,9 @@
 // import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 // import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 // import { Colors } from '../../constants/colors';
-// import { createInvestorDashboardStyles } from '../../styles/dashboard.styles';
+// // import { createInvestorDashboardStyles } from '../../styles/dashboard.styles';
 
-// const styles = createInvestorDashboardStyles(Colors);
+// // const styles = createInvestorDashboardStyles(Colors);
 
 // // ─── Mock Data ────────────────────────────────────────────────────────────────
 
