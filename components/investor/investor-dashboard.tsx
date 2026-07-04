@@ -1,8 +1,14 @@
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
+import {
+  addInvestmentContractSchedule,
+  fetchActiveInvestmentContractSchedule,
+  InvestmentContractScheduleApiError,
+} from '@/services/investment-contract-schedules/investment-contract-schedule.api';
+import { createVisitDateTimeISO } from '@/utils/property-details.utils';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Pressable,
@@ -15,6 +21,7 @@ import { ScheduleContractModal } from './ScheduleContractModal';
 
 type InvestorPlan = {
   id: string;
+  code: number;
   range: string;
   label: string;
   annualRate: number;
@@ -23,10 +30,10 @@ type InvestorPlan = {
 };
 
 const INVESTOR_PLANS: InvestorPlan[] = [
-  { id: 'starter', range: '100k to 499k', label: 'Starter', annualRate: 15, minimum: 100000, maximum: 499000 },
-  { id: 'growth', range: '500k to 999k', label: 'Growth', annualRate: 17, minimum: 500000, maximum: 999000 },
-  { id: 'premier', range: '1M to 1.999M', label: 'Premier', annualRate: 20, minimum: 1000000, maximum: 1999000 },
-  { id: 'elite', range: '2M to 5M', label: 'Elite', annualRate: 24, minimum: 2000000, maximum: 5000000 },
+  { id: 'starter', code: 1, range: '100k to 499k', label: 'Starter', annualRate: 15, minimum: 100000, maximum: 499000 },
+  { id: 'growth', code: 2, range: '500k to 999k', label: 'Growth', annualRate: 17, minimum: 500000, maximum: 999000 },
+  { id: 'premier', code: 3, range: '1M to 1.999M', label: 'Premier', annualRate: 20, minimum: 1000000, maximum: 1999000 },
+  { id: 'elite', code: 4, range: '2M to 5M', label: 'Elite', annualRate: 24, minimum: 2000000, maximum: 5000000 },
 ];
 
 function formatPeso(value: number) {
@@ -42,6 +49,9 @@ export function InvestorDashboard() {
   const [selectedPlanId, setSelectedPlanId] = useState(INVESTOR_PLANS[0].id);
   const [lockIn, setLockIn] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [checkingActiveSchedule, setCheckingActiveSchedule] = useState(false);
+  const [hasActiveSchedule, setHasActiveSchedule] = useState(false);
+  const [submittingSchedule, setSubmittingSchedule] = useState(false);
 
   const selectedPlan = useMemo(
     () => INVESTOR_PLANS.find((plan) => plan.id === selectedPlanId) ?? INVESTOR_PLANS[0],
@@ -51,17 +61,78 @@ export function InvestorDashboard() {
   const estimatedAnnualReturn = selectedPlan.minimum * (totalAnnualRate / 100);
   const schedulePicker = useSchedulePicker();
   const scheduleDisabled =
+    checkingActiveSchedule ||
+    hasActiveSchedule ||
+    submittingSchedule ||
     schedulePicker.visitDateLabel.trim().length === 0 ||
     schedulePicker.visitTimeLabel.trim().length === 0;
 
-  const handleSubmitInquiry = () => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkActiveSchedule = async () => {
+      if (!user?.uuid) {
+        setHasActiveSchedule(false);
+        return;
+      }
+
+      try {
+        setCheckingActiveSchedule(true);
+        const activeSchedule = await fetchActiveInvestmentContractSchedule();
+        if (!cancelled) setHasActiveSchedule(Boolean(activeSchedule));
+      } catch {
+        if (!cancelled) setHasActiveSchedule(false);
+      } finally {
+        if (!cancelled) setCheckingActiveSchedule(false);
+      }
+    };
+
+    checkActiveSchedule();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uuid]);
+
+  const handleSubmitInquiry = async () => {
     if (scheduleDisabled) return;
 
-    setModalVisible(false);
-    Alert.alert(
-      'Contract visit prepared',
-      'Your selected package and preferred office schedule are ready for backend submission. The actual investment transaction will still be added manually by the admin after the office visit.',
-    );
+    try {
+      setSubmittingSchedule(true);
+
+      await addInvestmentContractSchedule({
+        investment_plan_range: selectedPlan.code,
+        is_lock_in: lockIn,
+        preferred_signing_at: createVisitDateTimeISO(
+          schedulePicker.committedDate,
+          schedulePicker.committedTime,
+        ),
+      });
+
+      setHasActiveSchedule(true);
+      setModalVisible(false);
+      Alert.alert(
+        'Contract signing requested',
+        'Your preferred contract signing schedule has been submitted. Further details and next steps will be sent through Gmail.',
+      );
+    } catch (error) {
+      if (error instanceof InvestmentContractScheduleApiError && error.statusCode === 409) {
+        setHasActiveSchedule(true);
+        setModalVisible(false);
+        Alert.alert(
+          'Schedule already active',
+          'You already have an active contract signing schedule request. Our team will contact you soon.',
+        );
+        return;
+      }
+
+      Alert.alert(
+        'Unable to request schedule',
+        error instanceof Error ? error.message : 'Please try again in a moment.',
+      );
+    } finally {
+      setSubmittingSchedule(false);
+    }
   };
 
   return (
@@ -173,10 +244,26 @@ export function InvestorDashboard() {
 
       <Pressable
         accessibilityRole="button"
+        accessibilityState={{ disabled: checkingActiveSchedule || hasActiveSchedule }}
         onPress={() => setModalVisible(true)}
-        className="min-h-[52px] rounded-full bg-accent items-center justify-center active:opacity-[0.86] mb-2"
+        disabled={checkingActiveSchedule || hasActiveSchedule}
+        className={`min-h-[52px] rounded-full items-center justify-center mb-2 ${
+          checkingActiveSchedule || hasActiveSchedule
+            ? 'bg-border opacity-[0.72]'
+            : 'bg-accent active:opacity-[0.86]'
+        }`}
       >
-        <Text className="text-textOnDark text-[15px] font-black">SCHEDULE CONTRACT SIGNING</Text>
+        <Text
+          className={`text-[15px] font-black ${
+            checkingActiveSchedule || hasActiveSchedule ? 'text-textMuted' : 'text-textOnDark'
+          }`}
+        >
+          {checkingActiveSchedule
+            ? 'CHECKING SCHEDULE...'
+            : hasActiveSchedule
+              ? 'CONTRACT SIGNING REQUESTED'
+              : 'SCHEDULE CONTRACT SIGNING'}
+        </Text>
       </Pressable>
 
       <ScheduleContractModal
@@ -188,6 +275,7 @@ export function InvestorDashboard() {
         totalAnnualRate={totalAnnualRate}
         lockIn={lockIn}
         isSubmitDisabled={scheduleDisabled}
+        isSubmitting={submittingSchedule}
         onClose={() => setModalVisible(false)}
         onSubmit={handleSubmitInquiry}
         onPressDate={schedulePicker.openDatePicker}

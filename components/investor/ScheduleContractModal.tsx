@@ -20,6 +20,7 @@ export function ScheduleContractModal({
   visitDateLabel,
   visitTimeLabel,
   isSubmitDisabled,
+  isSubmitting,
   activePicker,
   draftDate,
   draftTime,
@@ -42,6 +43,7 @@ export function ScheduleContractModal({
   visitDateLabel: string;
   visitTimeLabel: string;
   isSubmitDisabled: boolean;
+  isSubmitting: boolean;
   activePicker: SchedulePickerKind;
   draftDate: VisitDateParts;
   draftTime: VisitTimeParts;
@@ -208,7 +210,7 @@ export function ScheduleContractModal({
               }`}
             >
               <Text className={`text-sm font-black ${isSubmitDisabled ? 'text-textMuted' : 'text-textOnDark'}`}>
-                Request Signing Schedule
+                {isSubmitting ? 'Requesting...' : 'Request Signing Schedule'}
               </Text>
             </Pressable>
           </View>
