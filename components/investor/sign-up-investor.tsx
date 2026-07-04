@@ -1,5 +1,6 @@
 import { AuthButton } from '@/components/auth/auth-button';
 import { AuthScreen } from '@/components/auth/auth-screen';
+import { InvestorDashboard } from '@/components/investor/investor-dashboard';
 import { useAuth } from '@/context/auth-context';
 import { useAppTheme } from '@/context/theme-context';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
@@ -38,6 +39,10 @@ export function SignUpInvestorForm() {
   }, [setUser, user?.accessToken]);
 
   const { refreshing, onRefresh } = useRefreshControl(refreshUser);
+
+  if (isApproved) {
+    return <InvestorDashboard />;
+  }
 
   const updateLocalUserType = async (nextUserType: number) => {
     if (!user) return;
@@ -102,22 +107,20 @@ export function SignUpInvestorForm() {
             : 'Sign up for investor access to review opportunities, monitor your portfolio, and receive guided support from Reyland PH.'}
       </Text>
 
-      {isPending || isApproved ? (
+      {isPending ? (
         <View className="rounded-[20px] border border-border bg-surfaceMuted p-4 mb-[18px]">
           <View className="flex-row items-center gap-2.5 mb-2">
             <Ionicons
-              name={isApproved ? 'checkmark-circle-outline' : 'time-outline'}
+              name="time-outline"
               size={20}
               color={colors.accent}
             />
             <Text className="text-base font-black text-textPrimary">
-              {isApproved ? 'Investor Approved' : 'Registration Submitted'}
+              Registration Submitted
             </Text>
           </View>
           <Text className="text-sm leading-[21px] text-textSecondary font-semibold">
-            {isApproved
-              ? 'Your account is marked as an approved investor.'
-              : 'Your request is pending admin approval.'}
+            Your request is pending admin approval.
           </Text>
         </View>
       ) : (
