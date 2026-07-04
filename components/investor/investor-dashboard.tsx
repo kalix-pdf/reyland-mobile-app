@@ -1,313 +1,295 @@
-// import { useRefreshControl } from '@/hooks/use-refresh-control';
-// import { Ionicons } from '@expo/vector-icons';
-// import React from 'react';
-// import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-// import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-// import { Colors } from '../../constants/colors';
-// // import { createInvestorDashboardStyles } from '../../styles/dashboard.styles';
+import { AuthScreen } from '@/components/auth/auth-screen';
+import { Colors } from '@/constants/colors';
+import { useAuth } from '@/context/auth-context';
+import {
+  addInvestmentContractSchedule,
+  fetchActiveInvestmentContractSchedule,
+  InvestmentContractScheduleApiError,
+} from '@/services/investment-contract-schedules/investment-contract-schedule.api';
+import { createVisitDateTimeISO } from '@/utils/property-details.utils';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Alert,
+  Pressable,
+  Switch,
+  Text,
+  View
+} from 'react-native';
+import { useSchedulePicker } from '../../hooks/property_details/useSchedulePicker';
+import { ScheduleContractModal } from './ScheduleContractModal';
 
-// // const styles = createInvestorDashboardStyles(Colors);
+type InvestorPlan = {
+  id: string;
+  code: number;
+  range: string;
+  label: string;
+  annualRate: number;
+  minimum: number;
+  maximum: number;
+};
 
-// // ─── Mock Data ────────────────────────────────────────────────────────────────
+const INVESTOR_PLANS: InvestorPlan[] = [
+  { id: 'starter', code: 1, range: '100k to 499k', label: 'Starter', annualRate: 15, minimum: 100000, maximum: 499000 },
+  { id: 'growth', code: 2, range: '500k to 999k', label: 'Growth', annualRate: 17, minimum: 500000, maximum: 999000 },
+  { id: 'premier', code: 3, range: '1M to 1.999M', label: 'Premier', annualRate: 20, minimum: 1000000, maximum: 1999000 },
+  { id: 'elite', code: 4, range: '2M to 5M', label: 'Elite', annualRate: 24, minimum: 2000000, maximum: 5000000 },
+];
 
-// const portfolioStats = [
-//   { label: 'Total Value', value: '₱48.3M', change: '+12.4%', positive: true },
-//   { label: 'Properties', value: '14', change: '+2 this yr', positive: true },
-//   { label: 'Gross Yield', value: '8.7%', change: '-0.3%', positive: false },
-//   { label: 'Occupancy', value: '91%', change: '+5%', positive: true },
-// ];
+function formatPeso(value: number) {
+  if (value >= 1000000) {
+    return `PHP ${(value / 1000000).toFixed(value % 1000000 === 0 ? 0 : 2)}M`;
+  }
 
-// const properties = [
-//   {
-//     id: '1',
-//     name: 'Lakeview Estate',
-//     location: 'Tagaytay, Cavite',
-//     area: '1,200 sqm',
-//     value: '₱12.5M',
-//     status: 'For Sale',
-//     roi: '14.2%',
-//     type: 'Residential',
-//     acquired: '2021',
-//     appreciation: '+22%',
-//   },
-//   {
-//     id: '2',
-//     name: 'Greenfield Lot 7B',
-//     location: 'Laguna, Biñan',
-//     area: '650 sqm',
-//     value: '₱4.8M',
-//     status: 'Leased',
-//     roi: '7.8%',
-//     type: 'Commercial',
-//     acquired: '2022',
-//     appreciation: '+11%',
-//   },
-//   {
-//     id: '3',
-//     name: 'Ridgepark Industrial',
-//     location: 'Batangas City',
-//     area: '3,400 sqm',
-//     value: '₱22.1M',
-//     status: 'For Sale',
-//     roi: '18.5%',
-//     type: 'Industrial',
-//     acquired: '2020',
-//     appreciation: '+34%',
-//   },
-//   {
-//     id: '4',
-//     name: 'Sunrise Cove Plot',
-//     location: 'Nasugbu, Batangas',
-//     area: '500 sqm',
-//     value: '₱3.2M',
-//     status: 'Leased',
-//     roi: '6.1%',
-//     type: 'Residential',
-//     acquired: '2023',
-//     appreciation: '+8%',
-//   },
-// ];
+  return `PHP ${Math.round(value / 1000)}k`;
+}
 
-// const transactions = [
-//   { label: 'Lease Income — Greenfield 7B', date: 'Apr 28', amount: '+₱38,000', positive: true },
-//   { label: 'Property Tax — Ridgepark', date: 'Apr 20', amount: '-₱12,400', positive: false },
-//   { label: 'Appraisal Fee — Lakeview', date: 'Apr 15', amount: '-₱3,200', positive: false },
-//   { label: 'Lease Income — Sunrise Cove', date: 'Apr 10', amount: '+₱22,000', positive: true },
-// ];
+export function InvestorDashboard() {
+  const { user } = useAuth();
+  const [selectedPlanId, setSelectedPlanId] = useState(INVESTOR_PLANS[0].id);
+  const [lockIn, setLockIn] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [checkingActiveSchedule, setCheckingActiveSchedule] = useState(false);
+  const [hasActiveSchedule, setHasActiveSchedule] = useState(false);
+  const [submittingSchedule, setSubmittingSchedule] = useState(false);
 
-// function StatCard({ label, value, change, positive }: (typeof portfolioStats)[0]) {
-//   return (
-//     <View style={styles.statCard}>
-//       <Text style={styles.statLabel}>{label}</Text>
-//       <Text style={styles.statValue}>{value}</Text>
-//       <View style={[styles.statBadge, positive ? styles.statBadgePos : styles.statBadgeNeg]}>
-//         <Text style={[styles.statChange, positive ? styles.statChangePos : styles.statChangeNeg]}>{change}</Text>
-//       </View>
-//     </View>
-//   );
-// }
+  const selectedPlan = useMemo(
+    () => INVESTOR_PLANS.find((plan) => plan.id === selectedPlanId) ?? INVESTOR_PLANS[0],
+    [selectedPlanId],
+  );
+  const totalAnnualRate = selectedPlan.annualRate + (lockIn ? 10 : 0);
+  const estimatedAnnualReturn = selectedPlan.minimum * (totalAnnualRate / 100);
+  const schedulePicker = useSchedulePicker();
+  const scheduleDisabled =
+    checkingActiveSchedule ||
+    hasActiveSchedule ||
+    submittingSchedule ||
+    schedulePicker.visitDateLabel.trim().length === 0 ||
+    schedulePicker.visitTimeLabel.trim().length === 0;
 
-// function SectionHeader({ title, action }: { title: string; action?: string }) {
-//   return (
-//     <View style={styles.sectionHeader}>
-//       <Text style={styles.sectionTitle}>{title}</Text>
-//       {action && (
-//         <TouchableOpacity>
-//           <Text style={styles.sectionAction}>{action}</Text>
-//         </TouchableOpacity>
-//       )}
-//     </View>
-//   );
-// }
+  useEffect(() => {
+    let cancelled = false;
 
-// const typeColors: Record<string, { bg: string; text: string }> = {
-//   Residential: { bg: '#E5F5EC', text: '#006B3D' },
-//   Commercial: { bg: '#EFF6FF', text: '#1D4ED8' },
-//   Industrial: { bg: '#FEF9EC', text: '#92400E' },
-// };
+    const checkActiveSchedule = async () => {
+      if (!user?.uuid) {
+        setHasActiveSchedule(false);
+        return;
+      }
 
-// function PropertyCard({ property }: { property: (typeof properties)[0] }) {
-//   const tc = typeColors[property.type] ?? typeColors.Residential;
-//   const isForSale = property.status === 'For Sale';
+      try {
+        setCheckingActiveSchedule(true);
+        const activeSchedule = await fetchActiveInvestmentContractSchedule();
+        if (!cancelled) setHasActiveSchedule(Boolean(activeSchedule));
+      } catch {
+        if (!cancelled) setHasActiveSchedule(false);
+      } finally {
+        if (!cancelled) setCheckingActiveSchedule(false);
+      }
+    };
 
-//   return (
-//     <View style={styles.propCard}>
-//       {/* Color accent strip */}
-//       <View style={[styles.propStrip, { backgroundColor: isForSale ? Colors.accent : Colors.warning }]} />
+    checkActiveSchedule();
 
-//       <View style={styles.propContent}>
-//         {/* Top row */}
-//         <View style={styles.propTopRow}>
-//           <View style={{ flex: 1 }}>
-//             <Text style={styles.propName} numberOfLines={1}>
-//               {property.name}
-//             </Text>
-//             <View style={styles.propLocationRow}>
-//               <Ionicons name="location-outline" size={14} color={Colors.accent} />
-//               <Text style={styles.propLocation}>{property.location}</Text>
-//             </View>
-//           </View>
-//           <View style={[styles.statusBadge, isForSale ? styles.saleStatus : styles.leaseStatus]}>
-//             <Text style={[styles.statusText, isForSale ? styles.saleStatusText : styles.leaseStatusText]}>
-//               {property.status}
-//             </Text>
-//           </View>
-//         </View>
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uuid]);
 
-//         {/* Divider */}
-//         <View style={styles.propDivider} />
+  const handleSubmitInquiry = async () => {
+    if (scheduleDisabled) return;
 
-//         {/* Metrics row */}
-//         <View style={styles.propMetrics}>
-//           <View style={styles.propMetric}>
-//             <Text style={styles.metricLabel}>Value</Text>
-//             <Text style={styles.metricValue}>{property.value}</Text>
-//           </View>
-//           <View style={styles.metricSep} />
-//           <View style={styles.propMetric}>
-//             <Text style={styles.metricLabel}>Area</Text>
-//             <Text style={styles.metricValue}>{property.area}</Text>
-//           </View>
-//           <View style={styles.metricSep} />
-//           <View style={styles.propMetric}>
-//             <Text style={styles.metricLabel}>ROI</Text>
-//             <Text style={[styles.metricValue, { color: Colors.accent }]}>{property.roi}</Text>
-//           </View>
-//           <View style={styles.metricSep} />
-//           <View style={styles.propMetric}>
-//             <Text style={styles.metricLabel}>+Growth</Text>
-//             <Text style={[styles.metricValue, { color: Colors.accent }]}>{property.appreciation}</Text>
-//           </View>
-//         </View>
+    try {
+      setSubmittingSchedule(true);
 
-//         {/* Footer row */}
-//         <View style={styles.propFooter}>
-//           <View style={[styles.typeBadge, { backgroundColor: tc.bg }]}>
-//             <Text style={[styles.typeBadgeText, { color: tc.text }]}>{property.type}</Text>
-//           </View>
-//           <Text style={styles.acquiredText}>Acquired {property.acquired}</Text>
-//         </View>
-//       </View>
-//     </View>
-//   );
-// }
+      await addInvestmentContractSchedule({
+        investment_plan_range: selectedPlan.code,
+        is_lock_in: lockIn,
+        preferred_signing_at: createVisitDateTimeISO(
+          schedulePicker.committedDate,
+          schedulePicker.committedTime,
+        ),
+      });
 
-// function TransactionRow({ item }: { item: (typeof transactions)[0] }) {
-//   return (
-//     <View style={styles.txRow}>
-//       <View style={[styles.txIcon, item.positive ? styles.txIconPos : styles.txIconNeg]}>
-//         <Ionicons
-//           name={item.positive ? 'arrow-up-outline' : 'arrow-down-outline'}
-//           size={16}
-//           color={item.positive ? Colors.tagText : Colors.error}
-//         />
-//       </View>
-//       <View style={{ flex: 1 }}>
-//         <Text style={styles.txLabel} numberOfLines={1}>
-//           {item.label}
-//         </Text>
-//         <Text style={styles.txDate}>{item.date}</Text>
-//       </View>
-//       <Text style={[styles.txAmount, item.positive ? styles.txPos : styles.txNeg]}>{item.amount}</Text>
-//     </View>
-//   );
-// }
+      setHasActiveSchedule(true);
+      setModalVisible(false);
+      Alert.alert(
+        'Contract signing requested',
+        'Your preferred contract signing schedule has been submitted. Further details and next steps will be sent through Gmail.',
+      );
+    } catch (error) {
+      if (error instanceof InvestmentContractScheduleApiError && error.statusCode === 409) {
+        setHasActiveSchedule(true);
+        setModalVisible(false);
+        Alert.alert(
+          'Schedule already active',
+          'You already have an active contract signing schedule request. Our team will contact you soon.',
+        );
+        return;
+      }
 
-// function QuickActions() {
-//   const actions = [
-//     { icon: 'add-outline' as const, label: 'Add Property' },
-//     { icon: 'bar-chart-outline' as const, label: 'Reports' },
-//     { icon: 'document-text-outline' as const, label: 'Documents' },
-//     { icon: 'chatbubble-ellipses-outline' as const, label: 'Inquiries' },
-//   ];
-//   return (
-//     <View style={styles.qaRow}>
-//       {actions.map((a) => (
-//         <TouchableOpacity key={a.label} style={styles.qaItem} activeOpacity={0.75}>
-//           <View style={styles.qaIconBox}>
-//             <Ionicons name={a.icon} size={22} color={Colors.accent} />
-//           </View>
-//           <Text style={styles.qaLabel}>{a.label}</Text>
-//         </TouchableOpacity>
-//       ))}
-//     </View>
-//   );
-// }
+      Alert.alert(
+        'Unable to request schedule',
+        error instanceof Error ? error.message : 'Please try again in a moment.',
+      );
+    } finally {
+      setSubmittingSchedule(false);
+    }
+  };
 
-// // ─── Main Component ───────────────────────────────────────────────────────────
+  return (
+    <AuthScreen
+      heroTitle={`Investor\nDesk`}
+      scrollEnabled
+      heroContent={
+        <View className="gap-3 pb-16">
+          <View className="w-[54px] h-[54px] rounded-[16px] items-center justify-center bg-white/10 border border-white/20">
+            <MaterialCommunityIcons name="finance" size={28} color={Colors.white} />
+          </View>
+          <View>
+            <Text className="text-white text-[30px] leading-[33px] font-black">Investor Desk</Text>
+            <Text className="mt-2 text-white/76 text-sm leading-[20px] font-semibold">
+              Choose a package and schedule your office visit before the transaction.
+            </Text>
+          </View>
+        </View>
+      }
+    >
+      <View className="flex-row items-center justify-between gap-3 mb-4">
+        <View className="flex-1 min-w-0">
+          <Text className="text-2xl leading-[30px] font-black text-textPrimary">Contract Scheduling</Text>
+          <Text className="mt-1 text-sm leading-[20px] text-textSecondary font-semibold">
+            Welcome{user?.name ? `, ${user.name.split(' ')[0]}` : ''}. Pick a target range and schedule your Reyland office visit.
+          </Text>
+        </View>
+        <View className="w-[44px] h-[44px] rounded-[22px] items-center justify-center bg-tag">
+          <Ionicons name="checkmark-circle-outline" size={22} color={Colors.accent} />
+        </View>
+      </View>
 
-// export function InvestorDashboard() {
-//   const insets = useSafeAreaInsets();
-//   const { refreshing, onRefresh } = useRefreshControl();
+      <View className="rounded-[18px] border border-border bg-surfaceMuted p-4 mb-4">
+        <View className="flex-row items-start gap-3">
+          <View className="w-9 h-9 rounded-[18px] items-center justify-center bg-tag">
+            <Ionicons name="business-outline" size={18} color={Colors.accent} />
+          </View>
+          <View className="flex-1 min-w-0">
+            <Text className="text-textPrimary text-base font-black">Office visit required</Text>
+            <Text className="mt-1 text-textSecondary text-[13px] leading-[19px] font-semibold">
+              The investor must visit the Reyland office for contract signing before the admin manually records the investment transaction.
+            </Text>
+          </View>
+        </View>
+      </View>
 
-//   return (
-//     <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
-//       <ScrollView
-//         // alwaysBounceVertical={false}
-//         // bounces={false}
-//         contentInsetAdjustmentBehavior="never"
-//         style={styles.scroll}
-//         contentContainerStyle={[styles.scrollContent, { paddingTop: insets.top + 18 }]}
-//         showsVerticalScrollIndicator={false}
-//         refreshControl={
-//           <RefreshControl
-//             refreshing={refreshing}
-//             onRefresh={onRefresh}
-//             tintColor={Colors.accent}
-//             progressViewOffset={insets.top + 28}
-//           />
-//         }
-//       >
-//         <View style={styles.heroShell}>
-//           <View style={styles.heroDecorCircleOne} />
-//           <View style={styles.heroDecorCircleTwo} />
+      <Text className="text-textPrimary text-lg font-black mb-3">Choose investment range</Text>
+      <View className="gap-3 mb-4">
+        {INVESTOR_PLANS.map((plan) => {
+          const selected = plan.id === selectedPlan.id;
+          return (
+            <Pressable
+              key={plan.id}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              onPress={() => setSelectedPlanId(plan.id)}
+              className={`rounded-[18px] border p-4 active:opacity-[0.78] ${
+                selected ? 'bg-tag border-accent' : 'bg-surface border-border'
+              }`}
+            >
+              <View className="flex-row items-start justify-between gap-3">
+                <View className="flex-1 min-w-0">
+                  <Text className="text-textPrimary text-base font-black">{plan.label}</Text>
+                  <Text className="mt-1 text-textSecondary text-[13px] font-bold">{plan.range}</Text>
+                </View>
+                <View className="items-end">
+                  <Text className="text-accent text-xl font-black">{plan.annualRate}%</Text>
+                  <Text className="text-textMuted text-[11px] font-extrabold">per annum</Text>
+                </View>
+              </View>
+            </Pressable>
+          );
+        })}
+      </View>
 
-//           <View style={styles.heroHeader}>
-//             <View>
-//               <Text style={styles.heroKicker}>Investor Center</Text>
-//               <Text style={styles.heroTitle}>Portfolio Overview</Text>
-//             </View>
+      <View className="rounded-[18px] border border-border bg-surface p-4 mb-4">
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="flex-1 min-w-0">
+            <Text className="text-textPrimary text-base font-black">3-year lock-in bonus</Text>
+            <Text className="mt-1 text-textSecondary text-[13px] leading-[18px] font-semibold">
+              Add 10% to the annual rate when the investor chooses a 3-year lock-in.
+            </Text>
+          </View>
+          <Switch
+            value={lockIn}
+            onValueChange={setLockIn}
+            trackColor={{ false: Colors.border, true: Colors.accentLight }}
+            thumbColor={lockIn ? Colors.accent : Colors.white}
+          />
+        </View>
+      </View>
 
-//             <View style={styles.heroIconButton}>
-//               <Ionicons name="analytics-outline" size={22} color="#FFFFFF" />
-//             </View>
-//           </View>
+      <View className="rounded-[18px] bg-primary p-4 mb-5">
+        <View className="flex-row items-center justify-between gap-3 pb-3 border-b border-white/15">
+          <Text className="text-white text-xs font-black">Selected package</Text>
+          <Text className="text-white text-sm font-black">{selectedPlan.range}</Text>
+        </View>
+        <View className="flex-row items-center justify-between gap-3 py-3 border-b border-white/15">
+          <Text className="text-white text-xs font-black">Annual rate</Text>
+          <Text className="text-white text-sm font-black">{totalAnnualRate}% per annum</Text>
+        </View>
+        <View className="flex-row items-center justify-between gap-3 pt-3">
+          <Text className="text-white text-xs font-black">Estimate from minimum</Text>
+          <Text className="text-white text-sm font-black">
+            {formatPeso(estimatedAnnualReturn)} / year
+          </Text>
+        </View>
+      </View>
 
-//           <View style={styles.heroCard}>
-//             <View style={styles.heroLeft}>
-//               <Text style={styles.heroLabel}>Total Portfolio Value</Text>
-//               <Text style={styles.heroValue}>₱48,300,000</Text>
-//               <View style={styles.heroBadge}>
-//                 <Text style={styles.heroBadgeText}>▲ 12.4% this year</Text>
-//               </View>
-//             </View>
-//             <View style={styles.heroRight}>
-//               <View style={styles.miniCircle}>
-//                 <Text style={styles.miniCircleVal}>14</Text>
-//                 <Text style={styles.miniCircleLabel}>Lots</Text>
-//               </View>
-//             </View>
-//           </View>
-//         </View>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ disabled: checkingActiveSchedule || hasActiveSchedule }}
+        onPress={() => setModalVisible(true)}
+        disabled={checkingActiveSchedule || hasActiveSchedule}
+        className={`min-h-[52px] rounded-full items-center justify-center mb-2 ${
+          checkingActiveSchedule || hasActiveSchedule
+            ? 'bg-border opacity-[0.72]'
+            : 'bg-accent active:opacity-[0.86]'
+        }`}
+      >
+        <Text
+          className={`text-[15px] font-black ${
+            checkingActiveSchedule || hasActiveSchedule ? 'text-textMuted' : 'text-textOnDark'
+          }`}
+        >
+          {checkingActiveSchedule
+            ? 'CHECKING SCHEDULE...'
+            : hasActiveSchedule
+              ? 'CONTRACT SIGNING REQUESTED'
+              : 'SCHEDULE CONTRACT SIGNING'}
+        </Text>
+      </Pressable>
 
-//         {/* Stats row */}
-//         <ScrollView
-//           horizontal
-//           contentInsetAdjustmentBehavior="never"
-//           showsHorizontalScrollIndicator={false}
-//           contentContainerStyle={styles.statsRow}
-//         >
-//           {portfolioStats.map((s) => (
-//             <StatCard key={s.label} {...s} />
-//           ))}
-//         </ScrollView>
-
-//         {/* Quick actions */}
-//         <SectionHeader title="Quick Actions" />
-//         <QuickActions />
-
-//         {/* Properties */}
-//         <SectionHeader title="My Properties" action="See All" />
-//         {properties.map((p) => (
-//           <PropertyCard key={p.id} property={p} />
-//         ))}
-
-//         {/* Recent transactions */}
-//         <SectionHeader title="Recent Transactions" action="History" />
-//         <View style={styles.txCard}>
-//           {transactions.map((t, i) => (
-//             <React.Fragment key={t.label}>
-//               <TransactionRow item={t} />
-//               {i < transactions.length - 1 && <View style={styles.txDivider} />}
-//             </React.Fragment>
-//           ))}
-//         </View>
-
-//         {/* Bottom padding */}
-//         <View style={{ height: 90 }} />
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// }
-
-// // ─── Styles ───────────────────────────────────────────────────────────────────
+      <ScheduleContractModal
+        visible={modalVisible}
+        userName={user?.name ?? ''}
+        userEmail={user?.email ?? ''}
+        userPhone={user?.phone ?? ''}
+        plan={selectedPlan}
+        totalAnnualRate={totalAnnualRate}
+        lockIn={lockIn}
+        isSubmitDisabled={scheduleDisabled}
+        isSubmitting={submittingSchedule}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleSubmitInquiry}
+        onPressDate={schedulePicker.openDatePicker}
+        visitDateLabel={schedulePicker.visitDateLabel}
+        visitTimeLabel={schedulePicker.visitTimeLabel}
+        onPressTime={schedulePicker.openTimePicker}
+        activePicker={schedulePicker.activePicker}
+        draftDate={schedulePicker.draftDate}
+        draftTime={schedulePicker.draftTime}
+        onChangeDraftDate={schedulePicker.updateDraftDate}
+        onChangeDraftTime={schedulePicker.updateDraftTime}
+        onConfirmPicker={schedulePicker.confirmPicker}
+        onCancelPicker={schedulePicker.cancelPicker}
+      />
+    </AuthScreen>
+  );
+}
