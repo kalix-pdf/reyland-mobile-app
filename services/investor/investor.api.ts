@@ -12,6 +12,12 @@ type InvestorRequestResponse = {
   };
 };
 
+export type InvestorAccessRequestPayload = {
+  investment_plan_range: number;
+  is_lock_in: boolean;
+  preferred_signing_at: string;
+};
+
 export class InvestorApiError extends Error {
   constructor(
     message: string,
@@ -23,9 +29,12 @@ export class InvestorApiError extends Error {
   }
 }
 
-export async function requestInvestorAccess(): Promise<number> {
+export async function requestInvestorAccess(payload: InvestorAccessRequestPayload): Promise<number> {
   try {
-    const response = await apiClient.post<InvestorRequestResponse>(REQUEST_INVESTOR_ACCESS_ENDPOINT);
+    const response = await apiClient.post<InvestorRequestResponse>(
+      REQUEST_INVESTOR_ACCESS_ENDPOINT,
+      payload,
+    );
 
     if (!response.data.success || response.data.data?.user_type === undefined) {
       throw new InvestorApiError(
