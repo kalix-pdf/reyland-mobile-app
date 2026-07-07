@@ -52,7 +52,7 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
     >
       <View className="flex-1 pr-3">
         <Text className="font-medium text-gray-900" numberOfLines={1}>
-          Property: {transaction.property.title}
+          {transaction.property?.title ? `Property: ${transaction.property.title}` : typeLabel}
         </Text>
         <Text className="text-gray-500 mt-0.5" numberOfLines={1}>
           {paymentType}
