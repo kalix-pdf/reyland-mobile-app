@@ -1,8 +1,8 @@
 // components/transactions/TransactionRow.tsx
-import { View, Text, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import type { Transaction } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
 
 interface TransactionRowProps {
   transaction: Transaction;
@@ -44,6 +44,11 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
   const statusStyle = STATUS_STYLES[transaction.status] ?? STATUS_STYLES.pending;
   const typeLabel = TYPE_LABELS[transaction.type] ?? `Type ${transaction.type}`;
   const paymentType = PAYMENT_TYPE_LABELS[transaction.payment_type] ?? `Payment Type ${transaction.payment_type}`;
+  const transactionTitle = transaction.property?.title
+    ? `Property: ${transaction.property.title}`
+    : transaction.type === 1
+      ? 'Investment Transaction'
+      : 'Property unavailable';
 
   return (
     <Pressable
@@ -52,7 +57,7 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
     >
       <View className="flex-1 pr-3">
         <Text className="font-medium text-gray-900" numberOfLines={1}>
-          Property: {transaction.property.title}
+          {transactionTitle}
         </Text>
         <Text className="text-gray-500 mt-0.5" numberOfLines={1}>
           {paymentType}

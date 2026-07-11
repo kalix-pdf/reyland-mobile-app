@@ -1,4 +1,5 @@
 import { HeaderNav, HeaderShell, HomeAction } from '@/components/header';
+import { AccountApprovalRequired } from '@/components/helper/account-approval-required';
 import { InquiryModal, PropertyActionBar, PropertyAmenities, PropertyHeaderCard,
   PropertyImageCarousel, PropertyOverview, PropertyPaymentPlan, PropertyQuickStats, ScheduleVisitModal } from '@/components/property-details';
 import { PropertyStateScreen as StateScreen } from '@/components/property-details/property-details'
@@ -19,8 +20,9 @@ import { ErrorScreen } from '@/components/helper/error-project';
 
 export default function PropertyDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const propertyId = Number(id);
+  const isApproved = user?.status === 1;
 
   const { property, loading, refreshing, refresh } = useProperty(propertyId);
   const galleryImages = useGalleryImages(property);
@@ -50,7 +52,20 @@ export default function PropertyDetailsScreen() {
     );
   }
 
-  if (loading || refreshing) {
+  if (!isApproved && !authLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
+        <HeaderShell transparent>
+          <HeaderNav title="Property Details" rightAction={<HomeAction />} />
+        </HeaderShell>
+
+        <AccountApprovalRequired message="Your account needs approval before you can view property details, inquire, or schedule a site visit." />
+      </SafeAreaView>
+    );
+  }
+
+  if (authLoading || loading || refreshing) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center px-7 bg-background">
         <ActivityIndicator size="large" color={Colors.accent} />

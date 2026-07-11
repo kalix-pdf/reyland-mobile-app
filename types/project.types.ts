@@ -5,7 +5,7 @@ export interface Project {
     location: string;
     status: number;
     date_completed: string;
-    image_url: string;
+    video_url: string;
     public_id: string;
     is_featured: number;
 }

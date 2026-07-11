@@ -1,5 +1,4 @@
 import { AppColors } from "@/constants/colors";
-import { createProfileViewStyles } from "@/styles/global.css";
 import { ReactNode } from "react";
 
 export type ViewProfileProps = {

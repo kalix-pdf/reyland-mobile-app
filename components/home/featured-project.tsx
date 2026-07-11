@@ -3,6 +3,7 @@ import { Project, Property, User } from '@/types';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
 import { Href, router } from 'expo-router';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Shadow } from 'react-native-shadow-2';
 
@@ -12,7 +13,67 @@ interface Props {
   onPress?: (project: Project) => void;
 }
 
-export function FeaturedProjectsScroll({ projects, user, onPress }: Props) {
+function ProjectCard({ project, user }: { project: Project; user: User | null }) {
+  const player = useVideoPlayer(project.video_url, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
+
+  return (
+    <Shadow
+      distance={12}
+      startColor="rgba(0,0,0,0.10)"
+      endColor="rgba(0,0,0,0)"
+      offset={[-5, 6]}
+      style={{ borderRadius: 24 }}
+    >
+      <Pressable
+        className="w-[180px] rounded-[18px] bg-white "
+        onPress={() => {
+          if (!user) {
+            router.push("/welcome");
+          } else {
+            router.push({
+              pathname: "/project-property/[id]",
+              params: {
+                id: project.id.toString(),
+                name: project.project_name,
+              },
+            } as Href);
+          }
+        }}
+      >
+        <View pointerEvents='none'>
+          <VideoView
+            player={player}
+            style={{
+              width: "100%",
+              aspectRatio: 16 / 9,
+              borderRadius: 18,
+            }}
+            contentFit="cover"
+            nativeControls={false}
+            />
+          </View>
+
+        <View className="py-[14px] px-[10px] gap-[3px]">
+          <Text className="capitalize text-[16px] font-semibold tracking-[-0.8px]" numberOfLines={1}>
+            {project.project_name}
+          </Text>
+          <View className="flex-row items-center gap-[3px]">
+            <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
+            <Text className="text-[14px] text-textMuted flex-1" numberOfLines={1}>
+              {project.location}
+            </Text>
+          </View>
+        </View>
+    </Pressable>
+    </Shadow>
+  );
+}
+
+export function FeaturedProjectsScroll({ projects, user }: Props) {
   return (
     <ScrollView
       horizontal
@@ -20,48 +81,11 @@ export function FeaturedProjectsScroll({ projects, user, onPress }: Props) {
       contentContainerClassName="gap-[9px] pb-4 px-4"
     >
       {projects.map((project) => (
-        <Shadow
-            key={project.id}
-            distance={12}
-            startColor="rgba(0,0,0,0.10)"
-            endColor="rgba(0,0,0,0)"
-            offset={[-5, 6]}
-            style={{ borderRadius: 24 }}>
-          
-            <Pressable key={project.id} className="w-[180px] rounded-[18px] bg-white"
-              onPress={() => { if (!user) {
-                router.push('/welcome');
-              } else {
-                router.push({
-                  pathname: '/project-property/[id]',
-                  params: {
-                    id: project.id.toString(),
-                    name: project.project_name,
-                  },
-                } as unknown as Href)
-              }
-              }}>
-            <Image
-              source={{ uri: project.image_url }}
-              style={{ borderRadius: 18, width: '100%', height: 160 }}
-              contentFit="cover"
-              cachePolicy="memory-disk"
-              transition={200}
-            />
-            <View className="py-[14px] px-[10px] gap-[3px]">
-              <Text className="capitalize text-[16px] font-semibold tracking-[-0.8px]" numberOfLines={1}>
-                {project.project_name}
-              </Text>
-              <View className="flex-row items-center gap-[3px]">
-                <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
-                <Text className="text-[14px] text-textMuted flex-1" numberOfLines={1}>
-                  {project.location}
-                </Text>
-              </View>
-            </View>
-          </Pressable>
-        </Shadow>
-        
+        <ProjectCard
+          key={project.id}
+          project={project}
+          user={user}
+        />
       ))}
     </ScrollView>
   );
