@@ -8,7 +8,7 @@ export interface Property {
   down_payment: number;
   installment_down_payment: number;
   monthly_installment?: number | null;
-  title: string;
+  title: string ;
   short_description: string;
   status: 0 | 1 | 2;
   category: string;

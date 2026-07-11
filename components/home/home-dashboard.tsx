@@ -2,6 +2,7 @@
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { useDashboard } from '@/context/dashboard-context';
+import { sharedPressedScale } from '@/styles/shared-primitives';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
@@ -13,7 +14,6 @@ import { ErrorScreen } from '../helper/error-project';
 import { DashboardSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll, FeaturedPropertiesScroll } from './featured-project';
-import { sharedPressedScale } from '@/styles/shared-primitives';
 
 const QUICK_ACTIONS = [
   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -102,7 +102,7 @@ export function HomeDashboard() {
             />}>
 
              {/* ── Quick Actions ────────────────────────────────────────────── */}
-            <View className="mx-[18px] flex-row justify-between gap-3 my-2">
+            {/* <View className="mx-[18px] flex-row justify-between gap-3 my-2">
               {QUICK_ACTIONS.map((action) => (
                 <Pressable
                   key={action.key}
@@ -127,7 +127,7 @@ export function HomeDashboard() {
                   </Text>
                 </Pressable>
               ))}
-            </View>
+            </View> */}
 
             {/* Featured Projects */}
             <View className="mt-[15px]">

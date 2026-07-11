@@ -3,17 +3,22 @@ import { useProjectSearch } from '@/hooks/use-project-search';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useMemo } from 'react';
 import {
-  ActivityIndicator, FlatList, ListRenderItemInfo, Pressable, RefreshControl,
+  ActivityIndicator,
+  FlatList,
+  ListRenderItemInfo, Pressable,
+  RefreshControl,
   StatusBar, Text, View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderSearchBar, HeaderShell } from '../header';
+import { AccountApprovalRequired } from '../helper/account-approval-required';
 import { ErrorScreen } from '../helper/error-project';
 import { ProjectsSkeletonScreen } from '../helper/skeleton';
 import ProjectCard from '../project-card';
 
 import AppColors from '@/tailwind.colors';
 import type { Project } from '@/types';
+import { useAuth } from '../../context/auth-context';
 
 // Module-level constants — created once, not on every render
 const CONTAINER_STYLE = { paddingBottom: 104 };
@@ -176,6 +181,8 @@ export function DiscoverScreen() {
     clear: clearSearch,
   } = useProjectSearch({ localProjects: project });
 
+  const { user, isLoading: authLoading } = useAuth();
+  const isApproved = user?.status === 1;
   const hasActiveSearch = search.trim().length > 0;
   const resultLabel = filtered.length === 1 ? 'project' : 'projects';
   const canLoadMore = hasMore && !loadingMore && filtered.length > 0 && !hasActiveSearch;
@@ -249,6 +256,24 @@ export function DiscoverScreen() {
     [showEmptyDebounced, hasActiveSearch, handleClearSearch]
   );
 
+  if (!isApproved) {
+    return (
+      <View className="flex-1 bg-background">
+        <StatusBar barStyle="dark-content" />
+
+        <SafeAreaView edges={['top']} className="bg-surface pt-5">
+          <HeaderShell>
+            <View className="py-4">
+              <Text className="text-[18px] font-black text-textPrimary">Discover</Text>
+            </View>
+          </HeaderShell>
+        </SafeAreaView>
+
+        <AccountApprovalRequired message="Your account needs to be approved before you can explore Reyland projects and property listings." />
+      </View>
+    );
+  }
+  if (authLoading) return <ProjectsSkeletonScreen />;
   if (loading) return <ProjectsSkeletonScreen />;
   if (error) return <ErrorScreen message={error} onRetry={retry} />;
 

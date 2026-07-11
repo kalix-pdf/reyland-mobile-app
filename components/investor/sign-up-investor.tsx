@@ -10,9 +10,9 @@ import { setCachedUser } from '@/services/auth/auth-session';
 import { getUserInfo } from '@/services/fetchData/user-info.api';
 import { InvestorApiError, requestInvestorAccess } from '@/services/investor/investor.api';
 import { createVisitDateTimeISO } from '@/utils/property-details.utils';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Alert, Pressable, RefreshControl, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, Switch, Text, View } from 'react-native';
 
 const INVESTOR_BENEFITS = [
   'Submit investor access and contract signing intent in one flow',

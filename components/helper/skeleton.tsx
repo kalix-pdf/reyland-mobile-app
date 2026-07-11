@@ -129,7 +129,7 @@ function DashboardSectionSkeleton({ cardCount }: { cardCount: number }) {
 
 export function PromotionalCarouselSkeleton() {
   return (
-    <View style={{ paddingHorizontal: 16, gap: 12 }}>
+    <View style={{ paddingHorizontal: 16, gap: 12, paddingTop: 20 }}>
       <SkeletonBox width="100%" height={140} borderRadius={24} />
     </View>
   )
@@ -139,7 +139,7 @@ export function ProjectCardsSkeleton() {
   return (
     <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 16 }}>
       {[...Array(3)].map((_, i) => (
-        <SkeletonBox key={i} width={180} height={220} borderRadius={16} />
+        <SkeletonBox key={i} width={180} height={183} borderRadius={16} />
       ))}
     </View>
   );

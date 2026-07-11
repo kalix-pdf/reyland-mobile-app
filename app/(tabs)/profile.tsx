@@ -1,9 +1,9 @@
+import { ErrorScreen } from '@/components/helper/error-project';
 import { ViewProfile } from '@/components/profile/profile-view';
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { useRefreshControl } from '@/hooks/use-refresh-control';
 import { getUserInfo } from '@/services/fetchData/user-info.api';
-import { ErrorScreen } from '@/components/helper/error-project';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text } from 'react-native';

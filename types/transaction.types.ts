@@ -3,7 +3,7 @@ import { User } from "./user.types";
 
 export interface Transaction {
   id: number,
-  property: Property,
+  property: Property | null,
   transaction_id: string,
   type: number,
   payment_type: number,

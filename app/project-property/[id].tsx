@@ -14,7 +14,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderNav, HeaderSearchBar, HeaderShell } from '@/components/header';
+import { AccountApprovalRequired } from '@/components/helper/account-approval-required';
 import PropertyCard from '@/components/property-card';
+import { useAuth } from '@/context/auth-context';
 import { useProjectProperties } from '@/hooks/useProjectProperties';
 import type { Property } from '@/types/property.types';
 import { ErrorScreen } from '@/components/helper/error-project';
@@ -31,6 +33,7 @@ const STATUS_FILTERS: { label: string; value: 'All' | Property['status'] }[] = [
 ];
 
 export default function ProjectPropertiesScreen() {
+  const { user, isLoading: authLoading } = useAuth();
   const { id, name } = useLocalSearchParams<{
     id?: string;
     name?: string;
@@ -72,6 +75,7 @@ export default function ProjectPropertiesScreen() {
   const hasActiveSearch = search.trim().length > 0;
   const hasActiveStatusFilter = activeStatus !== 'All';
   const hasActiveFilters = hasActiveSearch || hasActiveStatusFilter;
+  const isApproved = user?.status === 1;
 
   const activeStatusLabel =
     STATUS_FILTERS.find((filter) => filter.value === activeStatus)?.label ?? 'All';
@@ -189,6 +193,35 @@ export default function ProjectPropertiesScreen() {
       'alert-circle-outline',
       'Project not found',
       'We could not open the selected project. Please go back and try again.'
+    );
+  }
+
+  if (authLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor={AppColors.background} />
+        {renderHeader()}
+
+        <View className="flex-1 items-center justify-center px-8">
+          <ActivityIndicator size="large" color={AppColors.accent} />
+          <Text className="mt-3 text-sm font-bold text-textSecondary">
+            Loading properties...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isApproved) {
+    return (
+      <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor={AppColors.background} />
+        <HeaderShell transparent>
+          <HeaderNav title={projectName} />
+        </HeaderShell>
+
+        <AccountApprovalRequired message="Your account needs approval before you can view property listings under this project." />
+      </SafeAreaView>
     );
   }
 

@@ -1,16 +1,21 @@
+import AppColors from '@/tailwind.colors';
 import type { Project } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import React from 'react';
-import { Image } from 'expo-image';
 import { Pressable, Text, View } from 'react-native';
-import AppColors from '@/tailwind.colors';
 
 type Props = {
   project: Project;
 };
 
 function ProjectCard({ project }: Props) {
+  const player = useVideoPlayer(project.video_url, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
   const router = useRouter();
   const location = project.location?.trim() || 'Location unavailable';
   const completionLabel = project.date_completed?.trim() || 'Completion TBA';
@@ -28,14 +33,18 @@ function ProjectCard({ project }: Props) {
         })
       }
     >
-      <Image
-        source={{ uri: project.image_url }}
-        contentFit="cover"
-        transition={200}
-        priority="low"
-        cachePolicy="memory-disk"
-        style={{ backgroundColor: AppColors.border, aspectRatio: 16 / 9}}
-      />
+
+      <View pointerEvents="none">
+        <VideoView
+          player={player}
+          contentFit="cover"
+          style={{
+            backgroundColor: AppColors.border,
+            aspectRatio: 16 / 9,
+          }}
+          nativeControls={false}
+        />
+      </View>
 
       <View className="absolute top-3.5 left-3.5 right-3.5 flex-row justify-between gap-2">
         {project.is_featured ? (

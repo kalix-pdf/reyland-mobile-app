@@ -5,7 +5,6 @@ import { useVideoPlayer, VideoView } from 'expo-video';
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Shadow } from 'react-native-shadow-2';
 
 type WelcomeScreenProps = {
   onSignIn: () => void;
