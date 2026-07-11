@@ -10,9 +10,9 @@ import { setCachedUser } from '@/services/auth/auth-session';
 import { getUserInfo } from '@/services/fetchData/user-info.api';
 import { InvestorApiError, requestInvestorAccess } from '@/services/investor/investor.api';
 import { createVisitDateTimeISO } from '@/utils/property-details.utils';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Alert, Pressable, RefreshControl, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, Switch, Text, View } from 'react-native';
 
 const INVESTOR_BENEFITS = [
   'Submit investor access and contract signing intent in one flow',
@@ -30,10 +30,10 @@ type InvestorPlan = {
 };
 
 const INVESTOR_PLANS: InvestorPlan[] = [
-  { id: 'starter', code: 1, range: '100k to 499k', label: 'Starter', annualRate: 15, minimum: 100000 },
-  { id: 'growth', code: 2, range: '500k to 999k', label: 'Growth', annualRate: 17, minimum: 500000 },
-  { id: 'premier', code: 3, range: '1M to 1.999M', label: 'Premier', annualRate: 20, minimum: 1000000 },
-  { id: 'elite', code: 4, range: '2M to 5M', label: 'Elite', annualRate: 24, minimum: 2000000 },
+  { id: 'starter', code: 1, range: '₱100,000 to ₱499,000', label: 'Starter', annualRate: 15, minimum: 100000 },
+  { id: 'growth', code: 2, range: '₱500,000 to ₱999,000', label: 'Growth', annualRate: 17, minimum: 500000 },
+  { id: 'premier', code: 3, range: '₱1M to ₱1.999M', label: 'Premier', annualRate: 20, minimum: 1000000 },
+  { id: 'elite', code: 4, range: '₱2M to ₱5M', label: 'Elite', annualRate: 24, minimum: 2000000 },
 ];
 
 function formatPeso(value: number) {
@@ -60,7 +60,7 @@ export function SignUpInvestorForm() {
     () => INVESTOR_PLANS.find((plan) => plan.id === selectedPlanId) ?? INVESTOR_PLANS[0],
     [selectedPlanId],
   );
-  const totalAnnualRate = selectedPlan.annualRate + (lockIn ? 10 : 0);
+  const totalAnnualRate = selectedPlan.annualRate;
   const estimatedAnnualReturn = selectedPlan.minimum * (totalAnnualRate / 100);
   const canSubmit =
     agreed &&
@@ -134,20 +134,20 @@ export function SignUpInvestorForm() {
   return (
     <>
       <AuthScreen
-        heroTitle={`Investor\nAccess`}
+        heroTitle={`Reyland Investor`}
         scrollEnabled
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
-        }
+        // refreshControl={
+        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+        // }
       >
-      <View className="w-[54px] h-[54px] rounded-[14px] items-center justify-center bg-tag border border-border mb-[18px]">
-        <MaterialCommunityIcons name="chart-timeline-variant" size={26} color={colors.accent} />
-      </View>
+      {/* <View className="h-[54px] mb-[18px]"> */}
+        {/* <MaterialCommunityIcons name="chart-timeline-variant" size={26} color={colors.accent} /> */}
+      {/* </View> */}
 
       <Text className="text-2xl leading-[30px] font-black text-textPrimary mb-2">
         Become a Reyland Investor
       </Text>
-      <Text className="text-sm leading-[21px] text-textSecondary mb-[22px]">
+      <Text className="leading-[21px] text-textSecondary mb-[22px]">
         {isApproved
           ? 'Your investor access has been approved. You can now use investor features as they become available.'
           : isPending
@@ -167,7 +167,7 @@ export function SignUpInvestorForm() {
               Registration Submitted
             </Text>
           </View>
-          <Text className="text-sm leading-[21px] text-textSecondary font-semibold">
+          <Text className="leading-[21px] text-textSecondary font-semibold">
             Your request is pending admin approval. Contract signing details will be sent through Gmail after review.
           </Text>
         </View>
@@ -176,10 +176,10 @@ export function SignUpInvestorForm() {
           <View className="gap-3 py-[18px] border-y border-border mb-[18px]">
             {INVESTOR_BENEFITS.map((benefit) => (
               <View key={benefit} className="flex-row items-start gap-2.5">
-                <View className="w-[22px] h-[22px] rounded-[11px] items-center justify-center bg-tag mt-px">
-                  <Ionicons name="checkmark" size={13} color={colors.accent} />
+                <View className="w-[32px] h-[32px] rounded-[11px] items-center justify-center bg-tag mt-px">
+                  <Ionicons name="checkmark" size={18} color={colors.accent} />
                 </View>
-                <Text className="flex-1 text-sm leading-[21px] text-textPrimary font-semibold">
+                <Text className="flex-1 leading-[21px] text-textPrimary font-semibold">
                   {benefit}
                 </Text>
               </View>
@@ -189,11 +189,11 @@ export function SignUpInvestorForm() {
           <View className="rounded-[18px] border border-border bg-surfaceMuted p-4 mb-[18px]">
             <View className="flex-row items-center gap-2.5 mb-3">
               <View className="w-8 h-8 rounded-[16px] items-center justify-center bg-tag">
-                <Ionicons name="briefcase-outline" size={16} color={colors.accent} />
+                <Ionicons name="briefcase-outline" size={18} color={colors.accent} />
               </View>
               <View className="flex-1 min-w-0">
                 <Text className="text-textPrimary text-base font-black">Investment intent</Text>
-                <Text className="mt-0.5 text-textSecondary text-xs font-bold">
+                <Text className="mt-0.5 text-textSecondary text-sm font-bold">
                   Choose the range to prepare for contract signing.
                 </Text>
               </View>
@@ -214,12 +214,12 @@ export function SignUpInvestorForm() {
                   >
                     <View className="flex-row items-center justify-between gap-3">
                       <View className="flex-1 min-w-0">
-                        <Text className="text-textPrimary text-sm font-black">{plan.label}</Text>
-                        <Text className="mt-0.5 text-textSecondary text-xs font-bold">{plan.range}</Text>
+                        <Text className="text-textPrimary font-black">{plan.label}</Text>
+                        <Text className="mt-0.5 text-textSecondary font-bold">{plan.range}</Text>
                       </View>
                       <View className="items-end">
-                        <Text className="text-accent text-base font-black">{plan.annualRate}%</Text>
-                        <Text className="text-textMuted text-[10px] font-extrabold">per annum</Text>
+                        <Text className="text-accent font-black">{plan.annualRate}%</Text>
+                        <Text className="text-textMuted text-[12px] font-extrabold">per annum</Text>
                       </View>
                     </View>
                   </Pressable>
@@ -232,8 +232,8 @@ export function SignUpInvestorForm() {
             <View className="flex-row items-center justify-between gap-3">
               <View className="flex-1 min-w-0">
                 <Text className="text-textPrimary text-base font-black">3-year lock-in bonus</Text>
-                <Text className="mt-1 text-textSecondary text-[13px] leading-[18px] font-semibold">
-                  Add 10% to the annual rate when you choose a 3-year lock-in.
+                <Text className="mt-1 text-textSecondary text-[14px] leading-[18px] font-semibold">
+                  Add 10% rate after 3 years when you choose a 3-year lock-in.
                 </Text>
               </View>
               <Switch
@@ -252,9 +252,9 @@ export function SignUpInvestorForm() {
               </View>
               <View className="flex-1 min-w-0">
                 <Text className="text-textPrimary text-base font-black">Preferred contract signing</Text>
-                <Text className="mt-0.5 text-textSecondary text-xs font-bold">
+                {/* <Text className="mt-0.5 text-textSecondary text-xs font-bold">
                   Select your preferred Reyland office visit schedule.
-                </Text>
+                </Text> */}
               </View>
             </View>
 
@@ -304,6 +304,9 @@ export function SignUpInvestorForm() {
           <View className="rounded-[18px] bg-primary p-4 mb-[18px]">
             <CombinedSummaryRow label="Selected package" value={selectedPlan.range} />
             <CombinedSummaryRow label="Annual rate" value={`${totalAnnualRate}% per annum`} />
+            {lockIn === true && (
+              <CombinedSummaryRow label="Bonus" value={"+ 10% bonus rate after 3 years"} />
+            )}
             <CombinedSummaryRow
               label="Lock-in"
               value={lockIn ? '3 years selected' : 'Not selected'}
@@ -377,7 +380,7 @@ function CombinedSummaryRow({
 }) {
   return (
     <View className={`flex-row items-center justify-between gap-3 py-2 ${last ? '' : 'border-b border-white/15'}`}>
-      <Text className="text-white text-xs font-black">{label}</Text>
+      <Text className="text-white text-sm font-black">{label}</Text>
       <Text className="flex-1 text-right text-white text-[13px] font-black" numberOfLines={1}>
         {value}
       </Text>
