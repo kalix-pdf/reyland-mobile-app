@@ -1,17 +1,17 @@
-import { View, ActivityIndicator, Text } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { usePaymentHistory } from '@/hooks/use-transaction';
-import { PaymentRecordsList } from '@/components/transcations/payment-record-list';
-import { ErrorScreen } from '@/components/helper/error-project';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { HeaderNav, HeaderShell } from '@/components/header';
+import { ErrorScreen } from '@/components/helper/error-project';
+import { PaymentRecordsList } from '@/components/transcations/payment-record-list';
 import { Colors } from '@/constants/colors';
+import { usePaymentHistory } from '@/hooks/use-transaction';
+import { useLocalSearchParams } from 'expo-router';
+import { ActivityIndicator, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function PaymentRecordsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const transactionId = Number(id);
 
-  const { payments, summary, loading, error, refresh, refreshing } = usePaymentHistory(transactionId);
+  const { payments, summary, contract, loading, error, refresh, refreshing } = usePaymentHistory(transactionId);
 
   function renderContent() {
     if (loading || refreshing) {
@@ -26,7 +26,7 @@ export default function PaymentRecordsScreen() {
       return <ErrorScreen message='Unable to load Payment History.' onRetry={refresh}/>
     }
 
-    return <PaymentRecordsList payments={payments} summary={summary} />
+    return <PaymentRecordsList payments={payments} summary={summary} contract={contract} />
   }
 
   return (

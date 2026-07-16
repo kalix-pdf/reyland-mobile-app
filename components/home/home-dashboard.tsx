@@ -15,13 +15,13 @@ import { DashboardSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, W
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll, FeaturedPropertiesScroll } from './featured-project';
 
-const QUICK_ACTIONS = [
-  { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
-  { key: 'visit',   label: 'Site Visit',icon: 'calendar-outline'           },
-  { key: 'reserve', label: 'Reserve',   icon: 'bookmark-outline'           },
-  { key: 'Invest', label: 'Invest',   icon: 'cash-outline'              },
-  { key: 'support', label: 'Support',   icon: 'chatbubble-ellipses-outline'},
-] as const;
+// const QUICK_ACTIONS = [
+//   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
+//   { key: 'visit',   label: 'Site Visit',icon: 'calendar-outline'           },
+//   { key: 'reserve', label: 'Reserve',   icon: 'bookmark-outline'           },
+//   { key: 'Invest', label: 'Invest',   icon: 'cash-outline'              },
+//   { key: 'support', label: 'Support',   icon: 'chatbubble-ellipses-outline'},
+// ] as const;
 
 // const today = new Date().toLocaleDateString('en-PH', {
 //       weekday: 'long',

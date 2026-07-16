@@ -1,9 +1,12 @@
-import { View, Text, FlatList } from 'react-native';
-import type { InstallmentPayment, InstallmentSummary } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
+import * as WebBrowser from 'expo-web-browser';
+import { View, Text, FlatList, Pressable, Alert } from 'react-native';
+import type { InstallmentPayment, InstallmentSummary, TransactionContract } from '@/types';
 
 interface PaymentRecordsListProps {
   payments: InstallmentPayment[];
   summary?: InstallmentSummary;
+  contract?: TransactionContract | null;
 }
 
 function formatCurrency(amount: number) {
@@ -117,7 +120,67 @@ function PaymentRow({ payment }: { payment: InstallmentPayment }) {
   );
 }
 
-export function PaymentRecordsList({ payments, summary }: PaymentRecordsListProps) {
+function ContractCard({ contract }: { contract: TransactionContract }) {
+  const canView = Boolean(contract.view_url);
+
+  async function handleViewContract() {
+    if (!contract.view_url) {
+      Alert.alert(
+        'Contract unavailable',
+        'The contract link is currently unavailable. Please try again later.'
+      );
+      return;
+    }
+
+    try {
+      await WebBrowser.openBrowserAsync(contract.view_url);
+    } catch {
+      Alert.alert('Unable to open contract', 'Please try again in a moment.');
+    }
+  }
+
+  return (
+    <View className="mx-4 mt-4 rounded-2xl border border-gray-200 bg-white p-4">
+      <View className="flex-row items-start">
+        <View className="h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
+          <Ionicons name="document-text-outline" size={24} color="#2563EB" />
+        </View>
+
+        <View className="ml-3 flex-1">
+          <Text className="text-base font-semibold text-gray-900">
+            Investment Contract
+          </Text>
+          <Text className="mt-0.5 text-gray-500" numberOfLines={1}>
+            {contract.file_name || 'Contract document available'}
+          </Text>
+        </View>
+      </View>
+
+      <Pressable
+        onPress={handleViewContract}
+        disabled={!canView}
+        className={`mt-4 flex-row items-center justify-center rounded-xl px-4 py-3 ${
+          canView ? 'bg-gray-900 active:bg-gray-800' : 'bg-gray-200'
+        }`}
+      >
+        <Ionicons
+          name="open-outline"
+          size={18}
+          color={canView ? '#FFFFFF' : '#9CA3AF'}
+        />
+        <Text
+          className={`ml-2 font-semibold ${
+            canView ? 'text-white' : 'text-gray-400'
+          }`}
+        >
+          View Contract
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+export function PaymentRecordsList({ payments, summary, contract }: PaymentRecordsListProps) {
   return (
     
       <FlatList
@@ -128,6 +191,7 @@ export function PaymentRecordsList({ payments, summary }: PaymentRecordsListProp
         ListHeaderComponent={
           <>
             {summary && <SummaryCard summary={summary} />}
+            {contract && <ContractCard contract={contract} />}
             <Text className="px-4 pt-5 pb-2 text-gray-900 font-semibold">
               Payment history
             </Text>

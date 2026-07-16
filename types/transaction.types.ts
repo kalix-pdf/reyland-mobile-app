@@ -40,7 +40,14 @@ export type InstallmentSummary = {
     monthly_installment: number | null;
 }
 
+export type TransactionContract = {
+    file_url: string;
+    view_url: string | null;
+    file_name: string;
+}
+
 export type FetchInstallmentResponseData = {
     payments: InstallmentPayment[];
     summary: InstallmentSummary;
+    contract?: TransactionContract | null;
 }
