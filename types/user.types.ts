@@ -9,10 +9,10 @@ export type ViewProfileProps = {
   refreshOffset?: number;
 };
 
-export type Styles = ReturnType<typeof createProfileViewStyles>;
+// export type Styles = ReturnType<typeof createProfileViewStyles>;
 
 export type SettingItemProps = {
-  styles: Styles;
+  // styles: Styles;
   colors: AppColors;
   icon: ReactNode;
   label: string;
@@ -24,7 +24,7 @@ export type SettingItemProps = {
 };
 
 export type ToggleItemProps = {
-  styles: Styles;
+  // styles: Styles;
   colors: AppColors;
   icon: ReactNode;
   label: string;
