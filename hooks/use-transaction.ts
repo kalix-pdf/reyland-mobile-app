@@ -35,6 +35,7 @@ export function usePaymentHistory(id: number) {
   return {
     payments: data?.payments ?? [],
     summary: data?.summary,
+    contract: data?.contract ?? null,
     ...rest,
   };
 }
