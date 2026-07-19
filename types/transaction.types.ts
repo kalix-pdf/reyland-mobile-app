@@ -42,7 +42,6 @@ export type InstallmentSummary = {
 
 export type TransactionContract = {
     file_url: string;
-    view_url: string | null;
     file_name: string;
 }
 

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import * as WebBrowser from 'expo-web-browser';
-import { View, Text, FlatList, Pressable, Alert } from 'react-native';
+// import * as WebBrowser from 'expo-web-browser';
+import { View, Text, FlatList, Pressable, Alert, Linking } from 'react-native';
 import type { InstallmentPayment, InstallmentSummary, TransactionContract } from '@/types';
 
 interface PaymentRecordsListProps {
@@ -121,10 +121,10 @@ function PaymentRow({ payment }: { payment: InstallmentPayment }) {
 }
 
 function ContractCard({ contract }: { contract: TransactionContract }) {
-  const canView = Boolean(contract.view_url);
+  const canView = Boolean(contract.file_url);
 
   async function handleViewContract() {
-    if (!contract.view_url) {
+    if (!contract.file_url) {
       Alert.alert(
         'Contract unavailable',
         'The contract link is currently unavailable. Please try again later.'
@@ -133,7 +133,7 @@ function ContractCard({ contract }: { contract: TransactionContract }) {
     }
 
     try {
-      await WebBrowser.openBrowserAsync(contract.view_url);
+      await Linking.openURL(contract.file_url);
     } catch {
       Alert.alert('Unable to open contract', 'Please try again in a moment.');
     }

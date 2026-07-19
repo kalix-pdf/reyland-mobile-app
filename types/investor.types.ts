@@ -1,4 +1,4 @@
-export interface investments {
+export interface investment {
     id: number;
     investment_ref: string;
     user_id: string,
@@ -20,16 +20,17 @@ export interface investments {
     next_payout_at: string;
     payouts_made: number;
     contract_file_url: string;
+    investment_payouts: InvestmentPayout[];
 }
 
-export interface investment_payouts {
-    id: number;
-    investment_id: number;
-    payout_month: number;
-    expected_amount: number;
-    due_date: string;
-    paid_amount: number;
-    paid_date: string;
-    status: string;
-    created_at: string;
+export interface InvestmentPayout {
+  id: number;
+  investment_id: number;
+  payout_month: number;
+  expected_amount: number;
+  due_date: string;
+  paid_amount: number | null;
+  paid_date: string | null;
+  status: string;
+  created_at: string;
 }
