@@ -3,6 +3,7 @@ import { AuthInput } from '@/components/auth/auth-input';
 import { AuthMessage } from '@/components/auth/auth-message';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -359,8 +360,26 @@ export function SignUpForm({onSignUp, onLogin}: SignUpFormProps) {
             </View>
 
             <Text className="flex-1 leading-[18px] font-semibold text-textSecondary">
-              I agree to the <Text className="font-black text-accent">Terms</Text> and{' '}
-              <Text className="font-black text-accent">Privacy Policy</Text>
+              I agree to the{' '}
+              <Text
+                className="font-black text-accent"
+                onPress={(event) => {
+                  event.stopPropagation();
+                  router.push('/terms-and-conditions');
+                }}
+              >
+                Terms
+              </Text>{' '}
+              and{' '}
+              <Text
+                className="font-black text-accent"
+                onPress={(event) => {
+                  event.stopPropagation();
+                  router.push('/privacy-policy');
+                }}
+              >
+                Privacy Policy
+              </Text>
             </Text>
           </Pressable>
 

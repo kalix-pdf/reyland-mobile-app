@@ -14,7 +14,7 @@ export default function PaymentRecordsScreen() {
   const { payments, summary, contract, loading, error, refresh, refreshing } = usePaymentHistory(transactionId);
 
   function renderContent() {
-    if (loading || refreshing) {
+    if (loading) {
       return (
         <View className="flex-1 items-center justify-center bg-white">
           <ActivityIndicator size="large" color="#1F2937" />
@@ -26,7 +26,15 @@ export default function PaymentRecordsScreen() {
       return <ErrorScreen message='Unable to load Payment History.' onRetry={refresh}/>
     }
 
-    return <PaymentRecordsList payments={payments} summary={summary} contract={contract} />
+    return (
+      <PaymentRecordsList
+        payments={payments}
+        summary={summary}
+        contract={contract}
+        refreshing={refreshing}
+        onRefresh={refresh}
+      />
+    )
   }
 
   return (

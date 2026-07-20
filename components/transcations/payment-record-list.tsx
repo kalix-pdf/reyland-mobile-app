@@ -1,12 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 // import * as WebBrowser from 'expo-web-browser';
-import { View, Text, FlatList, Pressable, Alert, Linking } from 'react-native';
+import { View, Text, FlatList, Pressable, Alert, Linking, RefreshControl } from 'react-native';
 import type { InstallmentPayment, InstallmentSummary, TransactionContract } from '@/types';
+import { Colors } from '@/constants/colors';
 
 interface PaymentRecordsListProps {
   payments: InstallmentPayment[];
   summary?: InstallmentSummary;
   contract?: TransactionContract | null;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }
 
 function formatCurrency(amount: number) {
@@ -180,7 +183,7 @@ function ContractCard({ contract }: { contract: TransactionContract }) {
   );
 }
 
-export function PaymentRecordsList({ payments, summary, contract }: PaymentRecordsListProps) {
+export function PaymentRecordsList({ payments, summary, contract, refreshing = false, onRefresh }: PaymentRecordsListProps) {
   return (
     
       <FlatList
@@ -201,6 +204,11 @@ export function PaymentRecordsList({ payments, summary, contract }: PaymentRecor
           <View className="px-4 py-10 items-center">
             <Text className="text-gray-400">No payment records yet.</Text>
           </View>
+        }
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.accent} />
+          ) : undefined
         }
         contentContainerStyle={{ paddingBottom: 24 }}
       />

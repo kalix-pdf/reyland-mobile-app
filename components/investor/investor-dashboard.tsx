@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Linking, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, Text, View } from 'react-native';
 import type { investment, InvestmentPayout } from '@/types/investor.types';
 import { useInvestments } from '@/hooks/use-investment';
 import { HeaderShell, HeaderTitle } from '../header';
@@ -399,7 +399,7 @@ function InvestmentCard({ investment }: { investment: investment }) {
 // ---------- Dashboard ----------
 
 export function InvestorDashboard() {
-  const { investments, loading, error, hasMore, loadMore } = useInvestments();
+  const { investments, loading, refreshing, error, hasMore, loadMore, refresh } = useInvestments();
   const stats = usePortfolioStats(investments);
 
   if (loading && !investments?.length) {
@@ -436,6 +436,9 @@ export function InvestorDashboard() {
           </View>
         )}
         ListHeaderComponent={<PortfolioSummary stats={stats} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.accent} />
+        }
         ListEmptyComponent={
           !investments?.length ? (
             <View className="rounded-[18px] border border-border bg-surfaceMuted p-4 mb-4 mx-4">

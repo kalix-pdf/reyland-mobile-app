@@ -11,8 +11,9 @@ import { getUserInfo } from '@/services/fetchData/user-info.api';
 import { InvestorApiError, requestInvestorAccess } from '@/services/investor/investor.api';
 import { createVisitDateTimeISO } from '@/utils/property-details.utils';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Alert, Pressable, Switch, Text, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, Switch, Text, View } from 'react-native';
 
 const INVESTOR_BENEFITS = [
   'Submit investor access and contract signing intent in one flow',
@@ -136,9 +137,9 @@ export function SignUpInvestorForm() {
       <AuthScreen
         heroTitle={`Reyland Investor`}
         scrollEnabled
-        // refreshControl={
-        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
-        // }
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+        }
       >
       {/* <View className="h-[54px] mb-[18px]"> */}
         {/* <MaterialCommunityIcons name="chart-timeline-variant" size={26} color={colors.accent} /> */}
@@ -339,8 +340,24 @@ export function SignUpInvestorForm() {
             </View>
             <Text className="flex-1 text-[12.5px] leading-[18px] text-textSecondary font-semibold">
               I agree to the investor{' '}
-              <Text className="text-accent font-extrabold">terms and conditions</Text>,{' '}
-              <Text className="text-accent font-extrabold">privacy policy</Text>, and eligibility
+              <Text
+                className="text-accent font-extrabold"
+                onPress={(event) => {
+                  event.stopPropagation();
+                  router.push('/terms-and-conditions');
+                }}
+              >
+                terms and conditions
+              </Text>,{' '}
+              <Text
+                className="text-accent font-extrabold"
+                onPress={(event) => {
+                  event.stopPropagation();
+                  router.push('/privacy-policy');
+                }}
+              >
+                privacy policy
+              </Text>, and eligibility
               review.
             </Text>
           </Pressable>

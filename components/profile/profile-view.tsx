@@ -144,21 +144,21 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
               colors={colors}
               icon={<Ionicons name="help-circle-outline" size={18} color={colors.accent} />}
               label="About Reyland PH"
-              onPress={() => Alert.alert('About Reyland PH')}
+              onPress={() => router.push('/about-reyland')}
             />
 
             <Row
               colors={colors}
               icon={<MaterialCommunityIcons name="shield-lock-outline" size={18} color={colors.accent} />}
               label="Privacy Policy"
-              onPress={() => Alert.alert('Privacy Policy')}
+              onPress={() => router.push('/privacy-policy')}
             />
 
             <Row
               colors={colors}
               icon={<Ionicons name="document-text-outline" size={18} color={colors.accent} />}
-              label="Terms of Service"
-              onPress={() => Alert.alert('Terms of Service')}
+              label="Terms and Conditions"
+              onPress={() => router.push('/terms-and-conditions')}
               isLast
             />
 
