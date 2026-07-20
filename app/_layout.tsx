@@ -38,6 +38,9 @@ function RootNavigator() {
           <Stack.Screen name="(auth)/sign-up" />
           <Stack.Screen name="(auth)/forgot-password" />
           <Stack.Screen name="(auth)/reset-password" />
+          <Stack.Screen name="about-reyland" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="privacy-policy" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="terms-and-conditions" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="investor-signup" />
           <Stack.Screen name="profile/personal-information" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="profile/change-full-name" options={{ animation: 'simple_push' }} />

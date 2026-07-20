@@ -23,7 +23,7 @@ export default function TransactionsScreen() {
 
   function renderContent() {
     // Initial loading state (no data yet)
-    if (loading && transactions.length === 0 || refreshing) {
+    if (loading && transactions.length === 0) {
         return (
         <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" />
@@ -57,7 +57,7 @@ export default function TransactionsScreen() {
         }}
         onEndReachedThreshold={0.5}
         refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={refresh} />
+            <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.accent} />
         }
         ListFooterComponent={
             loading && transactions.length > 0 ? (

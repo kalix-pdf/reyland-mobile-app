@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
 import { router } from 'expo-router'
 import React, { useState } from 'react'
-import { ActivityIndicator, Alert, Image, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, Modal, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { clearCachedUser, setCachedUser } from '../../services/auth/auth-session'
 import { deleteAccount } from '../../services/user/delete-account.api'
@@ -17,6 +17,8 @@ import { getPhoneValue } from './phone-value'
 
 type PersonalInformationViewProps = {
   user: User
+  refreshing?: boolean
+  onRefresh?: () => void
 }
 
 function InformationField({ label, value, onPress, editable = true}: {
@@ -54,7 +56,7 @@ function InformationField({ label, value, onPress, editable = true}: {
   )
 }
 
-export function PersonalInformationView({ user }: PersonalInformationViewProps) {
+export function PersonalInformationView({ user, refreshing = false, onRefresh }: PersonalInformationViewProps) {
   const { colors } = useAppTheme()
   const { setUser } = useAuth()
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
@@ -168,7 +170,15 @@ const handleConfirmAvatarUpload = async () => {
         <HeaderNav title='Personal Information' rightAction={<HomeAction />}/>
       </HeaderShell>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName='px-5 pb-10'>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerClassName='px-5 pb-10'
+        refreshControl={
+          onRefresh ? (
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
+          ) : undefined
+        }
+      >
         <View className='items-center my-6'>
           <View className='w-[104px] h-[104px] rounded-[52px] bg-primary items-center justify-center overflow-hidden mb-2.5 border-2 border-surface'>
             {user.avatar ? (

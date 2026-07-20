@@ -1,6 +1,7 @@
 import { useAppTheme } from '@/context/theme-context';
 import { createAffiliateStyles } from '@/styles/affiliate.styles';
 import { Feather, Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
@@ -56,8 +57,24 @@ export function AffiliateEnrollPanel({ onEnroll, enrolling }: { onEnroll: () => 
           </View>
           <Text style={styles.termsText}>
             I agree to the affiliate{' '}
-            <Text style={styles.termsLink}>terms & conditions</Text>,{' '}
-            <Text style={styles.termsLink}>privacy policy</Text>, and referral
+            <Text
+              style={styles.termsLink}
+              onPress={(event) => {
+                event.stopPropagation();
+                router.push('/terms-and-conditions');
+              }}
+            >
+              terms & conditions
+            </Text>,{' '}
+            <Text
+              style={styles.termsLink}
+              onPress={(event) => {
+                event.stopPropagation();
+                router.push('/privacy-policy');
+              }}
+            >
+              privacy policy
+            </Text>, and referral
             reward rules.
           </Text>
         </Pressable>
