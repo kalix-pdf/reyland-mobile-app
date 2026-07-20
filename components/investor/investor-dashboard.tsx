@@ -1,11 +1,17 @@
 import { Colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, Text, View } from 'react-native';
+import { Modal, Alert, ActivityIndicator, FlatList, Linking, Pressable, RefreshControl, Text, View } from 'react-native';
 import type { investment, InvestmentPayout } from '@/types/investor.types';
 import { useInvestments } from '@/hooks/use-investment';
 import { HeaderShell, HeaderTitle } from '../header';
+import { InvestorPlan, INVESTOR_PLANS } from '@/constants/investor-plans';
+import { requestInvestorAccess, InvestorApiError } from '@/services/investor/investor.api';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSchedulePicker } from '@/hooks/property_details/useSchedulePicker';
+import { DateTimePickerModal } from '../property-details';
+import { createVisitDateTimeISO } from '@/utils/property-details.utils';
+import { Switch } from 'react-native';
 
 // ---------- Formatting helpers ----------
 // NOTE: principal_amount / monthly_payout_amount coming back from the API can be
@@ -401,6 +407,35 @@ function InvestmentCard({ investment }: { investment: investment }) {
 export function InvestorDashboard() {
   const { investments, loading, refreshing, error, hasMore, loadMore, refresh } = useInvestments();
   const stats = usePortfolioStats(investments);
+  const [planModalVisible, setPlanModalVisible] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmitNewInvestment = async (plan: InvestorPlan, is_lock_in: boolean, preferredSigningAt: string) => {
+    if (submitting) return;
+    try {
+      setSubmitting(true);
+      await requestInvestorAccess({
+        investment_plan_range: plan.code,
+        is_lock_in: false,
+        preferred_signing_at: preferredSigningAt
+      }); 
+      setPlanModalVisible(false);
+      Alert.alert(
+        'Request submitted',
+        `Your request for the ${plan.label} plan has been submitted for review.`,
+      );
+      refresh();
+    } catch (error) {
+      Alert.alert(
+        'Unable to submit request',
+        error instanceof InvestorApiError || error instanceof Error
+          ? error.message
+          : 'Please try again in a moment.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading && !investments?.length) {
     return (
@@ -436,6 +471,19 @@ export function InvestorDashboard() {
           </View>
         )}
         ListHeaderComponent={<PortfolioSummary stats={stats} />}
+        ListFooterComponent={
+          <View className="px-4 pb-6 pt-2">
+            <Pressable
+              onPress={() => setPlanModalVisible(true)}
+              className="flex-row items-center justify-center gap-2 rounded-2xl border border-accent py-3.5 active:opacity-75"
+            >
+              <Ionicons name="add-circle-outline" size={18} color={Colors.accent} />
+              <Text className="text-accent text-[13px] font-black">
+                Request New Investment
+              </Text>
+            </Pressable>
+          </View>
+        }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.accent} />
         }
@@ -449,6 +497,151 @@ export function InvestorDashboard() {
         onEndReached={hasMore ? loadMore : undefined}
         onEndReachedThreshold={0.4}
       />
+
+      <NewInvestmentPlanModal
+        visible={planModalVisible}
+        onClose={() => setPlanModalVisible(false)}
+        onSubmit={handleSubmitNewInvestment}
+        submitting={submitting}
+      />
     </SafeAreaView>
+  );
+}
+
+function NewInvestmentPlanModal({visible, onClose, onSubmit,submitting}: {
+  visible: boolean; onClose: () => void; 
+  onSubmit: (plan: InvestorPlan, lockIn: boolean, preferredSigningAt: string) => void; submitting: boolean; }) {
+  const [selectedId, setSelectedId] = useState(INVESTOR_PLANS[0].id);
+  const selectedPlan = INVESTOR_PLANS.find((p) => p.id === selectedId) ?? INVESTOR_PLANS[0];
+  const [lockIn, setLockIn] = useState(false);
+  const schedulePicker = useSchedulePicker();
+
+  const canSubmit =
+    schedulePicker.visitDateLabel.trim().length > 0 &&
+    schedulePicker.visitTimeLabel.trim().length > 0;
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    const preferredSigningAt = createVisitDateTimeISO(
+      schedulePicker.committedDate,
+      schedulePicker.committedTime,
+    );
+    onSubmit(selectedPlan, lockIn, preferredSigningAt);
+  };
+
+  return (
+    <>
+      <Modal visible={visible && !schedulePicker.activePicker} animationType="slide" transparent onRequestClose={onClose}>
+        <View className="flex-1 justify-end bg-black/40">
+          <View className="rounded-t-[24px] bg-background p-5 pb-8">
+            <View className="flex-row items-center justify-between mb-4">
+              <Text className="text-textPrimary text-lg font-black">Choose Investment Plan</Text>
+              <Pressable onPress={onClose} hitSlop={8}>
+                <Ionicons name="close" size={22} color={Colors.textSecondary} />
+              </Pressable>
+            </View>
+
+            <View className="gap-2.5 mb-5">
+              {INVESTOR_PLANS.map((plan) => {
+                const selected = plan.id === selectedId;
+                return (
+                  <Pressable
+                    key={plan.id}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    onPress={() => setSelectedId(plan.id)}
+                    className={`rounded-2xl border p-3 active:opacity-[0.78] ${
+                      selected ? 'bg-tag border-accent' : 'bg-surfaceMuted border-border'
+                    }`}
+                  >
+                    <View className="flex-row items-center justify-between gap-3">
+                      <View className="flex-1 min-w-0">
+                        <Text className="text-textPrimary font-black">{plan.label}</Text>
+                        <Text className="mt-0.5 text-textSecondary font-bold">{plan.range}</Text>
+                      </View>
+                      <Text className="text-accent font-black">{plan.annualRate}%</Text>
+                    </View>
+                  </Pressable>
+                );
+              })}
+              <View className="flex-row items-center justify-between gap-3">
+                <View className="flex-1 min-w-0">
+                  <Text className="text-textPrimary text-base font-black">3-year lock-in bonus</Text>
+                  <Text className="mt-1 text-textSecondary text-[14px] leading-[18px] font-semibold">
+                    Add 10% rate after 3 years
+                  </Text>
+                </View>
+                <Switch
+                  value={lockIn}
+                  onValueChange={setLockIn}
+                  trackColor={{ false: Colors.border, true: Colors.accentLight }}
+                  thumbColor={lockIn ? Colors.accent : Colors.white}
+                />
+              </View>
+            </View>
+
+            <Text className="text-textSecondary text-xs font-black mb-2">
+              Preferred contract signing
+            </Text>
+            <View className="flex-row gap-2.5 mb-5">
+              <View className="flex-1 gap-[7px]">
+                <Pressable
+                  onPress={schedulePicker.openDatePicker}
+                  className="min-h-[50px] flex-row items-center justify-between gap-2 px-3.5 py-3 rounded-2xl border border-border bg-surfaceMuted active:opacity-[0.78]"
+                >
+                  <Text
+                    className={`flex-1 text-[13px] font-extrabold ${
+                      schedulePicker.visitDateLabel ? 'text-textPrimary' : 'text-textMuted'
+                    }`}
+                    numberOfLines={1}
+                  >
+                    {schedulePicker.visitDateLabel || 'Select date'}
+                  </Text>
+                  <Ionicons name="calendar-outline" size={18} color={Colors.textMuted} />
+                </Pressable>
+              </View>
+              
+              <View className="flex-1 gap-[7px]">
+                <Pressable
+                  onPress={schedulePicker.openTimePicker}
+                  className="min-h-[50px] flex-row items-center justify-between gap-2 px-3.5 py-3 rounded-2xl border border-border bg-surfaceMuted active:opacity-[0.78]"
+                >
+                  <Text
+                    className={`flex-1 text-[13px] font-extrabold ${
+                      schedulePicker.visitTimeLabel ? 'text-textPrimary' : 'text-textMuted'
+                    }`}
+                    numberOfLines={1}
+                  >
+                    {schedulePicker.visitTimeLabel || 'Select time'}
+                  </Text>
+                  <Ionicons name="time-outline" size={18} color={Colors.textMuted} />
+                </Pressable>
+              
+              </View>
+            </View>
+
+            <Pressable
+              onPress={handleSubmit}
+              disabled={submitting || !canSubmit}
+              className={`rounded-2xl py-3.5 items-center ${submitting || !canSubmit ? 'bg-border' : 'bg-accent'}`}
+            >
+              <Text className="text-white text-[14px] font-black">
+                {submitting ? 'Submitting...' : `Request ${selectedPlan.label} Plan`}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      <DateTimePickerModal
+        visible={schedulePicker.activePicker}
+        draftDate={schedulePicker.draftDate}
+        draftTime={schedulePicker.draftTime}
+        onChangeDraftDate={schedulePicker.updateDraftDate}
+        onChangeDraftTime={schedulePicker.updateDraftTime}
+        onConfirm={schedulePicker.confirmPicker}
+        onCancel={schedulePicker.cancelPicker}
+      />
+    </>
   );
 }

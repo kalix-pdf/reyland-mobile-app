@@ -14,27 +14,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, Pressable, RefreshControl, Switch, Text, View } from 'react-native';
+import { INVESTOR_PLANS } from '@/constants/investor-plans';
 
 const INVESTOR_BENEFITS = [
   'Submit investor access and contract signing intent in one flow',
   'Choose your target investment range and lock-in preference',
   'Receive contract signing details and next steps through Gmail',
-];
-
-type InvestorPlan = {
-  id: string;
-  code: number;
-  range: string;
-  label: string;
-  annualRate: number;
-  minimum: number;
-};
-
-const INVESTOR_PLANS: InvestorPlan[] = [
-  { id: 'starter', code: 1, range: '₱100,000 to ₱499,000', label: 'Starter', annualRate: 15, minimum: 100000 },
-  { id: 'growth', code: 2, range: '₱500,000 to ₱999,000', label: 'Growth', annualRate: 17, minimum: 500000 },
-  { id: 'premier', code: 3, range: '₱1M to ₱1.999M', label: 'Premier', annualRate: 20, minimum: 1000000 },
-  { id: 'elite', code: 4, range: '₱2M to ₱5M', label: 'Elite', annualRate: 24, minimum: 2000000 },
 ];
 
 function formatPeso(value: number) {
@@ -85,13 +70,13 @@ export function SignUpInvestorForm() {
     return <InvestorDashboard />;
   }
 
-  const updateLocalUserType = async (nextUserType: number) => {
-    if (!user) return;
+  // const updateLocalUserType = async (nextUserType: number) => {
+  //   if (!user) return;
 
-    const nextUser = { ...user, role: nextUserType };
-    setUser(nextUser);
-    await setCachedUser(nextUser);
-  };
+  //   const nextUser = { ...user, role: nextUserType };
+  //   setUser(nextUser);
+  //   await setCachedUser(nextUser);
+  // };
 
   const handleSubmit = async () => {
     if (!canSubmit || loading) return;
@@ -106,7 +91,7 @@ export function SignUpInvestorForm() {
           schedulePicker.committedTime,
         ),
       });
-      await updateLocalUserType(nextUserType);
+      // await updateLocalUserType(nextUserType);
 
       Alert.alert(
         'Investor request submitted',
@@ -114,7 +99,7 @@ export function SignUpInvestorForm() {
       );
     } catch (error) {
       if (error instanceof InvestorApiError && error.userType !== undefined) {
-        await updateLocalUserType(error.userType);
+        // await updateLocalUserType(error.userType);
 
         Alert.alert(
           error.userType === 1 ? 'Investor approved' : 'Investor request submitted',
