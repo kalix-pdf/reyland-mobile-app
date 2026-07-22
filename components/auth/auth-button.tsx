@@ -19,21 +19,40 @@ export function AuthButton({
 
   return (
     <Pressable
-      className="rounded-full overflow-hidden bg-primary min-h-[52px] items-center justify-center"
+      className={`rounded-full overflow-hidden min-h-[52px] items-center justify-center ${
+        isDisabled ? 'bg-border' : 'bg-primary'
+      }`}
       style={({ pressed }) => [
-        pressed && !isDisabled && { opacity: 0.9, transform: [{ scale: 0.985 }] },
-        isDisabled && { opacity: 0.75 },
+        pressed && !isDisabled && {
+          opacity: 0.9,
+          transform: [{ scale: 0.985 }],
+        },
       ]}
       onPress={onPress}
       disabled={isDisabled}
     >
       {loading ? (
         <View className="flex-row items-center gap-2">
-          <ActivityIndicator color="white" size="small" />
-          <Text className="text-white text-[15px] font-black">{loadingTitle}</Text>
+          <ActivityIndicator
+            color={isDisabled ? '#9CA3AF' : 'white'}
+            size="small"
+          />
+          <Text
+            className={`text-[15px] font-black ${
+              isDisabled ? 'text-textMuted' : 'text-white'
+            }`}
+          >
+            {loadingTitle}
+          </Text>
         </View>
       ) : (
-        <Text className="text-white text-[15px] font-black">{title}</Text>
+        <Text
+          className={`text-[15px] font-black ${
+            isDisabled ? 'text-textMuted' : 'text-white'
+          }`}
+        >
+          {title}
+        </Text>
       )}
     </Pressable>
   );

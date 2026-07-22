@@ -2,6 +2,7 @@ import { AuthButton } from '@/components/auth/auth-button';
 import { AuthScreen } from '@/components/auth/auth-screen';
 import { InvestorDashboard } from '@/components/investor/investor-dashboard';
 import { DateTimePickerModal } from '@/components/property-details';
+import { INVESTOR_PLANS } from '@/constants/investor-plans';
 import { useAuth } from '@/context/auth-context';
 import { useAppTheme } from '@/context/theme-context';
 import { useSchedulePicker } from '@/hooks/property_details/useSchedulePicker';
@@ -14,7 +15,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, Pressable, RefreshControl, Switch, Text, View } from 'react-native';
-import { INVESTOR_PLANS } from '@/constants/investor-plans';
 
 const INVESTOR_BENEFITS = [
   'Submit investor access and contract signing intent in one flow',
@@ -39,7 +39,9 @@ export function SignUpInvestorForm() {
   const [lockIn, setLockIn] = useState(false);
 
   const userType = user?.role ?? 0;
+  const userStatus = user?.status ?? 0;
   const isApproved = userType === 1;
+  const isVerified = userStatus === 1;
   const isPending = userType === 2;
   const schedulePicker = useSchedulePicker();
   const selectedPlan = useMemo(
@@ -348,10 +350,10 @@ export function SignUpInvestorForm() {
           </Pressable>
 
           <AuthButton
-            title="SUBMIT INVESTOR REQUEST"
+            title={isVerified ? "SUBMIT INVESTOR REQUEST" : "ACCOUNT PENDING APPROVAL"}
             loadingTitle="Submitting..."
             loading={loading}
-            disabled={!canSubmit}
+            disabled={!canSubmit || !isVerified}
             onPress={handleSubmit}
           />
         </>
