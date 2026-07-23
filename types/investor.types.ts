@@ -21,6 +21,7 @@ export interface investment {
     payouts_made: number;
     contract_file_url: string;
     investment_payouts: InvestmentPayout[];
+    wallet_balance: number;
 }
 
 export interface InvestmentPayout {

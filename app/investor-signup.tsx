@@ -1,4 +1,4 @@
-import { SignUpInvestorForm } from '@/components/investor/sign-up-investor';
+import { SignUpInvestorForm } from '@/components/investor/sign-up/sign-up-investor';
 import { useAuth } from '@/context/auth-context';
 import { Redirect } from 'expo-router';
 
