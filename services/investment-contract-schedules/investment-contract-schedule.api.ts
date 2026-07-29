@@ -13,10 +13,11 @@ export type AddInvestmentContractSchedulePayload = {
 export type InvestmentContractSchedule = {
   id: string;
   investor_id: string;
-  investment_plan_range: number;
+  investment_plan_range: number | string;
   annual_rate: number;
   is_lock_in: boolean;
   preferred_signing_at: string;
+  confirmed_signing_at?: string | null;
   status: number;
   created_at: string;
   updated_at?: string | null;

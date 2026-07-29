@@ -134,6 +134,14 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
 
             <Row
               colors={colors}
+              icon={<Ionicons name="file-tray-full-outline" size={18} color={colors.accent} />}
+              label="Requests"
+              onPress={() => router.push('/requests')}
+              isLast
+            />
+
+            <Row
+              colors={colors}
               icon={<Feather name="users" size={17} color={colors.accent} />}
               label="Transactions"
               onPress={() => router.push('/transaction')}
