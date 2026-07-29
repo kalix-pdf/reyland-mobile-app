@@ -2,16 +2,18 @@
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { useDashboard } from '@/context/dashboard-context';
+import { useRequests } from '@/hooks/use-requests';
 import { sharedPressedScale } from '@/styles/shared-primitives';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, router } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBrand, HeaderSearchBar, HeaderShell } from '../header';
 import { ErrorScreen } from '../helper/error-project';
 import { DashboardSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, WithRefreshSkeleton } from '../helper/skeleton';
+import { HomeRequestsPreview } from '../requests/home-requests-preview';
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll, FeaturedPropertiesScroll } from './featured-project';
 
@@ -45,8 +47,15 @@ export function HomeDashboard() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
+  const wasDashboardRefreshingRef = useRef(false);
 
-  const { data, locations, loading, error, retry, refresh: handleRefresh, refreshing } = useDashboard();
+  const { data, locations, loading, error, retry, refresh: refreshDashboard, refreshing } = useDashboard();
+  const {
+    activeRequests,
+    loading: requestsLoading,
+    error: requestsError,
+    refresh: refreshRequests,
+  } = useRequests();
   const { projects, featuredProperties, promotionImages } = data;
   
   const player = useVideoPlayer(require('@/assets/vid/welcome-page-bg.mp4'), (p) => {
@@ -70,6 +79,26 @@ export function HomeDashboard() {
       params: { q: trimmedQuery },
     } as unknown as Href);
   }, []);
+
+  const handleRefresh = useCallback(() => {
+    refreshDashboard();
+  }, [refreshDashboard]);
+
+  useEffect(() => {
+    if (refreshing) {
+      wasDashboardRefreshingRef.current = true;
+      return;
+    }
+
+    if (!wasDashboardRefreshingRef.current) return;
+    wasDashboardRefreshingRef.current = false;
+
+    const requestRefreshTimer = setTimeout(() => {
+      void refreshRequests();
+    }, 250);
+
+    return () => clearTimeout(requestRefreshTimer);
+  }, [refreshing, refreshRequests]);
 
   // ── Guard Render ─────────────────────────────────────────────────────────────────
 
@@ -143,6 +172,14 @@ export function HomeDashboard() {
                 <FeaturedProjectsScroll user={user} projects={projects} />
               </WithRefreshSkeleton>
             </View>
+
+            {user ? (
+              <HomeRequestsPreview
+                activeRequests={activeRequests}
+                loading={requestsLoading}
+                error={requestsError}
+              />
+            ) : null}
 
             {/* ── Hero ────────────────────────────────────────────────────── */}
             <View className="mx-[18px] mt-[15px]">

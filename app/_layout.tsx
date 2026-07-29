@@ -48,6 +48,7 @@ function RootNavigator() {
           <Stack.Screen name="profile/change-phone" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="profile/change-password" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="affiliate/index" options={{ animation: 'simple_push' }} />
+          <Stack.Screen name="requests" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="transaction/index" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="transaction/[id]/payment-records" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="property/[id]" />
