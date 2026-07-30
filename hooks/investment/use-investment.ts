@@ -9,15 +9,14 @@ export function useInvestments() {
     []
   );
 
-  const { data: investments, ...rest } = usePaginatedFetcher<investment>(
+  const { data: investments, meta, ...rest } = usePaginatedFetcher<investment>(
     fetcherFn,
-    {
-      errorMessage: 'Failed to load investments.',
-    }
+    { errorMessage: 'Failed to load investments.' }
   );
 
   return {
     investments,
+    walletBalance: meta?.walletBalance ?? 0,
     ...rest,
   };
 }

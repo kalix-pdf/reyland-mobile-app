@@ -26,7 +26,7 @@ export function PayoutRow({ payout }: { payout: InvestmentPayout }) {
       </View>
       <View className="items-end">
         <Text className="text-textPrimary text-[12px] font-black">
-          {formatCompactCurrency(payout.paid_amount ?? payout.expected_amount)}
+          ₱{payout.paid_amount ?? payout.expected_amount}
         </Text>
         <StatusBadge status={effectiveStatus} small />
       </View>

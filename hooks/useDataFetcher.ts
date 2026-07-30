@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-
+import { PaginatedResult } from '@/services/fetchData/api-client';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface FetcherState<T> {
@@ -15,11 +15,12 @@ export interface FetcherActions {
   retry: () => void;
 }
 
-export interface PaginatedResult<T> {
-  data: T[];
-  nextCursor: string | null;
-  hasMore: boolean;
-}
+// export interface PaginatedResult<T, M = unknown> {
+//   data: T[];
+//   nextCursor: string | null;
+//   hasMore: boolean;
+//   meta?: M;
+// }
 
 export interface UseDataFetcherOptions {
   /** Milliseconds before the request is considered timed out. Default: 5000 */
@@ -124,6 +125,7 @@ export function useDataFetcher<T>(
 export interface PaginatedFetcherState<T> extends FetcherState<T[]> {
   hasMore: boolean;
   loadMore: () => void;
+  meta: PaginatedResult<T>['meta'];
 }
 
 /**
@@ -136,20 +138,20 @@ export interface PaginatedFetcherState<T> extends FetcherState<T[]> {
  *     errorMessage: 'Failed to load properties. Pull down to retry.',
  *   });
  */
-export function usePaginatedFetcher<T>(
-  /**
-   * A function that accepts an optional cursor and returns a paginated result.
-   * Pass the raw API method — the hook manages cursor state internally.
-   */
-  fetcherFn: (cursor?: string) => Promise<PaginatedResult<T>>,
-  options: UsePaginatedFetcherOptions = {},
-): PaginatedFetcherState<T> & FetcherActions {
+
+/**
+ * A function that accepts an optional cursor and returns a paginated result.
+ * Pass the raw API method — the hook manages cursor state internally.
+ */
+export function usePaginatedFetcher<T>(fetcherFn: (cursor?: string) => Promise<PaginatedResult<T>>,
+  options: UsePaginatedFetcherOptions = {}): PaginatedFetcherState<T> & FetcherActions {
   const {
     timeoutMs = 5000,
     errorMessage = 'Failed to load data. Pull down to retry.',
     fetchOnMount = true,
   } = options;
 
+  const [meta, setMeta] = useState<PaginatedResult<T>['meta']>(undefined);
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -185,13 +187,14 @@ export function usePaginatedFetcher<T>(
       }, timeoutMs);
 
       try {
-        const { data: freshData, nextCursor: cursor, hasMore: more } = await fetcherFn();
+        const { data: freshData, nextCursor: cursor, hasMore: more, meta: freshMeta } = await fetcherFn();
 
         if (fetchIdRef.current !== currentFetchId) return;
 
         setData(Array.isArray(freshData) ? freshData : []);
         setNextCursor(cursor);
         setHasMore(more);
+        setMeta(freshMeta);
       } catch {
         if (fetchIdRef.current !== currentFetchId) return;
         setError(errorMessage);
@@ -230,5 +233,5 @@ export function usePaginatedFetcher<T>(
   const refresh = useCallback(() => fetchData(true), [fetchData]);
   const retry = useCallback(() => fetchData(false), [fetchData]);
 
-  return { data, loading, refreshing, loadingMore, error, hasMore, loadMore, refresh, retry };
+  return { data, loading, refreshing, loadingMore, error, hasMore, loadMore, meta, refresh, retry };
 }

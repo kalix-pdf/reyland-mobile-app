@@ -11,6 +11,12 @@ import { StatusBadge } from './status-badge';
 export function InvestmentCard({ investment }: { investment: investment }) {
   const [expanded, setExpanded] = useState(false);
 
+  const totalPayoutsReceived = (investment.investment_payouts ?? []).reduce((sum, payout) =>
+    sum + (payout.status === 'paid' ? Number(payout.paid_amount ?? 0) : 0), 0);
+
+  const totalROI = investment.locked_investment ? totalPayoutsReceived + Number(investment.bonus_paid ?? 0)
+    : totalPayoutsReceived;
+
   const progress =
     investment.term_months > 0 ? Math.min(investment.payouts_made / investment.term_months, 1) : 0;
   const remaining = Math.max(investment.term_months - investment.payouts_made, 0);
@@ -43,7 +49,7 @@ export function InvestmentCard({ investment }: { investment: investment }) {
                   Monthly Payout
                 </Text>
                 <Text className="text-textPrimary text-[13px] font-black">
-                  {formatCompactCurrency(investment.monthly_payout_amount)}
+                  ₱{investment.monthly_payout_amount}
                 </Text>
               </View>
               <View>
@@ -87,10 +93,14 @@ export function InvestmentCard({ investment }: { investment: investment }) {
             />
             <DetailRow label="Investment Plan Range" value={String(investment.investment_plan_range)} />
             <DetailRow label="Locked" value={investment.locked_investment ? 'Yes' : 'No'} />
+            {investment.locked_investment && (
+              <DetailRow label="+10.0% Bonus after" value={investment.term_months + "months"} />
+            )}
             <DetailRow label="Maturity Action" value={investment.maturity_action ?? '—'} />
             <DetailRow label="Invested On" value={formatDate(investment.invested_at)} />
             <DetailRow label="Matures On" value={formatDate(investment.matures_at)} />
             <DetailRow label="Matured On" value={formatDate(investment.matured_at)} />
+            <DetailRow label="Total ROI" value={formatCompactCurrency(totalROI)} />
           </View>
 
           {investment.contract_file_url ? (

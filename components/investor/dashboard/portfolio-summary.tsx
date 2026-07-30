@@ -4,22 +4,34 @@ import { daysUntil, formatDate } from '@/utils/investor.utils';
 import { Text, View } from 'react-native';
 import { StatCard } from './stat-card';
 
-export function PortfolioSummary({ stats }: { stats: PortfolioStats }) {
+export function PortfolioSummary({ stats, walletBalance }: { stats: PortfolioStats, walletBalance: number }) {
   const nextPayoutDays = stats.nextPayout ? daysUntil(stats.nextPayout.date) : null;
+  const totalROI = stats.totalMaturedValue + walletBalance;
 
   return (
     <View className="px-4 pt-2 pb-4">
       <View className="rounded-[20px] bg-textPrimary p-5 mb-3">
-        <Text className="text-white/60 text-[11px] font-bold uppercase tracking-wide">
-          Total Portfolio Value
+        <Text className="text-white/70 text-[11px] font-bold uppercase tracking-wide">
+          Total Active Portfolio Value
         </Text>
         <Text className="mt-1 text-white text-3xl font-black">
           ₱{stats.totalPrincipal.toLocaleString()}
         </Text>
+        {stats.maturedCount > 0 && (
+          <View>
+            <Text className="text-white text-base font-semibold mt-1">
+              + ₱{totalROI.toLocaleString()} matured ({stats.maturedCount} plan
+              {stats.maturedCount > 1 ? 's' : ''})
+            </Text>
+            <Text className="text-white text-base font-semibold mt-1">
+                Total ROI: ₱{walletBalance.toLocaleString()}
+            </Text>
+          </View>
+        )}
 
         <View className="flex-row items-center justify-between mt-4 pt-4 border-t border-white/10">
           <View>
-            <Text className="text-white/60 font-bold uppercase tracking-wide">Monthly Income</Text>
+            <Text className="text-white/70 font-bold uppercase tracking-wide">Active Monthly Income</Text>
             <Text className="mt-0.5 text-white text-base font-black">
               ₱{stats.totalMonthlyPayout.toLocaleString()}
             </Text>

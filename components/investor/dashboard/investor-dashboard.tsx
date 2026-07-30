@@ -13,7 +13,7 @@ import { NewInvestmentPlanModal } from './new-investment-plan-modal';
 import { PortfolioSummary } from './portfolio-summary';
 
 export function InvestorDashboard() {
-  const { investments, loading, refreshing, error, hasMore, loadMore, refresh } = useInvestments();
+  const { investments, walletBalance, loading, refreshing, error, hasMore, loadMore, refresh } = useInvestments();
   const stats = usePortfolioStats(investments);
 
   const [planModalVisible, setPlanModalVisible] = useState(false);
@@ -57,6 +57,7 @@ export function InvestorDashboard() {
 
       <DashboardContent
         investments={investments}
+        walletBalance={walletBalance}
         loading={loading}
         error={error}
         stats={stats}
@@ -79,6 +80,7 @@ export function InvestorDashboard() {
 
 type DashboardContentProps = {
   investments: ReturnType<typeof useInvestments>['investments'];
+  walletBalance: number;
   loading: boolean;
   error: unknown;
   stats: ReturnType<typeof usePortfolioStats>;
@@ -89,17 +91,8 @@ type DashboardContentProps = {
   onRequestNewInvestment: () => void;
 };
 
-function DashboardContent({
-  investments,
-  loading,
-  error,
-  stats,
-  refreshing,
-  hasMore,
-  loadMore,
-  refresh,
-  onRequestNewInvestment,
-}: DashboardContentProps) {
+function DashboardContent({ investments, walletBalance, loading, error, stats, refreshing,
+  hasMore, loadMore, refresh, onRequestNewInvestment }: DashboardContentProps) {
   if (loading && !investments?.length) {
     return (
       <View className="py-10 items-center">
@@ -128,7 +121,7 @@ function DashboardContent({
           <InvestmentCard investment={item} />
         </View>
       )}
-      ListHeaderComponent={<PortfolioSummary stats={stats} />}
+      ListHeaderComponent={<PortfolioSummary stats={stats} walletBalance={walletBalance} />}
       ListFooterComponent={
         <View className="px-4 pb-6 pt-2">
           <Pressable
