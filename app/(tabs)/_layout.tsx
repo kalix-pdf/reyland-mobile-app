@@ -19,7 +19,7 @@ const TAB_SCREENS = [
   },
   {
     name: 'investor',
-    title: 'Investor',
+    title: 'Affiliate',
     icon: 'pulse-outline',
     activeIcon: 'pulse',
   },

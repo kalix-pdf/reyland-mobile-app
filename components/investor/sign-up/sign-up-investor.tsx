@@ -4,7 +4,7 @@ import { DateTimePickerModal } from '@/components/property-details';
 import { useAppTheme } from '@/context/theme-context';
 import { useInvestorSignupForm } from '@/hooks/investment/use-investor-signup-form';
 import React from 'react';
-import { RefreshControl, Text } from 'react-native';
+import { RefreshControl, Text, View } from 'react-native';
 import { InvestorBenefitsList } from './investor-benefits-list';
 import { InvestorInfoNotice } from './investor-info-notice';
 import { InvestorLockInToggle } from './investor-lock-in-toggle';
@@ -23,19 +23,19 @@ export function SignUpInvestorForm() {
   return (
     <>
       <AuthScreen
-        heroTitle="Reyland Investor"
+        heroTitle="Reyland Affiliate"
         scrollEnabled
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />
         }
       >
         <Text className="text-2xl leading-[30px] font-black text-textPrimary mb-2">
-          Become a Reyland Investor
+          Become a Reyland Affiliate
         </Text>
         <Text className="leading-[21px] text-textSecondary mb-[22px]">
           {isPendingApproval
-            ? 'Your investor registration has been submitted. Reyland PH will review your request and approve your access from the admin portal.'
-            : 'Sign up for investor access to review opportunities, monitor your portfolio, and receive guided support from Reyland PH.'}
+            ? 'Your Affiliate registration has been submitted. Reyland PH will review your request and approve your access from the admin portal.'
+            : 'Sign up for Affiliate access to review opportunities, monitor your portfolio, and receive guided support from Reyland PH.'}
         </Text>
 
         {isPendingApproval ? (
@@ -72,6 +72,7 @@ export function SignUpInvestorForm() {
               disabled={!canSubmit}
               onPress={handleSubmit}
             />
+            <View className="h-10" />
           </>
         )}
       </AuthScreen>

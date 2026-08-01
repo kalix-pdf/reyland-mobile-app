@@ -209,11 +209,16 @@ export function usePaginatedFetcher<T>(fetcherFn: (cursor?: string) => Promise<P
   );
 
   const loadMore = useCallback(async () => {
-    if (!hasMore || loadingMore || !nextCursor || loading) return;
+    if (!hasMore || loadingMore || !nextCursor || loading || refreshing) return;
+
+    const currentFetchId = fetchIdRef.current; // snapshot the id in effect at call time
 
     try {
       setLoadingMore(true);
       const { data: moreData, nextCursor: cursor, hasMore: more } = await fetcherFn(nextCursor);
+
+      // Bail if a refresh/retry started (and thus bumped fetchIdRef) while this was in flight
+      if (fetchIdRef.current !== currentFetchId) return;
 
       setData((prev) => [...prev, ...(Array.isArray(moreData) ? moreData : [])]);
       setNextCursor(cursor);
@@ -221,9 +226,11 @@ export function usePaginatedFetcher<T>(fetcherFn: (cursor?: string) => Promise<P
     } catch {
       // Silent fail — user can scroll back to retry
     } finally {
-      setLoadingMore(false);
+      if (fetchIdRef.current === currentFetchId) {
+        setLoadingMore(false);
+      }
     }
-  }, [hasMore, loadingMore, nextCursor, loading, fetcherFn]);
+  }, [hasMore, loadingMore, nextCursor, loading, refreshing, fetcherFn]);
 
   useEffect(() => {
     if (fetchOnMount) fetchData();

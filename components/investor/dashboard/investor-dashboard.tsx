@@ -52,7 +52,7 @@ export function InvestorDashboard() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
       <HeaderShell transparent>
-        <HeaderTitle title="Investor Dashboard" />
+        <HeaderTitle title="Affiliate Dashboard" />
       </HeaderShell>
 
       <DashboardContent

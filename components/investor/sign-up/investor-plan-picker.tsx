@@ -18,7 +18,7 @@ export function InvestorPlanPicker({ selectedPlanId, onSelectPlan }: InvestorPla
           <Ionicons name="briefcase-outline" size={18} color={colors.accent} />
         </View>
         <View className="flex-1 min-w-0">
-          <Text className="text-textPrimary text-base font-black">Investment intent</Text>
+          <Text className="text-textPrimary text-base font-black">Affiliate intent</Text>
           <Text className="mt-0.5 text-textSecondary text-sm font-bold">
             Choose the range to prepare for contract signing.
           </Text>

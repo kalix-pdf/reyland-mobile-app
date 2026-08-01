@@ -14,6 +14,8 @@ export function useInvestments() {
     { errorMessage: 'Failed to load investments.' }
   );
 
+  // console.log('useInvestments - investments:', investments);
+
   return {
     investments,
     walletBalance: meta?.walletBalance ?? 0,

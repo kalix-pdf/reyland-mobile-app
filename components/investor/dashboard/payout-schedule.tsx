@@ -19,8 +19,8 @@ export function PayoutSchedule({ payouts }: { payouts: InvestmentPayout[] }) {
 
   return (
     <View className="mt-1">
-      {sorted.map((payout) => (
-        <PayoutRow key={payout.id} payout={payout} />
+      {sorted.map((payout, idx) => (
+        <PayoutRow key={idx} payout={payout} />
       ))}
     </View>
   );

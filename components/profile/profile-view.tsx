@@ -124,13 +124,13 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
               onPress={() => router.push('/profile/personal-information')}
             />
 
-            <Row
+            {/* <Row
               colors={colors}
               icon={<Feather name="users" size={17} color={colors.accent} />}
               label="Affiliate Program"
               onPress={() => router.push('/affiliate' as Href)}
               isLast
-            />
+            /> */}
 
             <Row
               colors={colors}
@@ -145,6 +145,14 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
               icon={<Feather name="users" size={17} color={colors.accent} />}
               label="Transactions"
               onPress={() => router.push('/transaction')}
+              isLast
+            />
+
+            <Row
+              colors={colors}
+              icon={<Feather name="users" size={17} color={colors.accent} />}
+              label="Payment Method"
+              onPress={() => router.push('/payment-method')}
               isLast
             />
 

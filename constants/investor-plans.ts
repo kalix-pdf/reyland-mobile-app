@@ -13,3 +13,11 @@ export const INVESTOR_PLANS: InvestorPlan[] = [
   { id: 'premier', code: 3, range: '₱1M to ₱1.999M', label: 'Premier', annualRate: 20, minimum: 1000000 },
   { id: 'elite', code: 4, range: '₱2M to ₱5M', label: 'Elite', annualRate: 24, minimum: 2000000 },
 ];
+
+export function getInvestorPlanByCode(code: number): InvestorPlan | undefined {
+  return INVESTOR_PLANS.find((plan) => plan.code === code);
+}
+
+export function getInvestorPlanLabel(code: number): string {
+  return getInvestorPlanByCode(code)?.label ?? `Plan ${code}`;
+}

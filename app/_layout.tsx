@@ -38,16 +38,18 @@ function RootNavigator() {
           <Stack.Screen name="(auth)/sign-up" />
           <Stack.Screen name="(auth)/forgot-password" />
           <Stack.Screen name="(auth)/reset-password" />
+          <Stack.Screen name="payment-method/index" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="about-reyland" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="privacy-policy" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="terms-and-conditions" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="investor-signup" />
+          {/* <Stack.Screen name="investor-signup" /> */}
+          <Stack.Screen name="investor/investor-sign-up" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="profile/personal-information" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="profile/change-full-name" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="profile/change-email" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="profile/change-phone" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="profile/change-password" options={{ animation: 'simple_push' }} />
-          <Stack.Screen name="affiliate/index" options={{ animation: 'simple_push' }} />
+          {/* <Stack.Screen name="affiliate/index" options={{ animation: 'simple_push' }} /> */}
           <Stack.Screen name="requests" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="transaction/index" options={{ animation: 'simple_push' }} />
           <Stack.Screen name="transaction/[id]/payment-records" options={{ animation: 'simple_push' }} />

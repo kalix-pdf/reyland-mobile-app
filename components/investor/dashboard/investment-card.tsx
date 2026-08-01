@@ -7,6 +7,7 @@ import { Linking, Pressable, Text, View } from 'react-native';
 import { DetailRow } from './detail-row';
 import { PayoutSchedule } from './payout-schedule';
 import { StatusBadge } from './status-badge';
+import { getInvestorPlanLabel } from '@/constants/investor-plans';
 
 export function InvestmentCard({ investment }: { investment: investment }) {
   const [expanded, setExpanded] = useState(false);
@@ -91,7 +92,7 @@ export function InvestmentCard({ investment }: { investment: investment }) {
               label="Annual ROI Rate"
               value={`${(investment.annual_roi_base_rates * 100).toFixed(2)}%`}
             />
-            <DetailRow label="Investment Plan Range" value={String(investment.investment_plan_range)} />
+            <DetailRow label="Affiliate Plan Range" value={getInvestorPlanLabel(investment.investment_plan_range)} />
             <DetailRow label="Locked" value={investment.locked_investment ? 'Yes' : 'No'} />
             {investment.locked_investment && (
               <DetailRow label="+10.0% Bonus after" value={investment.term_months + "months"} />
