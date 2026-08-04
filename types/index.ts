@@ -4,3 +4,4 @@ export * from './project.types';
 export * from './promotion.types';
 export * from './transaction.types';
 export * from './property-details.types';
+export * from './payment.types';

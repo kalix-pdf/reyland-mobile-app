@@ -52,7 +52,7 @@ export function WelcomeInvestorPage({ onGetStarted }: WelcomePageProps) {
                         </View>
 
                         <Text className="text-heroText text-3xl font-bold text-center leading-tight">
-                        Invest in Your{'\n'}Future Today
+                        Secure Your{'\n'}Future Today
                         </Text>
                         <Text className="text-heroText text-lg font-semibold text-center mt-2 px-2">
                         Become a Reyland Affiliate and unlock exclusive affiliate opportunities.
