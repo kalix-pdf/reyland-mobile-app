@@ -1,7 +1,7 @@
 import { useAppTheme } from '@/context/theme-context';
 import { ViewProfileProps } from '@/types/user.types';
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { Href, router } from 'expo-router';
+import { router } from 'expo-router';
 import React, { ReactNode } from 'react';
 import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -128,7 +128,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
               colors={colors}
               icon={<Feather name="users" size={17} color={colors.accent} />}
               label="Affiliate Program"
-              onPress={() => router.push('/affiliate' as Href)}
+              onPress={() => router.push('/affiliate')}
               isLast
             /> */}
 

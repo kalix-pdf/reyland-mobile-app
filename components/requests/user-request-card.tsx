@@ -10,6 +10,7 @@ type Props = {
 
 const REQUEST_META: Record<RequestKind, { label: string; icon: keyof typeof Ionicons.glyphMap }> = {
   investment: { label: 'Investment', icon: 'trending-up-outline' },
+  withdrawal: { label: 'Withdrawal', icon: 'cash-outline' },
   site_visit: { label: 'Site Visit', icon: 'calendar-outline' },
   inquiry: { label: 'Inquiry', icon: 'chatbubble-ellipses-outline' },
 };

@@ -8,9 +8,17 @@ import { DetailRow } from './detail-row';
 import { PayoutSchedule } from './payout-schedule';
 import { StatusBadge } from './status-badge';
 import { getInvestorPlanLabel } from '@/constants/investor-plans';
+import { RequestWithdrawalModal, type WithdrawalRequestFormPayload } from './request-withdrawal-modal';
 
-export function InvestmentCard({ investment }: { investment: investment }) {
+type InvestmentCardProps = {
+  investment: investment;
+  onRequestWithdrawal: (investment: investment, payload: WithdrawalRequestFormPayload) => void;
+  withdrawalSubmitting?: boolean;
+};
+
+export function InvestmentCard({ investment, onRequestWithdrawal, withdrawalSubmitting = false }: InvestmentCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [withdrawalModalVisible, setWithdrawalModalVisible] = useState(false);
 
   const totalPayoutsReceived = (investment.investment_payouts ?? []).reduce((sum, payout) =>
     sum + (payout.status === 'paid' ? Number(payout.paid_amount ?? 0) : 0), 0);
@@ -120,6 +128,27 @@ export function InvestmentCard({ investment }: { investment: investment }) {
           <PayoutSchedule payouts={investment.investment_payouts ?? []} />
         </View>
       )}
+
+      {isActive ? (
+        <Pressable
+          onPress={() => setWithdrawalModalVisible(true)}
+          className="mt-3 flex-row items-center justify-center rounded-[14px] bg-accent py-3 active:opacity-80"
+        >
+          <Ionicons name="cash-outline" size={17} color={Colors.textOnDark} />
+          <Text className="ml-2 text-[13px] font-black text-textOnDark">Request Withdrawal</Text>
+        </Pressable>
+      ) : null}
+
+      <RequestWithdrawalModal
+        visible={withdrawalModalVisible}
+        investment={investment}
+        submitting={withdrawalSubmitting}
+        onClose={() => setWithdrawalModalVisible(false)}
+        onSubmit={(payload) => {
+          onRequestWithdrawal(investment, payload);
+          setWithdrawalModalVisible(false);
+        }}
+      />
     </View>
   );
 }
