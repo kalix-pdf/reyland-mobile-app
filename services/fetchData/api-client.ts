@@ -51,6 +51,18 @@ export class ApiError extends Error { constructor(
     }
 }
 
+// ─── Shared error normalizer ──────────────────────────────────────────────────
+
+function normalizeError<T>(err: unknown, endpoint: string): ApiError {
+  if (err instanceof ApiError) return err;
+  const axiosErr = err as AxiosError<ApiResponse<T>>;
+  return new ApiError(
+    axiosErr.response?.data?.message ?? axiosErr.message,
+    axiosErr.response?.status,
+    endpoint,
+  );
+}
+
 // ─── Core Fetcher ─────────────────────────────────────────────────────────────
 
 /**
@@ -73,13 +85,82 @@ export async function fetchOne<T>( endpoint: string, options?: AxiosRequestConfi
 
     return response.data.data;
   } catch (err) {
-    if (err instanceof ApiError) throw err;
-    const axiosErr = err as AxiosError<ApiResponse<T>>;
-    throw new ApiError(
-      axiosErr.response?.data?.message ?? axiosErr.message,
-      axiosErr.response?.status,
-      endpoint,
-    );
+    throw normalizeError<T>(err, endpoint);
+  }
+}
+
+// ─── Write Helpers (POST / PUT / DELETE) ──────────────────────────────────────
+
+/**
+ * Generic POST wrapper for creating a resource. Throws `ApiError` on failure.
+ *
+ * @example
+ * const created = await postOne<PaymentMethod>('/payment-method', payload);
+ */
+export async function postOne<T>( endpoint: string, body?: unknown, options?: AxiosRequestConfig ): Promise<T> {
+  try {
+    const response = await apiClient.post<ApiResponse<T>>(endpoint, body, options);
+
+    if (!response.data.success) {
+      throw new ApiError(
+        response.data.message ?? `Request failed: ${endpoint}`,
+        response.status,
+        endpoint,
+      );
+    }
+
+    return response.data.data;
+  } catch (err) {
+    throw normalizeError<T>(err, endpoint);
+  }
+}
+
+/**
+ * Generic PUT wrapper for updating a resource. Throws `ApiError` on failure.
+ *
+ * @example
+ * const updated = await putOne<PaymentMethod>('/payment-method/123', payload);
+ */
+export async function putOne<T>( endpoint: string, body?: unknown, options?: AxiosRequestConfig ): Promise<T> {
+  try {
+    const response = await apiClient.put<ApiResponse<T>>(endpoint, body, options);
+
+    if (!response.data.success) {
+      throw new ApiError(
+        response.data.message ?? `Request failed: ${endpoint}`,
+        response.status,
+        endpoint,
+      );
+    }
+
+    return response.data.data;
+  } catch (err) {
+    throw normalizeError<T>(err, endpoint);
+  }
+}
+
+/**
+ * Generic DELETE wrapper for removing a resource. Throws `ApiError` on failure.
+ * Use `T = void` when the endpoint returns no meaningful payload.
+ *
+ * @example
+ * await deleteOne('/payment-method/123');
+ */
+export async function deleteOne<T = void>( endpoint: string, options?: AxiosRequestConfig ): Promise<T> {
+  try {
+    const response = await apiClient.delete<ApiResponse<T>>(endpoint, options);
+
+    if (!response.data.success) {
+      throw new ApiError(
+        response.data.message ?? `Request failed: ${endpoint}`,
+        response.status,
+        endpoint,
+      );
+    }
+
+    return response.data.data;
+  } catch (err) {
+    throw normalizeError<T>(err, endpoint);
   }
 }
 
@@ -135,13 +216,7 @@ export async function fetchPaginated<T>(endpoint: string,
       meta: { walletBalance: response.data.wallet_balance },
     };
   } catch (err) {
-    if (err instanceof ApiError) throw err;
-    const axiosErr = err as AxiosError<PaginatedApiResponse<T>>;
-    throw new ApiError(
-      axiosErr.response?.data?.message ?? axiosErr.message,
-      axiosErr.response?.status,
-      endpoint,
-    );
+    throw normalizeError<T>(err, endpoint);
   }
 }
 
