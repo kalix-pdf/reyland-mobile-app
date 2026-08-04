@@ -1,11 +1,14 @@
 import { Colors } from '@/constants/colors';
+import { usePaymentMethods } from '@/hooks/payment-method/usePaymentMethods';
+import { WITHDRAWAL_TYPE, WithdrawalType } from '@/services/withdrawal-requests/withdrawal-request.api';
 import type { investment } from '@/types/investor.types';
+import type { PaymentMethod } from '@/types/payment.types';
 import { formatCurrency } from '@/utils/investor.utils';
 import { Ionicons } from '@expo/vector-icons';
-import { useMemo, useState } from 'react';
+import { router } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { WITHDRAWAL_TYPE, WithdrawalType } from '@/services/withdrawal-requests/withdrawal-request.api';
 
 type RequestWithdrawalModalProps = {
   visible: boolean;
@@ -18,10 +21,7 @@ type RequestWithdrawalModalProps = {
 export type WithdrawalRequestFormPayload = {
   withdrawalType: WithdrawalType;
   requestedAmount?: number;
-  payoutMethod: string;
-  accountName: string;
-  accountNumber: string;
-  bankName: string;
+  paymentMethodId: string;
   notes: string;
 };
 
@@ -59,6 +59,15 @@ function parseAmount(value: string) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function maskAccountNumber(value: string) {
+  return `•••• ${value.slice(-4)}`;
+}
+
+function getMethodLabel(method: PaymentMethod) {
+  const provider = method.provider_name ?? 'Payout Method';
+  return `${provider} - ${maskAccountNumber(method.account_number)}`;
+}
+
 function isEarnedPayout(payout: investment['investment_payouts'][number]) {
   if (payout.status === 'paid' || payout.status === 'failed') return false;
   const dueDate = new Date(payout.due_date);
@@ -80,13 +89,15 @@ export function RequestWithdrawalModal({
 }: RequestWithdrawalModalProps) {
   const [withdrawalType, setWithdrawalType] = useState<WithdrawalType>(WITHDRAWAL_TYPE.ROI_ONLY);
   const [amount, setAmount] = useState('');
-  const [payoutMethod, setPayoutMethod] = useState('Bank Transfer');
-  const [accountName, setAccountName] = useState('');
-  const [accountNumber, setAccountNumber] = useState('');
-  const [bankName, setBankName] = useState('');
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+  const { methods, loading: methodsLoading, error: methodsError, refresh: refreshMethods } = usePaymentMethods();
 
   const availableRoi = useMemo(() => calculateVisibleAvailableRoi(investment), [investment]);
+  const selectedPaymentMethod = useMemo(
+    () => methods.find((method) => method.id === selectedPaymentMethodId) ?? null,
+    [methods, selectedPaymentMethodId],
+  );
   const amountValue = parseAmount(amount);
   const isRoiWithdrawal = withdrawalType === WITHDRAWAL_TYPE.ROI_ONLY;
   const estimatedPayout = isRoiWithdrawal
@@ -100,23 +111,25 @@ export function RequestWithdrawalModal({
         ? 'Enter an amount greater than zero.'
         : null;
 
+  useEffect(() => {
+    if (!visible || selectedPaymentMethodId || methods.length === 0) return;
+
+    const defaultMethod = methods.find((method) => method.is_default) ?? methods[0];
+    setSelectedPaymentMethodId(defaultMethod.id);
+  }, [methods, selectedPaymentMethodId, visible]);
+
   const canSubmit =
-    accountName.trim().length > 0 &&
-    accountNumber.trim().length > 0 &&
-    payoutMethod.trim().length > 0 &&
+    Boolean(selectedPaymentMethodId) &&
     (!isRoiWithdrawal || (amountValue > 0 && amountValue <= availableRoi)) &&
     estimatedPayout > 0;
 
   const submit = () => {
-    if (!canSubmit || submitting) return;
+    if (!canSubmit || submitting || !selectedPaymentMethodId) return;
 
     onSubmit({
       withdrawalType,
       requestedAmount: isRoiWithdrawal ? amountValue : undefined,
-      payoutMethod,
-      accountName,
-      accountNumber,
-      bankName,
+      paymentMethodId: selectedPaymentMethodId,
       notes,
     });
   };
@@ -209,10 +222,85 @@ export function RequestWithdrawalModal({
               </View>
             )}
 
-            <Field label="Payout method" value={payoutMethod} onChangeText={setPayoutMethod} placeholder="Bank Transfer / GCash / Maya" />
-            <Field label="Account name" value={accountName} onChangeText={setAccountName} placeholder="Juan Dela Cruz" />
-            <Field label="Account number" value={accountNumber} onChangeText={setAccountNumber} placeholder="Account or wallet number" />
-            <Field label="Bank / wallet provider" value={bankName} onChangeText={setBankName} placeholder="BDO / GCash / Maya" />
+            <View className="gap-2">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-[12px] font-black uppercase text-textSecondary">Preferred payout method</Text>
+                <Pressable
+                  onPress={() => {
+                    onClose();
+                    router.push('/payment-method');
+                  }}
+                >
+                  <Text className="text-[12px] font-black text-accent">Manage</Text>
+                </Pressable>
+              </View>
+
+              {methodsLoading ? (
+                <View className="rounded-[16px] border border-border bg-surface p-4">
+                  <View className="flex-row items-center gap-2">
+                    <ActivityIndicator size="small" color={Colors.accent} />
+                    <Text className="text-[13px] font-semibold text-textSecondary">Loading saved methods...</Text>
+                  </View>
+                </View>
+              ) : methodsError ? (
+                <Pressable onPress={refreshMethods} className="rounded-[16px] border border-errorBorder bg-errorBackground p-4">
+                  <Text className="text-[13px] font-black text-error">Unable to load payout methods</Text>
+                  <Text className="mt-1 text-[12px] font-semibold text-error">Tap to retry.</Text>
+                </Pressable>
+              ) : methods.length === 0 ? (
+                <Pressable
+                  onPress={() => {
+                    onClose();
+                    router.push('/payment-method');
+                  }}
+                  className="rounded-[16px] border border-dashed border-border bg-surface p-4"
+                >
+                  <Text className="text-[14px] font-black text-textPrimary">Add a payout method</Text>
+                  <Text className="mt-1 text-[12px] leading-4 font-semibold text-textSecondary">
+                    Add your preferred bank or e-wallet first. Our team may still confirm details by email before processing.
+                  </Text>
+                </Pressable>
+              ) : (
+                <View className="gap-2">
+                  {methods.map((method) => {
+                    const selected = selectedPaymentMethodId === method.id;
+
+                    return (
+                      <Pressable
+                        key={method.id}
+                        onPress={() => setSelectedPaymentMethodId(method.id)}
+                        className={`rounded-[16px] border p-3 ${
+                          selected ? 'border-accent bg-tag' : 'border-border bg-surface'
+                        }`}
+                      >
+                        <View className="flex-row items-center justify-between gap-3">
+                          <View className="flex-1 min-w-0">
+                            <Text className="text-[14px] font-black text-textPrimary" numberOfLines={1}>
+                              {getMethodLabel(method)}
+                            </Text>
+                            <Text className="mt-1 text-[12px] font-semibold text-textSecondary" numberOfLines={1}>
+                              {method.account_name ?? 'Account name not set'}{method.is_default ? ' • Default' : ''}
+                            </Text>
+                          </View>
+                          <Ionicons
+                            name={selected ? 'radio-button-on' : 'radio-button-off'}
+                            size={20}
+                            color={selected ? Colors.accent : Colors.textMuted}
+                          />
+                        </View>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              )}
+
+              {selectedPaymentMethod ? (
+                <Text className="text-[12px] leading-4 font-semibold text-textMuted">
+                  Selected details are saved with the request. Final payout coordination can continue through email.
+                </Text>
+              ) : null}
+            </View>
+
             <Field label="Notes" value={notes} onChangeText={setNotes} placeholder="Optional request note" multiline />
           </ScrollView>
 

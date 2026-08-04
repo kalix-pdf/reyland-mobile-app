@@ -9,14 +9,27 @@ import { PayoutSchedule } from './payout-schedule';
 import { StatusBadge } from './status-badge';
 import { getInvestorPlanLabel } from '@/constants/investor-plans';
 import { RequestWithdrawalModal, type WithdrawalRequestFormPayload } from './request-withdrawal-modal';
+import type { WithdrawalRequest } from '@/services/withdrawal-requests/withdrawal-request.api';
 
 type InvestmentCardProps = {
   investment: investment;
   onRequestWithdrawal: (investment: investment, payload: WithdrawalRequestFormPayload) => void;
   withdrawalSubmitting?: boolean;
+  activeWithdrawalRequest?: WithdrawalRequest;
 };
 
-export function InvestmentCard({ investment, onRequestWithdrawal, withdrawalSubmitting = false }: InvestmentCardProps) {
+const WITHDRAWAL_STATUS_LABELS: Record<number, string> = {
+  0: 'Pending Review',
+  1: 'Approved',
+  2: 'Processing',
+};
+
+export function InvestmentCard({
+  investment,
+  onRequestWithdrawal,
+  withdrawalSubmitting = false,
+  activeWithdrawalRequest,
+}: InvestmentCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [withdrawalModalVisible, setWithdrawalModalVisible] = useState(false);
 
@@ -30,6 +43,9 @@ export function InvestmentCard({ investment, onRequestWithdrawal, withdrawalSubm
     investment.term_months > 0 ? Math.min(investment.payouts_made / investment.term_months, 1) : 0;
   const remaining = Math.max(investment.term_months - investment.payouts_made, 0);
   const isActive = investment.status?.toLowerCase() === 'active';
+  const activeWithdrawalStatus = activeWithdrawalRequest
+    ? WITHDRAWAL_STATUS_LABELS[Number(activeWithdrawalRequest.status)] ?? 'Submitted'
+    : null;
 
   return (
     <View className="rounded-[18px] border border-border bg-surfaceMuted p-4 mb-4">
@@ -131,11 +147,20 @@ export function InvestmentCard({ investment, onRequestWithdrawal, withdrawalSubm
 
       {isActive ? (
         <Pressable
-          onPress={() => setWithdrawalModalVisible(true)}
-          className="mt-3 flex-row items-center justify-center rounded-[14px] bg-accent py-3 active:opacity-80"
+          onPress={activeWithdrawalRequest ? undefined : () => setWithdrawalModalVisible(true)}
+          disabled={Boolean(activeWithdrawalRequest)}
+          className={`mt-3 flex-row items-center justify-center rounded-[14px] py-3 ${
+            activeWithdrawalRequest ? 'bg-border opacity-80' : 'bg-accent active:opacity-80'
+          }`}
         >
-          <Ionicons name="cash-outline" size={17} color={Colors.textOnDark} />
-          <Text className="ml-2 text-[13px] font-black text-textOnDark">Request Withdrawal</Text>
+          <Ionicons
+            name={activeWithdrawalRequest ? 'time-outline' : 'cash-outline'}
+            size={17}
+            color={activeWithdrawalRequest ? Colors.textMuted : Colors.textOnDark}
+          />
+          <Text className={`ml-2 text-[13px] font-black ${activeWithdrawalRequest ? 'text-textMuted' : 'text-textOnDark'}`}>
+            {activeWithdrawalRequest ? `Withdrawal ${activeWithdrawalStatus}` : 'Request Withdrawal'}
+          </Text>
         </Pressable>
       ) : null}
 

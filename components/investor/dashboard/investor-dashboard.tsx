@@ -3,8 +3,10 @@ import { HeaderShell, HeaderTitle } from '@/components/header';
 import type { InvestorPlan } from '@/constants/investor-plans';
 import { useInvestments } from '@/hooks/investment/use-investment';
 import { usePortfolioStats } from '@/hooks/investment/use-portfolio-stats';
+import { useInvestmentWithdrawalRequests } from '@/hooks/investment/use-withdrawal-requests';
 import { InvestorApiError, requestInvestorAccess } from '@/services/investor/investor.api';
 import { addWithdrawalRequest, WithdrawalRequestApiError } from '@/services/withdrawal-requests/withdrawal-request.api';
+import type { WithdrawalRequest } from '@/services/withdrawal-requests/withdrawal-request.api';
 import type { investment } from '@/types/investor.types';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -17,6 +19,10 @@ import type { WithdrawalRequestFormPayload } from './request-withdrawal-modal';
 
 export function InvestorDashboard() {
   const { investments, walletBalance, loading, refreshing, error, hasMore, loadMore, refresh } = useInvestments();
+  const {
+    activeWithdrawalRequests,
+    refresh: refreshWithdrawalRequests,
+  } = useInvestmentWithdrawalRequests();
   const stats = usePortfolioStats(investments);
 
   const [planModalVisible, setPlanModalVisible] = useState(false);
@@ -65,15 +71,13 @@ export function InvestorDashboard() {
         investment_id: investment.id,
         withdrawal_type: payload.withdrawalType,
         requested_amount: payload.requestedAmount,
-        payout_method: payload.payoutMethod,
-        account_name: payload.accountName,
-        account_number: payload.accountNumber,
-        bank_name: payload.bankName || null,
+        payment_method_id: payload.paymentMethodId,
         notes: payload.notes || null,
       });
 
       Alert.alert('Withdrawal request submitted', 'Your request is now pending review.');
       refresh();
+      refreshWithdrawalRequests();
     } catch (error) {
       Alert.alert(
         'Unable to submit withdrawal',
@@ -101,10 +105,14 @@ export function InvestorDashboard() {
         refreshing={refreshing}
         hasMore={hasMore}
         loadMore={loadMore}
-        refresh={refresh}
+        onRefreshDashboard={() => {
+          refresh();
+          refreshWithdrawalRequests();
+        }}
         onRequestNewInvestment={() => setPlanModalVisible(true)}
         onRequestWithdrawal={handleRequestWithdrawal}
         withdrawalSubmittingId={withdrawalSubmittingId}
+        withdrawalRequests={activeWithdrawalRequests}
       />
 
       <NewInvestmentPlanModal
@@ -126,17 +134,19 @@ type DashboardContentProps = {
   refreshing: boolean;
   hasMore: boolean;
   loadMore: () => void;
-  refresh: () => void;
+  onRefreshDashboard: () => void;
   onRequestNewInvestment: () => void;
   onRequestWithdrawal: (
     investment: investment,
     payload: WithdrawalRequestFormPayload,
   ) => void;
   withdrawalSubmittingId: number | null;
+  withdrawalRequests: WithdrawalRequest[];
 };
 
 function DashboardContent({ investments, walletBalance, loading, error, stats, refreshing,
-  hasMore, loadMore, refresh, onRequestNewInvestment, onRequestWithdrawal, withdrawalSubmittingId }: DashboardContentProps) {
+  hasMore, loadMore, onRefreshDashboard, onRequestNewInvestment, onRequestWithdrawal, withdrawalSubmittingId,
+  withdrawalRequests }: DashboardContentProps) {
   if (loading && !investments?.length) {
     return (
       <View className="py-10 items-center">
@@ -166,6 +176,13 @@ function DashboardContent({ investments, walletBalance, loading, error, stats, r
             investment={item}
             onRequestWithdrawal={onRequestWithdrawal}
             withdrawalSubmitting={withdrawalSubmittingId === item.id}
+            activeWithdrawalRequest={withdrawalRequests.find((request) => {
+              const investmentId = typeof request.investment_id === 'object'
+                ? request.investment_id.id
+                : request.investment_id;
+
+              return Number(investmentId) === Number(item.id);
+            })}
           />
         </View>
       )}
@@ -181,7 +198,7 @@ function DashboardContent({ investments, walletBalance, loading, error, stats, r
           </Pressable>
         </View>
       }
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.accent} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshDashboard} tintColor={Colors.accent} />}
       ListEmptyComponent={
         !investments?.length ? (
           <View className="rounded-[18px] border border-border bg-surfaceMuted p-4 mb-4 mx-4">
