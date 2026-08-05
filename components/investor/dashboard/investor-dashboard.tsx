@@ -3,7 +3,11 @@ import { HeaderShell, HeaderTitle } from '@/components/header';
 import type { InvestorPlan } from '@/constants/investor-plans';
 import { useInvestments } from '@/hooks/investment/use-investment';
 import { usePortfolioStats } from '@/hooks/investment/use-portfolio-stats';
+import { useInvestmentWithdrawalRequests } from '@/hooks/investment/use-withdrawal-requests';
 import { InvestorApiError, requestInvestorAccess } from '@/services/investor/investor.api';
+import { addWithdrawalRequest, WithdrawalRequestApiError } from '@/services/withdrawal-requests/withdrawal-request.api';
+import type { WithdrawalRequest } from '@/services/withdrawal-requests/withdrawal-request.api';
+import type { investment } from '@/types/investor.types';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
@@ -11,13 +15,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { InvestmentCard } from './investment-card';
 import { NewInvestmentPlanModal } from './new-investment-plan-modal';
 import { PortfolioSummary } from './portfolio-summary';
+import type { WithdrawalRequestFormPayload } from './request-withdrawal-modal';
 
 export function InvestorDashboard() {
   const { investments, walletBalance, loading, refreshing, error, hasMore, loadMore, refresh } = useInvestments();
+  const {
+    activeWithdrawalRequests,
+    refresh: refreshWithdrawalRequests,
+  } = useInvestmentWithdrawalRequests();
   const stats = usePortfolioStats(investments);
 
   const [planModalVisible, setPlanModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [withdrawalSubmittingId, setWithdrawalSubmittingId] = useState<number | null>(null);
 
   const handleSubmitNewInvestment = async (
     plan: InvestorPlan,
@@ -49,6 +59,37 @@ export function InvestorDashboard() {
     }
   };
 
+  const handleRequestWithdrawal = async (
+    investment: investment,
+    payload: WithdrawalRequestFormPayload,
+  ) => {
+    if (withdrawalSubmittingId) return;
+
+    try {
+      setWithdrawalSubmittingId(investment.id);
+      await addWithdrawalRequest({
+        investment_id: investment.id,
+        withdrawal_type: payload.withdrawalType,
+        requested_amount: payload.requestedAmount,
+        payment_method_id: payload.paymentMethodId,
+        notes: payload.notes || null,
+      });
+
+      Alert.alert('Withdrawal request submitted', 'Your request is now pending review.');
+      refresh();
+      refreshWithdrawalRequests();
+    } catch (error) {
+      Alert.alert(
+        'Unable to submit withdrawal',
+        error instanceof WithdrawalRequestApiError || error instanceof Error
+          ? error.message
+          : 'Please try again in a moment.',
+      );
+    } finally {
+      setWithdrawalSubmittingId(null);
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
       <HeaderShell transparent>
@@ -64,8 +105,14 @@ export function InvestorDashboard() {
         refreshing={refreshing}
         hasMore={hasMore}
         loadMore={loadMore}
-        refresh={refresh}
+        onRefreshDashboard={() => {
+          refresh();
+          refreshWithdrawalRequests();
+        }}
         onRequestNewInvestment={() => setPlanModalVisible(true)}
+        onRequestWithdrawal={handleRequestWithdrawal}
+        withdrawalSubmittingId={withdrawalSubmittingId}
+        withdrawalRequests={activeWithdrawalRequests}
       />
 
       <NewInvestmentPlanModal
@@ -87,12 +134,19 @@ type DashboardContentProps = {
   refreshing: boolean;
   hasMore: boolean;
   loadMore: () => void;
-  refresh: () => void;
+  onRefreshDashboard: () => void;
   onRequestNewInvestment: () => void;
+  onRequestWithdrawal: (
+    investment: investment,
+    payload: WithdrawalRequestFormPayload,
+  ) => void;
+  withdrawalSubmittingId: number | null;
+  withdrawalRequests: WithdrawalRequest[];
 };
 
 function DashboardContent({ investments, walletBalance, loading, error, stats, refreshing,
-  hasMore, loadMore, refresh, onRequestNewInvestment }: DashboardContentProps) {
+  hasMore, loadMore, onRefreshDashboard, onRequestNewInvestment, onRequestWithdrawal, withdrawalSubmittingId,
+  withdrawalRequests }: DashboardContentProps) {
   if (loading && !investments?.length) {
     return (
       <View className="py-10 items-center">
@@ -118,7 +172,18 @@ function DashboardContent({ investments, walletBalance, loading, error, stats, r
       keyExtractor={(item) => String(item.id)}
       renderItem={({ item }) => (
         <View className="px-4">
-          <InvestmentCard investment={item} />
+          <InvestmentCard
+            investment={item}
+            onRequestWithdrawal={onRequestWithdrawal}
+            withdrawalSubmitting={withdrawalSubmittingId === item.id}
+            activeWithdrawalRequest={withdrawalRequests.find((request) => {
+              const investmentId = typeof request.investment_id === 'object'
+                ? request.investment_id.id
+                : request.investment_id;
+
+              return Number(investmentId) === Number(item.id);
+            })}
+          />
         </View>
       )}
       ListHeaderComponent={<PortfolioSummary stats={stats} walletBalance={walletBalance} />}
@@ -133,7 +198,7 @@ function DashboardContent({ investments, walletBalance, loading, error, stats, r
           </Pressable>
         </View>
       }
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.accent} />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefreshDashboard} tintColor={Colors.accent} />}
       ListEmptyComponent={
         !investments?.length ? (
           <View className="rounded-[18px] border border-border bg-surfaceMuted p-4 mb-4 mx-4">

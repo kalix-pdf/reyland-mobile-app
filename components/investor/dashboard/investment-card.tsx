@@ -1,4 +1,6 @@
 import { Colors } from '@/constants/colors';
+import { getInvestorPlanLabel } from '@/constants/investor-plans';
+import type { WithdrawalRequest } from '@/services/withdrawal-requests/withdrawal-request.api';
 import type { investment } from '@/types/investor.types';
 import { formatCompactCurrency, formatDate } from '@/utils/investor.utils';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,11 +8,30 @@ import { useState } from 'react';
 import { Linking, Pressable, Text, View } from 'react-native';
 import { DetailRow } from './detail-row';
 import { PayoutSchedule } from './payout-schedule';
+import { RequestWithdrawalModal, type WithdrawalRequestFormPayload } from './request-withdrawal-modal';
 import { StatusBadge } from './status-badge';
-import { getInvestorPlanLabel } from '@/constants/investor-plans';
 
-export function InvestmentCard({ investment }: { investment: investment }) {
+type InvestmentCardProps = {
+  investment: investment;
+  onRequestWithdrawal: (investment: investment, payload: WithdrawalRequestFormPayload) => void;
+  withdrawalSubmitting?: boolean;
+  activeWithdrawalRequest?: WithdrawalRequest;
+};
+
+const WITHDRAWAL_STATUS_LABELS: Record<number, string> = {
+  0: 'Pending Review',
+  1: 'Approved',
+  2: 'Processing',
+};
+
+export function InvestmentCard({
+  investment,
+  onRequestWithdrawal,
+  withdrawalSubmitting = false,
+  activeWithdrawalRequest,
+}: InvestmentCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [withdrawalModalVisible, setWithdrawalModalVisible] = useState(false);
 
   const totalPayoutsReceived = (investment.investment_payouts ?? []).reduce((sum, payout) =>
     sum + (payout.status === 'paid' ? Number(payout.paid_amount ?? 0) : 0), 0);
@@ -21,7 +42,11 @@ export function InvestmentCard({ investment }: { investment: investment }) {
   const progress =
     investment.term_months > 0 ? Math.min(investment.payouts_made / investment.term_months, 1) : 0;
   const remaining = Math.max(investment.term_months - investment.payouts_made, 0);
-  const isActive = investment.status?.toLowerCase() === 'active';
+  const isActive = investment.status?.toLowerCase() === 'active' ||
+                   investment.status?.toLowerCase() === 'matured';
+  const activeWithdrawalStatus = activeWithdrawalRequest
+    ? WITHDRAWAL_STATUS_LABELS[Number(activeWithdrawalRequest.status)] ?? 'Submitted'
+    : null;
 
   return (
     <View className="rounded-[18px] border border-border bg-surfaceMuted p-4 mb-4">
@@ -120,6 +145,36 @@ export function InvestmentCard({ investment }: { investment: investment }) {
           <PayoutSchedule payouts={investment.investment_payouts ?? []} />
         </View>
       )}
+
+      {isActive ? (
+        <Pressable
+          onPress={activeWithdrawalRequest ? undefined : () => setWithdrawalModalVisible(true)}
+          disabled={Boolean(activeWithdrawalRequest)}
+          className={`mt-3 flex-row items-center justify-center rounded-[14px] py-3 ${
+            activeWithdrawalRequest ? 'bg-border opacity-80' : 'bg-accent active:opacity-80'
+          }`}
+        >
+          <Ionicons
+            name={activeWithdrawalRequest ? 'time-outline' : 'cash-outline'}
+            size={17}
+            color={activeWithdrawalRequest ? Colors.textMuted : Colors.textOnDark}
+          />
+          <Text className={`ml-2 text-[13px] font-black ${activeWithdrawalRequest ? 'text-textMuted' : 'text-textOnDark'}`}>
+            {activeWithdrawalRequest ? `Withdrawal ${activeWithdrawalStatus}` : 'Request Withdrawal'}
+          </Text>
+        </Pressable>
+      ) : null}
+
+      <RequestWithdrawalModal
+        visible={withdrawalModalVisible}
+        investment={investment}
+        submitting={withdrawalSubmitting}
+        onClose={() => setWithdrawalModalVisible(false)}
+        onSubmit={(payload) => {
+          onRequestWithdrawal(investment, payload);
+          setWithdrawalModalVisible(false);
+        }}
+      />
     </View>
   );
 }

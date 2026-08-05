@@ -5,7 +5,7 @@ import { useDashboard } from '@/context/dashboard-context';
 import { useRequests } from '@/hooks/use-requests';
 import { sharedPressedScale } from '@/styles/shared-primitives';
 import { Ionicons } from '@expo/vector-icons';
-import { Href, router } from 'expo-router';
+import { Href, router, useFocusEffect } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -83,6 +83,13 @@ export function HomeDashboard() {
   const handleRefresh = useCallback(() => {
     refreshDashboard();
   }, [refreshDashboard]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) return;
+      void refreshRequests();
+    }, [refreshRequests, user]),
+  );
 
   useEffect(() => {
     if (refreshing) {

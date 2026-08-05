@@ -1,7 +1,18 @@
 import { fetchUserRequests, RequestFilter, UserRequest } from '@/services/requests/request.api';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-const ACTIVE_STATUSES = new Set(['new', 'requested', 'pending', 'contacted', 'qualified', 'confirmed', 'rescheduled']);
+const ACTIVE_STATUSES = new Set([
+  'new',
+  'requested',
+  'pending',
+  'pending review',
+  'approved',
+  'processing',
+  'contacted',
+  'qualified',
+  'confirmed',
+  'rescheduled',
+]);
 
 export function useRequests(filter: RequestFilter = 'all') {
   const [requests, setRequests] = useState<UserRequest[]>([]);

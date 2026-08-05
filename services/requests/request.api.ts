@@ -2,9 +2,10 @@ import { apiClient } from '@/lib/axios';
 import type { Inquiry } from '@/services/inquiries/inquiry.api';
 import type { InvestmentContractSchedule } from '@/services/investment-contract-schedules/investment-contract-schedule.api';
 import type { SiteVisit } from '@/services/site-visits/site-visit.api';
+import type { WithdrawalRequest } from '@/services/withdrawal-requests/withdrawal-request.api';
 import axios from 'axios';
 
-export type RequestKind = 'investment' | 'site_visit' | 'inquiry';
+export type RequestKind = 'investment' | 'withdrawal' | 'site_visit' | 'inquiry';
 export type RequestFilter = 'all' | RequestKind;
 export type RequestTone = 'pending' | 'success' | 'warning' | 'muted' | 'error';
 
@@ -78,6 +79,15 @@ const INVESTMENT_STATUS_LABELS: Record<number, { label: string; tone: RequestTon
   3: { label: 'Cancelled', tone: 'error' },
 };
 
+const WITHDRAWAL_STATUS_LABELS: Record<number, { label: string; tone: RequestTone }> = {
+  0: { label: 'Pending Review', tone: 'pending' },
+  1: { label: 'Approved', tone: 'success' },
+  2: { label: 'Processing', tone: 'warning' },
+  3: { label: 'Paid', tone: 'muted' },
+  4: { label: 'Rejected', tone: 'error' },
+  5: { label: 'Cancelled', tone: 'error' },
+};
+
 function relatedTitle(property?: PropertyRelation | null, project?: ProjectRelation | null) {
   return property?.title || project?.project_name || 'Property request';
 }
@@ -129,6 +139,33 @@ function mapInvestment(schedule: InvestmentContractSchedule): UserRequest {
   };
 }
 
+function getWithdrawalInvestmentRef(withdrawal: WithdrawalRequest) {
+  return typeof withdrawal.investment_id === 'object'
+    ? withdrawal.investment_id.investment_ref || `Investment #${withdrawal.investment_id.id}`
+    : `Investment #${withdrawal.investment_id}`;
+}
+
+function mapWithdrawal(withdrawal: WithdrawalRequest): UserRequest {
+  const status = WITHDRAWAL_STATUS_LABELS[withdrawal.status] ?? WITHDRAWAL_STATUS_LABELS[0];
+  const isFullInvestment = withdrawal.withdrawal_type === 1;
+  const amount = Number(withdrawal.estimated_payout ?? withdrawal.requested_amount ?? 0).toLocaleString('en-PH', {
+    style: 'currency',
+    currency: 'PHP',
+    minimumFractionDigits: 2,
+  });
+
+  return {
+    id: `withdrawal-${withdrawal.id}`,
+    kind: 'withdrawal',
+    title: isFullInvestment ? 'Full investment withdrawal' : 'ROI withdrawal',
+    subtitle: `${amount} from ${getWithdrawalInvestmentRef(withdrawal)}`,
+    status: status.label,
+    tone: status.tone,
+    requestedAt: withdrawal.created_at,
+    detail: withdrawal.notes,
+  };
+}
+
 async function getList<T>(endpoint: string, fallbackMessage: string) {
   const response = await apiClient.get<ListResponse<T>>(endpoint);
 
@@ -141,19 +178,21 @@ async function getList<T>(endpoint: string, fallbackMessage: string) {
 
 export async function fetchUserRequests(): Promise<UserRequest[]> {
   try {
-    const [inquiries, siteVisits, investmentSchedules] = await Promise.all([
+    const [inquiries, siteVisits, investmentSchedules, withdrawalRequests] = await Promise.all([
       getList<RelatedInquiry>('/inquiries/fetch/me', 'Unable to load inquiries right now.'),
       getList<RelatedSiteVisit>('/site-visits/me', 'Unable to load site visits right now.'),
       getList<InvestmentContractSchedule>(
         '/investment-contract-schedules/me',
         'Unable to load investment requests right now.',
       ),
+      getList<WithdrawalRequest>('/withdrawal-requests/me', 'Unable to load withdrawal requests right now.'),
     ]);
 
     return [
       ...inquiries.map(mapInquiry),
       ...siteVisits.map(mapSiteVisit),
       ...investmentSchedules.map(mapInvestment),
+      ...withdrawalRequests.map(mapWithdrawal),
     ].sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
   } catch (error) {
     if (error instanceof RequestsApiError) throw error;

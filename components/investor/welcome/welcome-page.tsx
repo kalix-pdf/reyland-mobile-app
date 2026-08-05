@@ -113,7 +113,7 @@ export function WelcomeInvestorPage({ onGetStarted }: WelcomePageProps) {
                     </TouchableOpacity>
 
                     <Text className="text-textMuted text-sm text-center mt-4 px-8">
-                        By continuing, you agree to Reyland's Affiliate terms and data handling policy.
+                        By continuing, you agree to Reyland&apos;s Affiliate terms and data handling policy.
                     </Text>
                     </View>
             </ScrollView>   

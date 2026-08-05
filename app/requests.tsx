@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const FILTERS: { key: RequestFilter; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'investment', label: 'Investment' },
+  { key: 'withdrawal', label: 'Withdrawal' },
   { key: 'site_visit', label: 'Site Visits' },
   { key: 'inquiry', label: 'Inquiries' },
 ];
@@ -24,6 +25,7 @@ export default function RequestsScreen() {
     () => ({
       all: allRequests.length,
       investment: allRequests.filter((request) => request.kind === 'investment').length,
+      withdrawal: allRequests.filter((request) => request.kind === 'withdrawal').length,
       site_visit: allRequests.filter((request) => request.kind === 'site_visit').length,
       inquiry: allRequests.filter((request) => request.kind === 'inquiry').length,
     }),
