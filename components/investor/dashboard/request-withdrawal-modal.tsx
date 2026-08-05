@@ -68,16 +68,24 @@ function getMethodLabel(method: PaymentMethod) {
   return `${provider} - ${maskAccountNumber(method.account_number)}`;
 }
 
-function isEarnedPayout(payout: investment['investment_payouts'][number]) {
-  if (payout.status === 'paid' || payout.status === 'failed') return false;
-  const dueDate = new Date(payout.due_date);
-  return !Number.isNaN(dueDate.getTime()) && dueDate.getTime() <= Date.now();
-}
+// function isEarnedPayout(payout: investment['investment_payouts'][number]) {
+//   if (payout.status === 'paid' || payout.status === 'failed') return false;
+//   const dueDate = new Date(payout.due_date);
+//   return !Number.isNaN(dueDate.getTime()) && dueDate.getTime() <= Date.now();
+// }
+
 
 export function calculateVisibleAvailableRoi(investment: investment) {
-  return (investment.investment_payouts ?? [])
-    .filter(isEarnedPayout)
-    .reduce((sum, payout) => sum + Number(payout.expected_amount ?? 0), 0);
+
+  const totalPayoutsReceived = (investment.investment_payouts ?? []).reduce((sum, payout) =>
+    sum + (payout.status === 'paid' ? Number(payout.paid_amount ?? 0) : 0), 0);
+
+  const totalROI = investment.locked_investment ? totalPayoutsReceived + Number(investment.bonus_paid ?? 0)
+    : totalPayoutsReceived;
+  return totalROI;
+  // return (investment.investment_payouts ?? [])
+  //   .filter(isEarnedPayout)
+  //   .reduce((sum, payout) => sum + Number(payout.expected_amount ?? 0), 0);
 }
 
 export function RequestWithdrawalModal({
@@ -300,8 +308,7 @@ export function RequestWithdrawalModal({
                 </Text>
               ) : null}
             </View>
-
-            <Field label="Notes" value={notes} onChangeText={setNotes} placeholder="Optional request note" multiline />
+            {/* <Field label="Notes" value={notes} onChangeText={setNotes} placeholder="Optional request note" multiline /> */}
           </ScrollView>
 
           <View className="border-t border-border px-5 pt-3 pb-5">

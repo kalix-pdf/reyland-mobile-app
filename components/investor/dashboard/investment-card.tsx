@@ -1,4 +1,6 @@
 import { Colors } from '@/constants/colors';
+import { getInvestorPlanLabel } from '@/constants/investor-plans';
+import type { WithdrawalRequest } from '@/services/withdrawal-requests/withdrawal-request.api';
 import type { investment } from '@/types/investor.types';
 import { formatCompactCurrency, formatDate } from '@/utils/investor.utils';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,10 +8,8 @@ import { useState } from 'react';
 import { Linking, Pressable, Text, View } from 'react-native';
 import { DetailRow } from './detail-row';
 import { PayoutSchedule } from './payout-schedule';
-import { StatusBadge } from './status-badge';
-import { getInvestorPlanLabel } from '@/constants/investor-plans';
 import { RequestWithdrawalModal, type WithdrawalRequestFormPayload } from './request-withdrawal-modal';
-import type { WithdrawalRequest } from '@/services/withdrawal-requests/withdrawal-request.api';
+import { StatusBadge } from './status-badge';
 
 type InvestmentCardProps = {
   investment: investment;
@@ -42,7 +42,8 @@ export function InvestmentCard({
   const progress =
     investment.term_months > 0 ? Math.min(investment.payouts_made / investment.term_months, 1) : 0;
   const remaining = Math.max(investment.term_months - investment.payouts_made, 0);
-  const isActive = investment.status?.toLowerCase() === 'active';
+  const isActive = investment.status?.toLowerCase() === 'active' ||
+                   investment.status?.toLowerCase() === 'matured';
   const activeWithdrawalStatus = activeWithdrawalRequest
     ? WITHDRAWAL_STATUS_LABELS[Number(activeWithdrawalRequest.status)] ?? 'Submitted'
     : null;
