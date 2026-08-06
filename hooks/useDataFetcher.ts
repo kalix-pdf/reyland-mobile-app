@@ -102,7 +102,8 @@ export function useDataFetcher<T>(
       } finally {
         if (fetchIdRef.current === currentFetchId) {
           clearErrorTimer();
-          isRefreshing ? setRefreshing(false) : setLoading(false);
+          setLoading(false);
+          setRefreshing(false);
         }
       }
     },
@@ -177,6 +178,12 @@ export function usePaginatedFetcher<T>(fetcherFn: (cursor?: string) => Promise<P
       isRefreshing ? setRefreshing(true) : setLoading(true);
       setError(null);
 
+      if (!isRefreshing) {
+        setData([]); 
+        setNextCursor(null);
+        setHasMore(false);
+      }
+
       clearErrorTimer();
 
       errorTimerRef.current = setTimeout(() => {
@@ -235,7 +242,7 @@ export function usePaginatedFetcher<T>(fetcherFn: (cursor?: string) => Promise<P
   useEffect(() => {
     if (fetchOnMount) fetchData();
     return clearErrorTimer;
-  }, []);
+  }, [fetcherFn]);
 
   const refresh = useCallback(() => fetchData(true), [fetchData]);
   const retry = useCallback(() => fetchData(false), [fetchData]);

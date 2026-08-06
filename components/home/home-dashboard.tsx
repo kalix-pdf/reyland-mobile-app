@@ -2,7 +2,7 @@
 import { Colors } from '@/constants/colors';
 import { useAuth } from '@/context/auth-context';
 import { useDashboard } from '@/context/dashboard-context';
-import { useRequests } from '@/hooks/use-requests';
+import { useRequests } from '@/hooks/requests/use-requests';
 import { sharedPressedScale } from '@/styles/shared-primitives';
 import { Ionicons } from '@expo/vector-icons';
 import { Href, router, useFocusEffect } from 'expo-router';

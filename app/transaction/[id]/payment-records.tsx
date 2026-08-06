@@ -2,7 +2,7 @@ import { HeaderNav, HeaderShell } from '@/components/header';
 import { ErrorScreen } from '@/components/helper/error-project';
 import { PaymentRecordsList } from '@/components/transcations/payment-record-list';
 import { Colors } from '@/constants/colors';
-import { usePaymentHistory } from '@/hooks/use-transaction';
+import { usePaymentHistory } from '@/hooks/transaction/use-transaction';
 import { useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

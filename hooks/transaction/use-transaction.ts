@@ -4,10 +4,10 @@ import { transactionsAPI } from '@/services/fetchData/transaction/fetch-transact
 import { useDataFetcher, usePaginatedFetcher } from '@/hooks/useDataFetcher';
 import type { Transaction, FetchInstallmentResponseData } from '@/types';
 
-export function useTransaction() {
+export function useTransaction({ type }: { type: 0 | 1 | 2 | undefined }) {
   const fetcherFn = useCallback(
-    (cursor?: string) => transactionsAPI.getPaginated(cursor),
-    []
+    (cursor?: string) => transactionsAPI.getPaginated(cursor, type),
+    [type]
   );
 
   const { data: transactions, ...rest } = usePaginatedFetcher<Transaction>(

@@ -8,8 +8,10 @@ export const transactionsAPI = {
   /**
    * Fetch a paginated list of transactions.
    */
-  getPaginated: (cursor?: string, limit = 5): Promise<PaginatedResult<Transaction>> =>
-    fetchPaginated<Transaction>(`${BASE}/byuser`, { cursor, limit }),
+  getPaginated: ( cursor?: string, type?: 0 | 1 | 2, limit = 5): Promise<PaginatedResult<Transaction>> =>
+    fetchPaginated<Transaction>(`${BASE}/byuser`, {cursor, limit,
+      ...(type !== undefined ? { type } : {}),
+    }),
 
   /**
    * Fetch installment payment history + summary for a given transaction.
