@@ -1,6 +1,6 @@
-import { useCallback, useMemo } from 'react';
-import { fetchUserRequests, RequestFilter, UserRequest } from '@/services/requests/request.api';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { fetchUserRequests, RequestFilter, UserRequest } from '@/services/fetchData/requests/request.api';
+import { useCallback, useMemo } from 'react';
 
 const ACTIVE_STATUSES = new Set([
   'new',

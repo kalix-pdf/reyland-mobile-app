@@ -203,7 +203,6 @@ export async function fetchUserRequests(): Promise<UserRequest[]> {
         error.response?.status,
       );
     }
-
     throw error;
   }
 }
