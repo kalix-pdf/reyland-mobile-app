@@ -3,7 +3,7 @@ import { ErrorScreen } from '@/components/helper/error-project';
 import { UserRequestCard } from '@/components/requests/user-request-card';
 import { Colors } from '@/constants/colors';
 import { useRequests } from '@/hooks/requests/use-requests';
-import type { RequestFilter } from '@/services/requests/request.api';
+import type { RequestFilter } from '@/services/fetchData/requests/request.api';
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';

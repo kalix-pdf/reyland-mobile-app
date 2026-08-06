@@ -1,4 +1,4 @@
-import type { UserRequest } from '@/services/requests/request.api';
+import type { UserRequest } from '@/services/fetchData/requests/request.api';
 import { sharedPressedScale } from '@/styles/shared-primitives';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';

@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors';
-import type { RequestKind, RequestTone, UserRequest } from '@/services/requests/request.api';
+import type { RequestKind, RequestTone, UserRequest } from '@/services/fetchData/requests/request.api';
 import { Ionicons } from '@expo/vector-icons';
 import { Text, View } from 'react-native';
 
