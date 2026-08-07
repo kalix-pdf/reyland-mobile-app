@@ -42,8 +42,10 @@ export function InvestmentCard({
   const progress =
     investment.term_months > 0 ? Math.min(investment.payouts_made / investment.term_months, 1) : 0;
   const remaining = Math.max(investment.term_months - investment.payouts_made, 0);
-  const isActive = investment.status?.toLowerCase() === 'active' ||
-                   investment.status?.toLowerCase() === 'matured';
+  const isActive = investment.status?.toLowerCase() === 'active'
+    || investment.status?.toLowerCase() === 'matured';
+  
+  const isLockedIn = investment.locked_investment && investment.status?.toLowerCase() === 'active';
   const activeWithdrawalStatus = activeWithdrawalRequest
     ? WITHDRAWAL_STATUS_LABELS[Number(activeWithdrawalRequest.status)] ?? 'Submitted'
     : null;
@@ -147,20 +149,23 @@ export function InvestmentCard({
       )}
 
       {isActive ? (
-        <Pressable
-          onPress={activeWithdrawalRequest ? undefined : () => setWithdrawalModalVisible(true)}
-          disabled={Boolean(activeWithdrawalRequest)}
+        <Pressable onPress={ activeWithdrawalRequest || isLockedIn
+              ? undefined : () => setWithdrawalModalVisible(true)}
+          disabled={Boolean(activeWithdrawalRequest) || isLockedIn}
           className={`mt-3 flex-row items-center justify-center rounded-[14px] py-3 ${
-            activeWithdrawalRequest ? 'bg-border opacity-80' : 'bg-accent active:opacity-80'
-          }`}
-        >
-          <Ionicons
-            name={activeWithdrawalRequest ? 'time-outline' : 'cash-outline'}
-            size={17}
-            color={activeWithdrawalRequest ? Colors.textMuted : Colors.textOnDark}
-          />
-          <Text className={`ml-2 text-[13px] font-black ${activeWithdrawalRequest ? 'text-textMuted' : 'text-textOnDark'}`}>
-            {activeWithdrawalRequest ? `Withdrawal ${activeWithdrawalStatus}` : 'Request Withdrawal'}
+            activeWithdrawalRequest || isLockedIn
+              ? 'bg-border opacity-80'
+              : 'bg-accent active:opacity-80'}`}>
+          <Ionicons name={activeWithdrawalRequest ? 'time-outline' : isLockedIn
+                  ? 'lock-closed-outline' : 'cash-outline'}
+            size={17} color={ activeWithdrawalRequest || isLockedIn ? Colors.textMuted
+                : Colors.textOnDark }/>
+
+          <Text className={`ml-2 text-[13px] font-black ${
+              activeWithdrawalRequest ? 'text-textMuted' : isLockedIn
+                  ? 'text-textMuted' : 'text-textOnDark' }`} >
+            {activeWithdrawalRequest ? `Withdrawal ${activeWithdrawalStatus}`
+              : isLockedIn ? 'Available for withdrawal after 3 years' : 'Request Withdrawal'}
           </Text>
         </Pressable>
       ) : null}
