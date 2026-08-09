@@ -25,9 +25,13 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
 
   return (
     <Pressable
-      onPress={() => router.push(`/transaction/${transaction.id}/payment-records`)}
-      className="flex-row items-center justify-between bg-surface border border-border rounded-2xl px-4 py-3 mx-4 mb-3 active:opacity-80"
-    >
+      onPress={() => router.push({
+          pathname: '/transaction/[id]/payment-records',
+          params: { id: String(transaction.id), transaction: JSON.stringify(transaction) },
+        })
+      }
+      className="flex-row items-center justify-between bg-surface border border-border rounded-2xl px-4 py-3 mx-4 mb-3 active:opacity-80">
+
       <View className="flex-row items-center flex-1 pr-3">
         <View className={`w-11 h-11 rounded-full items-center justify-center mr-3 ${typeConfig.iconBg}`}>
           <Ionicons name={typeConfig.icon} size={20} color={typeConfig.iconColor} />

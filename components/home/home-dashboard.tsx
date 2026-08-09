@@ -180,6 +180,10 @@ export function HomeDashboard() {
               </WithRefreshSkeleton>
             </View>
 
+              <WithRefreshSkeleton refreshing={refreshing} skeleton={<PromotionalCarouselSkeleton />}>
+              <PromotionalCarousel promotionImages={promotionImages} />
+            </WithRefreshSkeleton>
+
             {user ? (
               <HomeRequestsPreview
                 activeRequests={activeRequests}
@@ -228,10 +232,6 @@ export function HomeDashboard() {
                 </View>
               </View>
             </View>
-
-            <WithRefreshSkeleton refreshing={refreshing} skeleton={<PromotionalCarouselSkeleton />}>
-              <PromotionalCarousel promotionImages={promotionImages} />
-            </WithRefreshSkeleton>
 
             {/* ── Project Locations ────────────────────────────────────────── */}
             <View className="mx-[18px] mt-[15px]">

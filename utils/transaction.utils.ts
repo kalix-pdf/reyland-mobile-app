@@ -56,3 +56,50 @@ export function formatDate(dateString: string) {
     year: 'numeric',
   });
 }
+
+// Transaction type: 0 = Purchase, 1 = Investment, 2 = Withdrawal
+export type TransactionType = 0 | 1 | 2;
+
+export interface StatementConfigEntry {
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  accent: string;
+  accentSoft: string;
+  accentBorder: string;
+  entryLabel: string;
+  entryIcon: keyof typeof Ionicons.glyphMap;
+  sign: '+' | '-';
+}
+
+export const STATEMENT_CONFIG: Record<TransactionType, StatementConfigEntry> = {
+  0: {
+    label: 'Property Purchase',
+    icon: 'home-outline',
+    accent: '#01690f',
+    accentSoft: '#EFF6FF',
+    accentBorder: '#DBEAFE',
+    entryLabel: 'Installment Payments',
+    entryIcon: 'card-outline',
+    sign: '+',
+  },
+  1: {
+    label: 'Investment Account',
+    icon: 'trending-up-outline',
+    accent: '#059669',
+    accentSoft: '#ECFDF5',
+    accentBorder: '#D1FAE5',
+    entryLabel: 'Payout History',
+    entryIcon: 'cash-outline',
+    sign: '+',
+  },
+  2: {
+    label: 'Withdrawal Request',
+    icon: 'arrow-down-circle-outline',
+    accent: '#D97706',
+    accentSoft: '#FFFBEB',
+    accentBorder: '#FDE68A',
+    entryLabel: 'Processing History',
+    entryIcon: 'time-outline',
+    sign: '-',
+  },
+};

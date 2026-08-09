@@ -182,7 +182,7 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
               colors={colors}
               icon={<Ionicons name="document-text-outline" size={18} color={colors.accent} />}
               label="Contact Us"
-              onPress={() => Alert.alert('Contact Us')}
+              onPress={() => router.push('/contact-us')}
               isLast
             />
 
