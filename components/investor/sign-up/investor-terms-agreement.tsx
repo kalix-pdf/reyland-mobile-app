@@ -25,7 +25,7 @@ export function InvestorTermsAgreement({ agreed, onToggle }: InvestorTermsAgreem
         {agreed ? <Ionicons name="checkmark" size={12} color={colors.white} /> : null}
       </View>
       <Text className="flex-1 text-[12.5px] leading-[18px] text-textSecondary font-semibold">
-        I agree to the investor{' '}
+        I agree to the affiliate{' '}
         <Text
           className="text-accent font-extrabold"
           onPress={(event) => {

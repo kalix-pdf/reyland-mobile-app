@@ -68,7 +68,7 @@ export function NewInvestmentPlanModal({
               button always sits at a predictable position near the bottom. */}
           <SafeAreaView edges={['bottom']} className="max-h-[90%] rounded-t-[24px] bg-background">
             <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
-              <Text className="text-textPrimary text-lg font-black">Request New Investment</Text>
+              <Text className="text-textPrimary text-lg font-black">Request New Affiliate</Text>
               <Pressable onPress={onClose} hitSlop={8}>
                 <Ionicons name="close" size={22} color={colors.textSecondary} />
               </Pressable>

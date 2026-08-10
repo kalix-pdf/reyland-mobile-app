@@ -194,7 +194,7 @@ function DashboardContent({ investments, walletBalance, loading, error, stats, r
             className="flex-row items-center justify-center gap-2 rounded-2xl border border-accent py-3.5 active:opacity-75"
           >
             <Ionicons name="add-circle-outline" size={18} color={Colors.accent} />
-            <Text className="text-accent text-[13px] font-black">Request New Investment</Text>
+            <Text className="text-accent text-[13px] font-black">Request New Affiliate</Text>
           </Pressable>
         </View>
       }
