@@ -16,6 +16,7 @@ import { DashboardSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, W
 import { HomeRequestsPreview } from '../requests/home-requests-preview';
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll, FeaturedPropertiesScroll } from './featured-project';
+import { CustomerReviews } from './customer-reviews';
 
 // const QUICK_ACTIONS = [
 //   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -275,6 +276,8 @@ export function HomeDashboard() {
               </View>
               <FeaturedPropertiesScroll user={user} properties={featuredProperties} />
             </View>
+
+            <CustomerReviews />
 
       </ScrollView>
     </SafeAreaView>
