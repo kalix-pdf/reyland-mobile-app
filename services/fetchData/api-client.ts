@@ -11,6 +11,12 @@ export interface ApiResponse<T> {
 
 export interface PaginatedApiResponse<T> extends ApiResponse<T[]> {
   wallet_balance: number;
+  type_counts?: {
+    all: number;
+    purchase: number;
+    investment: number;
+    withdrawal: number;
+  };
   pagination: {
     nextCursor: string | null;
     hasMore: boolean;
@@ -25,6 +31,12 @@ export interface PaginatedResult<T> {
   total: number;
   meta?: {
     walletBalance: number;
+    typeCounts?: {
+      all: number;
+      purchase: number;
+      investment: number;
+      withdrawal: number;
+    };
   }
 }
 
@@ -213,7 +225,10 @@ export async function fetchPaginated<T>(endpoint: string,
       nextCursor: response.data.pagination.nextCursor,
       hasMore: response.data.pagination.hasMore,
       total: response.data.pagination.total,
-      meta: { walletBalance: response.data.wallet_balance },
+      meta: {
+        walletBalance: response.data.wallet_balance,
+        typeCounts: response.data.type_counts,
+      },
     };
   } catch (err) {
     throw normalizeError<T>(err, endpoint);

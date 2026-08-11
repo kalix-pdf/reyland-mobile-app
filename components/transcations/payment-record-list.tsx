@@ -1,30 +1,29 @@
-import { memo, useCallback, useMemo } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  Alert,
-  Linking,
-  RefreshControl,
-  ActivityIndicator,
-  ListRenderItemInfo,
-} from 'react-native';
+import { Colors } from '@/constants/colors';
 import type {
-  Transaction,
   InstallmentPayment,
   InstallmentSummary,
+  Transaction,
   TransactionContract,
 } from '@/types';
-import { Colors } from '@/constants/colors';
 import {
-  TransactionType,
-  StatementConfigEntry,
   STATEMENT_CONFIG,
+  StatementConfigEntry,
+  TransactionType,
   formatCurrency,
   formatDate,
 } from '@/utils/transaction.utils';
+import { Ionicons } from '@expo/vector-icons';
+import { memo, useCallback, useMemo } from 'react';
+import {
+  Alert,
+  FlatList,
+  Linking,
+  ListRenderItemInfo,
+  Pressable,
+  RefreshControl,
+  Text,
+  View
+} from 'react-native';
 
 interface PaymentRecordsListProps {
   transaction: Transaction | null | undefined;
