@@ -1,8 +1,19 @@
-import { useEffect, useState } from 'react';
-import { Modal, View, Text, Pressable, TextInput, ActivityIndicator, ScrollView } from 'react-native';
+import { Colors } from '@/constants/colors';
 import { PaymentMethod, Provider, PROVIDERS } from '@/types';
 import { resolveProvider } from '@/utils/payment-method.utils';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 interface PaymentMethodModalProps {
   visible: boolean;
@@ -12,8 +23,13 @@ interface PaymentMethodModalProps {
   editingMethod?: PaymentMethod | null;
 }
 
-export function PaymentMethodModal({ visible, onClose, onSubmit,
-  isSubmitting, editingMethod }: PaymentMethodModalProps) {
+export function PaymentMethodModal({
+  visible,
+  onClose,
+  onSubmit,
+  isSubmitting,
+  editingMethod,
+}: PaymentMethodModalProps) {
   const isEditing = Boolean(editingMethod);
 
   const [provider, setProvider] = useState<Provider | null>(null);
@@ -22,7 +38,6 @@ export function PaymentMethodModal({ visible, onClose, onSubmit,
   const [defaultMethod, setDefaultMethod] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Prefill (or reset) fields whenever the modal opens.
   useEffect(() => {
     if (!visible) return;
 
@@ -37,11 +52,16 @@ export function PaymentMethodModal({ visible, onClose, onSubmit,
       setAccountNumber('');
       setDefaultMethod(false);
     }
+
     setError(null);
   }, [visible, editingMethod]);
 
+  const banks = PROVIDERS.filter((item) => item.type === 'bank');
+  const ewallets = PROVIDERS.filter((item) => item.type === 'ewallet');
   const isValid =
-    provider !== null && accountName.trim().length > 0 && accountNumber.trim().length > 0;
+    provider !== null &&
+    accountName.trim().length > 0 &&
+    accountNumber.trim().length > 0;
 
   const reset = () => {
     setProvider(null);
@@ -52,153 +72,129 @@ export function PaymentMethodModal({ visible, onClose, onSubmit,
   };
 
   const handleClose = () => {
+    if (isSubmitting) return;
+
     reset();
     onClose();
   };
 
   const handleSubmit = async () => {
     if (!isValid || !provider) {
-      setError('Please fill in all fields and select a provider.');
+      setError('Select a provider and complete the account details.');
       return;
     }
+
     setError(null);
+
     try {
-      await onSubmit(provider, accountName, accountNumber, defaultMethod);
+      await onSubmit(provider, accountName.trim(), accountNumber.trim(), defaultMethod);
       reset();
       onClose();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to submit payment method.';
+      const message = err instanceof Error ? err.message : 'Failed to save payment method.';
       setError(message);
     }
   };
 
-  const banks = PROVIDERS.filter((p) => p.type === 'bank');
-  const ewallets = PROVIDERS.filter((p) => p.type === 'ewallet');
-
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View className="flex-1 justify-end bg-black/50">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1 justify-end"
-        style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
       >
-        <View className="max-h-[90%] rounded-t-3xl bg-surface">
-          {/* Header */}
-          <View className="flex-row items-center justify-between border-b border-border px-5 py-4">
-            <Text className="text-lg font-semibold text-textPrimary">
-              {isEditing ? 'Edit Payment Method' : 'Add Payment Method'}
-            </Text>
-            <Pressable onPress={handleClose} hitSlop={10}>
-              <Text className="text-sm text-textSecondary">Cancel</Text>
+        <Pressable className="absolute inset-0 bg-black/[0.42]" onPress={handleClose} />
+
+        <View className="max-h-[90%] rounded-t-[26px] bg-surface">
+          <View className="self-center mt-2.5 h-[5px] w-11 rounded-full bg-border" />
+
+          <View className="flex-row items-center justify-between px-5 pb-3 pt-4">
+            <View className="flex-1 pr-4">
+              <Text className="text-[18px] font-black text-textPrimary">
+                {isEditing ? 'Edit payout method' : 'Add payout method'}
+              </Text>
+              <Text className="mt-1 text-[13px] leading-5 font-semibold text-textSecondary">
+                Save a bank or e-wallet account for withdrawal payouts.
+              </Text>
+            </View>
+
+            <Pressable
+              onPress={handleClose}
+              hitSlop={10}
+              className="h-9 w-9 items-center justify-center rounded-full bg-background active:opacity-70"
+              accessibilityLabel="Close payment method form"
+            >
+              <Ionicons name="close" size={20} color={Colors.textMuted} />
             </Pressable>
           </View>
 
-          {/* Scrollable body */}
           <ScrollView
             className="px-5"
-            contentContainerClassName="py-4"
+            contentContainerClassName="gap-4 pb-4"
             keyboardShouldPersistTaps="handled"
           >
-            {/* Provider type: banks */}
-            <Text className="mb-2 font-medium uppercase text-textMuted">Banks</Text>
-            <View className="mb-4 flex-row flex-wrap gap-2">
-              {banks.map((p) => {
-                const isSelected = provider?.id === p.id;
-                return (
-                  <Pressable
-                    key={p.id}
-                    onPress={() => setProvider(p)}
-                    className={`text-[12px] rounded-full border px-4 py-2 ${
-                      isSelected ? 'border-primary bg-primaryLight' : 'border-border bg-surfaceMuted'
-                    }`}
-                  >
-                    <Text
-                      className={`text-[12px] ${
-                        isSelected ? 'font-semibold text-white' : 'text-textSecondary'
-                      }`}
-                    >
-                      {p.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+            <ProviderSection title="Banks" providers={banks} selectedProvider={provider} onSelect={setProvider} />
+            <ProviderSection title="E-Wallets" providers={ewallets} selectedProvider={provider} onSelect={setProvider} />
+
+            <View className="gap-3">
+              <FieldLabel label="Account name" />
+              <TextInput
+                value={accountName}
+                onChangeText={setAccountName}
+                placeholder="Juan Dela Cruz"
+                placeholderTextColor={Colors.textMuted}
+                className="min-h-[50px] rounded-[16px] border border-border bg-background px-3.5 text-[14px] font-semibold text-textPrimary"
+              />
+
+              <FieldLabel label="Account number" />
+              <TextInput
+                value={accountNumber}
+                onChangeText={setAccountNumber}
+                placeholder="0917xxxxxxx or 0123456789"
+                placeholderTextColor={Colors.textMuted}
+                keyboardType="number-pad"
+                className="min-h-[50px] rounded-[16px] border border-border bg-background px-3.5 text-[14px] font-semibold text-textPrimary"
+              />
             </View>
 
-            {/* Provider type: e-wallets */}
-            <Text className="mb-2 text-[12px] font-medium uppercase text-textMuted">E-Wallets</Text>
-            <View className="mb-5 flex-row flex-wrap gap-2">
-              {ewallets.map((p) => {
-                const isSelected = provider?.id === p.id;
-                return (
-                  <Pressable
-                    key={p.id}
-                    onPress={() => setProvider(p)}
-                    className={`text-[12px] rounded-full border px-4 py-2 ${
-                      isSelected ? 'border-primary bg-primaryLight' : 'border-border bg-surfaceMuted'
-                    }`}
-                  >
-                    <Text
-                      className={`text-[12px] ${
-                        isSelected ? 'font-semibold text-white' : 'text-textSecondary'
-                      }`}
-                    >
-                      {p.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            <Pressable
+              onPress={() => setDefaultMethod(!defaultMethod)}
+              className="flex-row items-center justify-between rounded-[18px] border border-border bg-background p-3.5 active:opacity-75"
+            >
+              <View className="flex-1 pr-3">
+                <Text className="text-[14px] font-black text-textPrimary">Set as default</Text>
+                <Text className="mt-1 text-[12px] leading-4 font-semibold text-textSecondary">
+                  This method will be preselected when requesting withdrawals.
+                </Text>
+              </View>
 
-            {/* Account name */}
-            <Text className="mb-1 font-medium text-textMuted">Account Name</Text>
-            <TextInput
-              value={accountName}
-              onChangeText={setAccountName}
-              placeholder="Juan Dela Cruz"
-              placeholderTextColor={AppColors_textMutedFallback}
-              className="mb-4 rounded-xl border border-border bg-surfaceMuted px-4 py-3 text-textPrimary"
-            />
-
-            {/* Account number */}
-            <Text className="mb-1 font-medium text-textMuted">Account Number</Text>
-            <TextInput
-              value={accountNumber}
-              onChangeText={setAccountNumber}
-              placeholder="e.g. 0917xxxxxxx or 0123456789"
-              placeholderTextColor={AppColors_textMutedFallback}
-              keyboardType="number-pad"
-              className="mb-2 rounded-xl border border-border bg-surfaceMuted px-4 py-3 text-textPrimary"
-            />
-
-            {error && <Text className="mt-2 text-sm text-error">{error}</Text>}
-
-            {/* Default method toggle */}
-            <Text className="mb-1 mt-3 font-medium text-neutral-400">
-              Set as default payment method
-            </Text>
-            <Pressable onPress={() => setDefaultMethod(!defaultMethod)} className="ml-2">
               <View
-                className={`h-9 w-14 justify-center rounded-full px-1 ${
-                  defaultMethod ? 'bg-accent' : 'bg-neutral-600'
+                className={`h-8 w-14 justify-center rounded-full px-1 ${
+                  defaultMethod ? 'bg-accent' : 'bg-border'
                 }`}
               >
-                <View className={`h-6 w-6 rounded-full bg-white ${defaultMethod ? 'ml-5' : 'ml-0'}`} />
+                <View className={`h-6 w-6 rounded-full bg-white ${defaultMethod ? 'ml-6' : 'ml-0'}`} />
               </View>
             </Pressable>
+
+            {error ? (
+              <View className="rounded-[16px] border border-errorBorder bg-errorBackground p-3">
+                <Text className="text-[13px] font-bold text-error">{error}</Text>
+              </View>
+            ) : null}
           </ScrollView>
 
-          {/* Sticky submit button */}
-          <View className="border-t border-border px-5 py-4">
+          <View className="border-t border-border px-5 pb-5 pt-3">
             <Pressable
               onPress={handleSubmit}
-              disabled={isSubmitting}
-              className={`items-center rounded-xl py-3 ${isSubmitting ? 'bg-primaryLight' : 'bg-primary'}`}
+              disabled={isSubmitting || !isValid}
+              className={`min-h-[52px] items-center justify-center rounded-[18px] ${
+                isSubmitting || !isValid ? 'bg-border opacity-70' : 'bg-accent active:opacity-80'
+              }`}
             >
               {isSubmitting ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={Colors.textOnDark} />
               ) : (
-                <Text className="font-semibold text-textOnDark">
+                <Text className="text-[14px] font-black text-textOnDark">
                   {isEditing ? 'Save Changes' : 'Add Payment Method'}
                 </Text>
               )}
@@ -206,10 +202,77 @@ export function PaymentMethodModal({ visible, onClose, onSubmit,
           </View>
         </View>
       </KeyboardAvoidingView>
-      </View>
     </Modal>
   );
 }
 
-// placeholder — replace with your actual textMuted hex from tailwind.colors.js
-const AppColors_textMutedFallback = '#9ca3af';
+function ProviderSection({
+  title,
+  providers,
+  selectedProvider,
+  onSelect,
+}: {
+  title: string;
+  providers: Provider[];
+  selectedProvider: Provider | null;
+  onSelect: (provider: Provider) => void;
+}) {
+  return (
+    <View>
+      <Text className="mb-2 text-[12px] font-black uppercase text-textSecondary">
+        {title}
+      </Text>
+
+      <View className="flex-row flex-wrap gap-2">
+        {providers.map((provider) => (
+          <ProviderPill
+            key={provider.id}
+            provider={provider}
+            selected={selectedProvider?.id === provider.id}
+            onPress={() => onSelect(provider)}
+          />
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function ProviderPill({
+  provider,
+  selected,
+  onPress,
+}: {
+  provider: Provider;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      className={`min-h-[40px] flex-row items-center gap-1.5 rounded-[15px] border px-3 active:opacity-80 ${
+        selected ? 'border-accent bg-tag' : 'border-border bg-background'
+      }`}
+    >
+      <Ionicons
+        name={provider.type === 'bank' ? 'business-outline' : 'wallet-outline'}
+        size={15}
+        color={selected ? Colors.accent : Colors.textMuted}
+      />
+      <Text
+        className={`text-[12px] font-black ${
+          selected ? 'text-accent' : 'text-textSecondary'
+        }`}
+      >
+        {provider.name}
+      </Text>
+    </Pressable>
+  );
+}
+
+function FieldLabel({ label }: { label: string }) {
+  return (
+    <Text className="-mb-1 text-[12px] font-black uppercase text-textSecondary">
+      {label}
+    </Text>
+  );
+}

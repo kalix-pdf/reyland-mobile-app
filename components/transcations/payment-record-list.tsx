@@ -1,38 +1,37 @@
-import { memo, useCallback, useMemo } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  Alert,
-  Linking,
-  RefreshControl,
-  ActivityIndicator,
-  ListRenderItemInfo,
-} from 'react-native';
+import { Colors } from '@/constants/colors';
 import type {
-  Transaction,
   InstallmentPayment,
   InstallmentSummary,
+  Transaction,
   TransactionContract,
 } from '@/types';
-import { Colors } from '@/constants/colors';
 import {
-  TransactionType,
-  StatementConfigEntry,
+  PAYMENT_TYPE_LABELS,
   STATEMENT_CONFIG,
+  StatementConfigEntry,
+  TransactionType,
   formatCurrency,
   formatDate,
 } from '@/utils/transaction.utils';
+import { Ionicons } from '@expo/vector-icons';
+import type { ReactNode } from 'react';
+import { memo, useCallback } from 'react';
+import {
+  Alert,
+  FlatList,
+  Linking,
+  ListRenderItemInfo,
+  Pressable,
+  RefreshControl,
+  Text,
+  View,
+} from 'react-native';
 
 interface PaymentRecordsListProps {
   transaction: Transaction | null | undefined;
   payments: InstallmentPayment[];
   summary?: InstallmentSummary;
   contract?: TransactionContract | null;
-  /** True while the parent is still fetching `transaction`. Prevents the
-   * config fallback from ever rendering an incorrect statement type. */
   loading?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;
@@ -42,13 +41,6 @@ function isKnownTransactionType(type: number | undefined): type is TransactionTy
   return type === 0 || type === 1 || type === 2;
 }
 
-// function maskRef(ref: string) {
-//   if (!ref) return '—';
-//   return ref.length > 8 ? `${ref.slice(0, 4)} •••• ${ref.slice(-4)}` : ref;
-// }
-
-// Avoids the previous `formatCurrency(x).replace(/^\D+/, '')` hack, which
-// silently breaks if formatCurrency's symbol/format ever changes.
 function formatAmountNoSymbol(value: number) {
   return value.toLocaleString('en-PH', {
     minimumFractionDigits: 2,
@@ -56,16 +48,17 @@ function formatAmountNoSymbol(value: number) {
   });
 }
 
-// function StatementSkeleton() {
-//   return (
-//     <View className="flex-1 items-center justify-center bg-background py-24">
-//       <ActivityIndicator size="small" color={Colors.accent} />
-//       <Text className="text-textMuted text-xs mt-3">Loading statement…</Text>
-//     </View>
-//   );
-// }
+function getTransactionTitle(transaction: Transaction) {
+  if (transaction.property?.title) return transaction.property.title;
+  if (transaction.type === 1) return 'Investment Transaction';
+  if (transaction.type === 2) return 'Investment Withdrawal';
+  return 'Property Transaction';
+}
 
-// ---------- Statement header (e-wallet balance-card style, light) ----------
+function getPaymentTypeLabel(transaction: Transaction) {
+  return PAYMENT_TYPE_LABELS[transaction.payment_type] ?? `Payment Type ${transaction.payment_type}`;
+}
+
 const StatementHeader = memo(function StatementHeader({
   transaction,
   config,
@@ -74,80 +67,70 @@ const StatementHeader = memo(function StatementHeader({
   config: StatementConfigEntry;
 }) {
   return (
-    <View
-      className="mx-4 mt-4 rounded-2xl bg-surface border border-border p-5"
-      style={{
-        shadowColor: Colors.textPrimary,
-        shadowOpacity: 0.06,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 4 },
-        elevation: 2,
-      }}
-    >
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center">
-          <View
-            className="h-8 w-8 rounded-full items-center justify-center mr-2"
-            style={{ backgroundColor: config.accentSoft }}
-          >
-            <Ionicons name={config.icon} size={18} color={config.accent} />
+    <View className="mx-5 mt-3 overflow-hidden rounded-[24px] bg-primary p-5">
+      <View className="flex-row items-start justify-between gap-4">
+        <View className="flex-1">
+          <View className="mb-3 flex-row items-center gap-2">
+            <View className="h-9 w-9 items-center justify-center rounded-[14px] bg-textOnDark/10">
+              <Ionicons name={config.icon} size={19} color={Colors.textOnDark} />
+            </View>
+            <Text className="text-[12px] font-black uppercase tracking-[1px] text-textOnDark/60">
+              {config.label}
+            </Text>
           </View>
-          <Text className="text-textSecondary text-sm font-semibold uppercase tracking-widest">
-            {config.label}
+
+          <Text className="text-[18px] font-black leading-6 text-textOnDark" numberOfLines={2}>
+            {getTransactionTitle(transaction)}
+          </Text>
+
+          <Text className="mt-2 text-[13px] font-semibold text-textOnDark/65">
+            {getPaymentTypeLabel(transaction)}
           </Text>
         </View>
-        <View
-          className="px-2.5 py-1 rounded-full border"
-          style={{ backgroundColor: config.accentSoft, borderColor: config.accentBorder }}
-        >
-          <Text className="text-sm font-semibold capitalize" style={{ color: config.accent }}>
+
+        <View className="rounded-full bg-textOnDark/10 px-2.5 py-1">
+          <Text className="text-[10px] font-black uppercase text-textOnDark">
             {transaction.status}
           </Text>
         </View>
       </View>
 
-      <View className="flex-row items-end mt-4">
-        <Text className="text-textMuted text-base font-semibold mb-1 mr-1">₱</Text>
-        <Text
-          className="text-textPrimary text-4xl font-bold"
-          style={{ fontVariant: ['tabular-nums'], letterSpacing: -0.5 }}
-        >
-          {formatAmountNoSymbol(transaction.total_price)}
-        </Text>
-      </View>
-
-      <View className="flex-row justify-between mt-5 pt-4 border-t border-border">
-        <View>
-          <Text className="text-textMuted text-[13px] uppercase tracking-wide">Reference No.</Text>
+      <View className="mt-5">
+        <Text className="text-[12px] font-black uppercase text-textOnDark/55">Amount</Text>
+        <View className="mt-1 flex-row items-end">
+          <Text className="mr-1 text-[34px] font-black text-textOnDark">₱</Text>
           <Text
-            className="text-textSecondary text-sm mt-0.5 font-medium"
+            className="text-[34px] font-black text-textOnDark"
             style={{ fontVariant: ['tabular-nums'] }}
           >
-            {transaction.reference_no}
+            {formatAmountNoSymbol(Number(transaction.total_price ?? 0))}
           </Text>
         </View>
-        <View className="items-end">
-          <Text className="text-textMuted text-[13px] uppercase tracking-wide">Date Issued</Text>
-          <Text className="text-sm mt-0.5 font-medium">
-            {formatDate(transaction.created_at)}
-          </Text>
-        </View>
+      </View>
+
+      <View className="mt-5 flex-row gap-3 border-t border-textOnDark/10 pt-4">
+        <HeaderMeta label="Reference" value={transaction.reference_no || 'Not provided'} />
+        <HeaderMeta label="Date" value={formatDate(transaction.created_at)} alignEnd />
       </View>
     </View>
   );
 });
 
-// ---------- Summary panel components ----------
-function SummaryStat({ label, value }: { label: string; value: string }) {
+function HeaderMeta({
+  label,
+  value,
+  alignEnd = false,
+}: {
+  label: string;
+  value: string;
+  alignEnd?: boolean;
+}) {
   return (
-    <View className="flex-1 mx-1">
-      <Text className="text-textMuted text-center text-[13px] uppercase tracking-wide">
-        {label}
-      </Text>
+    <View className={`flex-1 ${alignEnd ? 'items-end' : ''}`}>
+      <Text className="text-[11px] font-black uppercase text-textOnDark/50">{label}</Text>
       <Text
-        className="text-textPrimary font-semibold text-center mt-1"
+        className={`mt-1 text-[12px] font-bold text-textOnDark ${alignEnd ? 'text-right' : ''}`}
         numberOfLines={1}
-        style={{ fontVariant: ['tabular-nums'] }}
       >
         {value}
       </Text>
@@ -155,49 +138,63 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Balance is only meaningful for a Purchase (installment) transaction — an
-// investment or withdrawal record has no running "balance owed" concept.
+function SummaryStat({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="flex-1 rounded-[16px] bg-background p-3">
+      <Text className="text-[11px] font-black uppercase text-textMuted">{label}</Text>
+      <Text className="mt-1 text-[13px] font-black text-textPrimary" numberOfLines={1}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
 const InstallmentSummaryPanel = memo(function InstallmentSummaryPanel({
-  summary }: { summary: InstallmentSummary; }) {
+  summary,
+}: {
+  summary: InstallmentSummary;
+}) {
   const progress =
     summary.total_price > 0 ? Math.min(summary.total_paid / summary.total_price, 1) : 0;
 
   return (
-    <View className="mx-4 mt-3 rounded-2xl bg-surface border border-border p-5">
-      <View className="flex-row justify-between items-baseline">
-        <Text className="text-textSecondary text-[13px] uppercase tracking-wide font-medium">
+    <SectionCard title="Payment Summary" icon="pie-chart-outline">
+      <View className="flex-row items-baseline justify-between gap-3">
+        <Text className="text-[13px] font-black uppercase text-textSecondary">
           Remaining Balance
         </Text>
-        <Text className="text-textPrimary text-lg font-bold" style={{ fontVariant: ['tabular-nums'] }}>
+        <Text className="text-lg font-black text-textPrimary">
           {formatCurrency(summary.payment_balance)}
         </Text>
       </View>
 
-      <View className="h-2.5 bg-border/40 rounded-full mt-3 overflow-hidden">
-        <View className="h-2.5 rounded-full bg-accentDark" style={{ width: `${progress * 100}%` }} />
-      </View>
-      <View className="flex-row justify-between mt-1.5 mb-4">
-        <Text className="text-textSecondary text-[13px]">{formatCurrency(summary.total_paid)} paid</Text>
-        <Text className="text-textSecondary text-[13px]">of {formatCurrency(summary.total_price)}</Text>
+      <View className="mt-3 h-2.5 overflow-hidden rounded-full bg-border/50">
+        <View className="h-2.5 rounded-full bg-accent" style={{ width: `${progress * 100}%` }} />
       </View>
 
-      <View className="flex-row mt-5 -mx-1">
+      <View className="mb-4 mt-2 flex-row justify-between">
+        <Text className="text-[12px] font-semibold text-textSecondary">
+          {formatCurrency(summary.total_paid)} paid
+        </Text>
+        <Text className="text-[12px] font-semibold text-textSecondary">
+          of {formatCurrency(summary.total_price)}
+        </Text>
+      </View>
+
+      <View className="flex-row gap-2">
         <SummaryStat label="Initial" value={formatCurrency(summary.initial_amount_paid)} />
         <SummaryStat
           label="Monthly"
-          value={summary.monthly_installment != null ? formatCurrency(summary.monthly_installment) : '—'}
+          value={summary.monthly_installment != null ? formatCurrency(summary.monthly_installment) : '-'}
         />
         <SummaryStat
-          label="Term (yrs)"
-          value={summary.years_to_pay != null ? String(summary.years_to_pay) : '—'}
+          label="Term"
+          value={summary.years_to_pay != null ? `${summary.years_to_pay} yrs` : '-'}
         />
       </View>
 
-      <View className="mt-4 pt-4 flex-row justify-between border-t border-border">
-        <Text className="text-textSecondary text-sm">Next due date</Text>
-        <Text className="text-textPrimary text-sm font-medium">{formatDate(summary.due_date)}</Text>
-      </View>
-    </View>
+      <DetailLine label="Next due date" value={formatDate(summary.due_date)} />
+    </SectionCard>
   );
 });
 
@@ -207,21 +204,18 @@ const WithdrawalSummaryPanel = memo(function WithdrawalSummaryPanel({
   transaction: Transaction;
 }) {
   return (
-    <View className="mx-4 mt-3 rounded-2xl bg-surface border border-border p-5">
-      <View className="flex-row -mx-1">
+    <SectionCard title="Withdrawal Summary" icon="wallet-outline">
+      <View className="flex-row gap-2">
         <SummaryStat label="Amount" value={formatCurrency(transaction.total_price)} />
-        <SummaryStat label="Method" value={transaction.payment_method ?? '—'} />
+        <SummaryStat label="Method" value={transaction.payment_method ?? '-'} />
         <SummaryStat label="Status" value={transaction.status} />
       </View>
-      <View className="mt-4 pt-4 flex-row justify-between border-t border-border">
-        <Text className="text-textSecondary text-xs">Requested on</Text>
-        <Text className="text-textPrimary text-xs font-medium">{formatDate(transaction.created_at)}</Text>
-      </View>
-    </View>
+
+      <DetailLine label="Requested on" value={formatDate(transaction.created_at)} />
+    </SectionCard>
   );
 });
 
-// ---------- Contract card ----------
 const ContractCard = memo(function ContractCard({ contract }: { contract: TransactionContract }) {
   const canView = Boolean(contract.file_url);
 
@@ -230,12 +224,14 @@ const ContractCard = memo(function ContractCard({ contract }: { contract: Transa
       Alert.alert('Contract unavailable', 'The contract link is currently unavailable. Please try again later.');
       return;
     }
+
     try {
       const supported = await Linking.canOpenURL(contract.file_url);
       if (!supported) {
         Alert.alert('Unable to open contract', 'No app is available to open this link.');
         return;
       }
+
       await Linking.openURL(contract.file_url);
     } catch {
       Alert.alert('Unable to open contract', 'Please try again in a moment.');
@@ -243,84 +239,132 @@ const ContractCard = memo(function ContractCard({ contract }: { contract: Transa
   }, [contract.file_url]);
 
   return (
-    <View className="mx-4 mt-3 rounded-2xl bg-surface border border-border p-4">
-      <View className="flex-row items-start">
-        <View className="h-11 w-11 items-center justify-center rounded-xl bg-accent/10">
-          <Ionicons name="document-text-outline" size={22} color={Colors.accent} />
-        </View>
-        <View className="ml-3 flex-1">
-          <Text className="text-base font-semibold text-textPrimary">Contract</Text>
-          <Text className="mt-0.5 text-textSecondary text-xs" numberOfLines={1}>
-            {contract.file_name || 'Document available'}
-          </Text>
-        </View>
-      </View>
+    <SectionCard title="Contract" icon="document-text-outline">
+      <Text className="text-[13px] font-semibold text-textSecondary" numberOfLines={1}>
+        {contract.file_name || 'Document available'}
+      </Text>
 
       <Pressable
         onPress={handleViewContract}
         disabled={!canView}
         accessibilityRole="button"
         accessibilityLabel="View contract"
-        className={`mt-4 flex-row items-center justify-center rounded-xl px-4 py-3 ${
-          canView ? 'bg-accent active:bg-accentDark' : 'bg-surfaceMuted'
+        className={`mt-4 min-h-[46px] flex-row items-center justify-center rounded-[16px] ${
+          canView ? 'bg-accent active:opacity-80' : 'bg-surfaceMuted'
         }`}
       >
         <Ionicons name="open-outline" size={17} color={canView ? Colors.white : Colors.textMuted} />
-        <Text className={`ml-2 font-semibold text-sm ${canView ? 'text-white' : 'text-textMuted'}`}>
+        <Text className={`ml-2 text-[13px] font-black ${canView ? 'text-white' : 'text-textMuted'}`}>
           View Contract
         </Text>
       </Pressable>
+    </SectionCard>
+  );
+});
+
+const LedgerRow = memo(function LedgerRow({
+  payment,
+  config,
+}: {
+  payment: InstallmentPayment;
+  config: StatementConfigEntry;
+}) {
+  return (
+    <View className="mx-5 mb-3 rounded-[20px] border border-border bg-surface p-4 shadow-sm">
+      <View className="flex-row items-start gap-3">
+        <View className="h-11 w-11 items-center justify-center rounded-[15px] bg-tag">
+          <Ionicons name={config.entryIcon} size={20} color={Colors.accent} />
+        </View>
+
+        <View className="min-w-0 flex-1">
+          <View className="flex-row items-start justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-[14px] font-black text-textPrimary" numberOfLines={1}>
+                {payment.payment_method}
+              </Text>
+              <Text className="mt-1 text-[12px] font-semibold text-textSecondary" numberOfLines={1}>
+                Ref: {payment.reference_no || 'Not provided'}
+              </Text>
+            </View>
+
+            <Text className="text-[14px] font-black text-accent">
+              {config.sign} {formatCurrency(payment.amount_paid)}
+            </Text>
+          </View>
+
+          {!!payment.notes && (
+            <Text className="mt-2 text-[12px] font-semibold text-textMuted" numberOfLines={2}>
+              {payment.notes}
+            </Text>
+          )}
+
+          <View className="mt-3 flex-row items-center justify-between gap-3 border-t border-border pt-3">
+            <Text className="text-[12px] font-semibold text-textMuted" numberOfLines={1}>
+              Recorded by {payment.recorded_by || 'Admin'}
+            </Text>
+            <Text className="text-[12px] font-semibold text-textSecondary">
+              {formatDate(payment.payment_date)}
+            </Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 });
 
-// ---------- Ledger entry row (self-contained card, no group-wrapper needed) ----------
-const LedgerRow = memo(function LedgerRow({ payment, accent, accentSoft,
-  entryIcon, sign }: { payment: InstallmentPayment; accent: string;
-  accentSoft: string; entryIcon: keyof typeof Ionicons.glyphMap; sign: '+' | '-'; }) {
-
+function SectionCard({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  children: ReactNode;
+}) {
   return (
-    <View className="mx-4 mb-2 flex-row items-center rounded-2xl bg-surface border border-border px-4 py-3.5">
-      <View
-        className="h-10 w-10 rounded-full items-center justify-center mr-3"
-        style={{ backgroundColor: accentSoft }}
-      >
-        <Ionicons name={entryIcon} size={20} color={accent} />
+    <View className="mx-5 mt-3 rounded-[20px] border border-border bg-surface p-4 shadow-sm">
+      <View className="mb-3 flex-row items-center gap-2">
+        <View className="h-9 w-9 items-center justify-center rounded-[13px] bg-tag">
+          <Ionicons name={icon} size={18} color={Colors.accent} />
+        </View>
+        <Text className="text-[15px] font-black text-textPrimary">{title}</Text>
       </View>
-
-      <View className="flex-1 pr-3">
-        <Text className="font-medium text-textPrimary text-[13px]">{payment.payment_method}</Text>
-        <Text className="text-textSecondary text-sm mt-0.5" style={{ fontVariant: ['tabular-nums'] }}>
-          Ref: {payment.reference_no}
-        </Text>
-        {!!payment.notes && (
-          <Text className="text-textMuted text-xs mt-0.5" numberOfLines={2}>
-            {payment.notes}
-          </Text>
-        )}
-        <Text className="text-textMuted text-sm mt-1">Recorded by {payment.recorded_by}</Text>
-      </View>
-
-      <View className="items-end">
-        <Text className="text-[13px] font-bold" style={{ color: accent, fontVariant: ['tabular-nums'] }}>
-          {sign} {formatCurrency(payment.amount_paid)}
-        </Text>
-        <Text className="text-textSecondary text-sm mt-0.5">{formatDate(payment.payment_date)}</Text>
-      </View>
-    </View>
-  );
-});
-
-function EmptyState() {
-  return (
-    <View className="px-4 py-10 items-center">
-      <Ionicons name="receipt-outline" size={28} color={Colors.textMuted} />
-      <Text className="text-textMuted text-sm mt-2">No records yet.</Text>
+      {children}
     </View>
   );
 }
 
-// ---------- Main component ----------
+function DetailLine({ label, value }: { label: string; value: string }) {
+  return (
+    <View className="mt-4 flex-row justify-between border-t border-border pt-4">
+      <Text className="text-[13px] font-semibold text-textSecondary">{label}</Text>
+      <Text className="text-[13px] font-black text-textPrimary">{value}</Text>
+    </View>
+  );
+}
+
+function EmptyState() {
+  return (
+    <View className="mx-5 items-center rounded-[20px] border border-dashed border-border bg-surface px-6 py-10">
+      <View className="mb-3 h-14 w-14 items-center justify-center rounded-[20px] bg-tag">
+        <Ionicons name="receipt-outline" size={26} color={Colors.accent} />
+      </View>
+      <Text className="text-[15px] font-black text-textPrimary">No records yet</Text>
+      <Text className="mt-2 text-center text-[13px] font-semibold text-textMuted">
+        Payment or processing records will appear here once available.
+      </Text>
+    </View>
+  );
+}
+
+function LoadingStatementState() {
+  return (
+    <View className="flex-1 items-center justify-center bg-background py-24">
+      <Text className="text-xs font-semibold text-textMuted">Loading statement...</Text>
+    </View>
+  );
+}
+
 function PaymentRecordsListImpl({
   transaction,
   payments,
@@ -330,58 +374,38 @@ function PaymentRecordsListImpl({
   refreshing = false,
   onRefresh,
 }: PaymentRecordsListProps) {
-
   if (loading || !transaction || !isKnownTransactionType(transaction.type)) {
-    return (
-      <Text className="text-textMuted text-xs mt-3">Loading statement…</Text>
-    );
+    return <LoadingStatementState />;
   }
 
   const config = STATEMENT_CONFIG[transaction.type];
-
   const showInstallmentSummary = transaction.type === 0 && !!summary;
   const showWithdrawalSummary = transaction.type === 2;
 
-  const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<InstallmentPayment>) => (
-      <LedgerRow
-        payment={item}
-        accent={config.accent}
-        accentSoft={config.accentSoft}
-        entryIcon={config.entryIcon}
-        sign={config.sign}
-      />
-    ),
-    [config],
-  );
+  const listHeader = (
+    <>
+      <StatementHeader transaction={transaction} config={config} />
+      {showInstallmentSummary && <InstallmentSummaryPanel summary={summary} />}
+      {showWithdrawalSummary && <WithdrawalSummaryPanel transaction={transaction} />}
+      {contract && <ContractCard contract={contract} />}
 
-  const keyExtractor = useCallback((item: InstallmentPayment) => String(item.id), []);
-
-  const listHeader = useMemo(
-    () => (
-      <>
-        <StatementHeader transaction={transaction} config={config} />
-        {showInstallmentSummary && <InstallmentSummaryPanel summary={summary!} />}
-        {showWithdrawalSummary && <WithdrawalSummaryPanel transaction={transaction} />}
-        {contract && <ContractCard contract={contract} />}
-
-        <View className="mx-4 mt-5 mb-1 flex-row items-center justify-between">
-          <Text className="text-textPrimary font-semibold text-sm">{config.entryLabel}</Text>
-          <Text className="text-textMuted text-xs">
-            {payments.length} record{payments.length !== 1 ? 's' : ''}
-          </Text>
-        </View>
-      </>
-    ),
-    [transaction, config, showInstallmentSummary, showWithdrawalSummary, summary, contract, payments.length],
+      <View className="mx-5 mb-2 mt-5 flex-row items-center justify-between">
+        <Text className="text-[15px] font-black text-textPrimary">{config.entryLabel}</Text>
+        <Text className="text-[12px] font-semibold text-textMuted">
+          {payments.length} record{payments.length !== 1 ? 's' : ''}
+        </Text>
+      </View>
+    </>
   );
 
   return (
     <FlatList
       className="flex-1 bg-background"
       data={payments}
-      keyExtractor={keyExtractor}
-      renderItem={renderItem}
+      keyExtractor={(item) => String(item.id)}
+      renderItem={({ item }: ListRenderItemInfo<InstallmentPayment>) => (
+        <LedgerRow payment={item} config={config} />
+      )}
       ListHeaderComponent={listHeader}
       ListEmptyComponent={EmptyState}
       refreshControl={

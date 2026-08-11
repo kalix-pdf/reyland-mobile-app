@@ -17,3 +17,17 @@ export function getProviderDisplayName(method: PaymentMethod): string {
   const name = method.provider_name;
   return name ?? 'Unknown Provider';
 }
+
+export function getPaymentMethodTypeLabel(method: PaymentMethod): string {
+  return method.method_type === 'bank' ? 'Bank Account' : 'E-Wallet';
+}
+
+export function maskAccountNumber(accountNumber?: string | null): string {
+  const value = accountNumber?.trim();
+
+  if (!value) return 'No account number';
+
+  if (value.length <= 4) return value;
+
+  return `**** ${value.slice(-4)}`;
+}

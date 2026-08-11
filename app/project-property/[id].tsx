@@ -7,7 +7,6 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   StatusBar,
   Text,
   View,
@@ -25,12 +24,18 @@ import { ErrorScreen } from '@/components/helper/error-project';
 // (ActivityIndicator color, StatusBar backgroundColor, Ionicons color) stay in sync.
 const AppColors = require('@/tailwind.colors');
 
-const STATUS_FILTERS: { label: string; value: 'All' | Property['status'] }[] = [
-  { label: 'All', value: 'All' },
-  { label: 'Company Hold', value: 0 },
-  { label: 'Reserved', value: 1 },
-  { label: 'Sold', value: 2 },
+const STATUS_FILTERS: {
+  label: string;
+  value: 'All' | Property['status'];
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+  { label: 'All', value: 'All', icon: 'apps-outline' },
+  { label: 'Company Hold', value: 0, icon: 'business-outline' },
+  { label: 'Reserved', value: 1, icon: 'bookmark-outline' },
+  { label: 'Sold', value: 2, icon: 'checkmark-circle-outline' },
 ];
+
+type StatusCounts = Record<'All' | Property['status'], number>;
 
 export default function ProjectPropertiesScreen() {
   const { user, isLoading: authLoading } = useAuth();
@@ -72,6 +77,19 @@ export default function ProjectPropertiesScreen() {
     return searchResults.filter((p) => p.status === activeStatus);
   }, [activeStatus, searchResults]);
 
+  const statusCounts = useMemo<StatusCounts>(
+    () =>
+      searchResults.reduce(
+        (counts, property) => {
+          counts.All += 1;
+          counts[property.status] += 1;
+          return counts;
+        },
+        { All: 0, 0: 0, 1: 0, 2: 0 },
+      ),
+    [searchResults],
+  );
+
   const hasActiveSearch = search.trim().length > 0;
   const hasActiveStatusFilter = activeStatus !== 'All';
   const hasActiveFilters = hasActiveSearch || hasActiveStatusFilter;
@@ -103,33 +121,54 @@ export default function ProjectPropertiesScreen() {
 
   const renderListHeader = () => (
     <View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="px-[18px] pb-3 gap-[9px]"
-      >
+      <Text className="mx-[18px] mb-2 text-[12px] font-black uppercase text-textSecondary">
+        Property type
+      </Text>
+
+      <View className="mx-[18px] flex-row flex-wrap gap-[9px] pb-3">
         {STATUS_FILTERS.map((filter) => {
           const isActive = activeStatus === filter.value;
+          const count = statusCounts[filter.value];
 
           return (
             <Pressable
               key={filter.label}
-              className={`min-h-[38px] px-3.5 rounded-full border items-center justify-center active:opacity-80 active:scale-[0.98] ${
-                isActive ? 'border-accent bg-tag' : 'border-border bg-surface'
+              className={`min-h-[38px] flex-row items-center justify-center gap-1.5 rounded-[15px] border px-3 active:opacity-80 active:scale-[0.98] ${
+                isActive ? 'border-primary bg-primary' : 'border-border bg-surface'
               }`}
               onPress={() => setActiveStatus(filter.value)}
             >
+              <Ionicons
+                name={filter.icon}
+                size={14}
+                color={isActive ? AppColors.textOnDark : AppColors.accent}
+              />
+
               <Text
-                className={`text-[13px] font-extrabold ${
-                  isActive ? 'text-accent font-black' : 'text-textSecondary'
+                className={`text-[12px] font-black ${
+                  isActive ? 'text-textOnDark' : 'text-textSecondary'
                 }`}
               >
                 {filter.label}
               </Text>
+
+              <View
+                className={`min-w-[22px] rounded-full px-1.5 py-0.5 ${
+                  isActive ? 'bg-textOnDark/15' : 'bg-surfaceMuted'
+                }`}
+              >
+                <Text
+                  className={`text-center text-[10px] font-black ${
+                    isActive ? 'text-textOnDark' : 'text-textMuted'
+                  }`}
+                >
+                  {count}
+                </Text>
+              </View>
             </Pressable>
           );
         })}
-      </ScrollView>
+      </View>
 
       <View className="mx-[18px] mb-3 flex-row items-center justify-between gap-3">
         <View>
