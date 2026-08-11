@@ -60,7 +60,7 @@ export default function AboutReylandScreen() {
         </View>
 
         <View className="gap-5">
-          <Section title="Reyland PH Mobile Application">
+          <Section title="Reyland Development PH">
             <Text className="text-[14px] leading-[22px] font-medium text-textSecondary">
               The Reyland PH Mobile Application was developed to provide a more convenient and efficient way for
               clients to access services and stay connected with property updates. Through the application, buyers and
@@ -101,7 +101,7 @@ export default function AboutReylandScreen() {
         </View>
 
         <Text className="text-center text-xs font-semibold text-textMuted mt-7">
-          Reyland PH Mobile Application
+          Reyland Development PH
         </Text>
       </ScrollView>
     </SafeAreaView>

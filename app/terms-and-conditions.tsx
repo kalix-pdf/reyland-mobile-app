@@ -171,7 +171,7 @@ export default function TermsAndConditionsScreen() {
         </View>
 
         <Text className="text-center text-xs font-semibold text-textMuted mt-7">
-          Reyland PH Mobile Application
+          Reyland Development PH
         </Text>
       </ScrollView>
     </SafeAreaView>
