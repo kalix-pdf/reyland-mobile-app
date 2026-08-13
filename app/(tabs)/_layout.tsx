@@ -3,40 +3,26 @@ import { useAuth } from '@/context/auth-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Redirect, Tabs } from 'expo-router';
 import { Platform, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TAB_SCREENS = [
-  {
-    name: 'index',
-    title: 'Home',
-    icon: 'home-outline',
-    activeIcon: 'home',
-  },
-  {
-    name: 'discover',
-    title: 'Discover',
-    icon: 'telescope-outline',
-    activeIcon: 'telescope',
-  },
-  {
-    name: 'investor',
-    title: 'Affiliate',
-    icon: 'pulse-outline',
-    activeIcon: 'pulse',
-  },
-  {
-    name: 'profile',
-    title: 'Profile',
-    icon: 'person-circle-outline',
-    activeIcon: 'person-circle',
-  },
+  { name: 'index', title: 'Home', icon: 'home-outline', activeIcon: 'home' },
+  { name: 'discover', title: 'Discover', icon: 'telescope-outline', activeIcon: 'telescope' },
+  { name: 'investor', title: 'Affiliate', icon: 'pulse-outline', activeIcon: 'pulse' },
+  { name: 'profile', title: 'Profile', icon: 'person-circle-outline', activeIcon: 'person-circle' },
 ] as const;
 
 export default function TabLayout() {
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   if (!user) {
     return <Redirect href="/" />;
   }
+
+  // Base content height (icon + label) stays constant across devices.
+  const BAR_CONTENT_HEIGHT = Platform.OS === 'ios' ? 60 : 56;
+  const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 0);
 
   return (
     <Tabs
@@ -48,13 +34,10 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors.accent,
         tabBarInactiveTintColor: Colors.textMuted,
 
-        // tabBarStyle/tabBarItemStyle/tabBarLabelStyle are consumed by the
-        // navigator config, not rendered as className-able elements, so
-        // they stay as style objects — values now sourced from tailwind.colors.js
         tabBarStyle: {
-          height: Platform.OS === 'ios' ? 92 : 78,
+          height: BAR_CONTENT_HEIGHT + bottomInset,
           paddingTop: 10,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+          paddingBottom: bottomInset,
           paddingHorizontal: 14,
           backgroundColor: Colors.surface,
           borderTopWidth: 0,
