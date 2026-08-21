@@ -48,6 +48,8 @@ export default function AuthCallbackScreen() {
       }
 
       try {
+        if (!refreshToken) return;
+        
         const completed = await completeOAuthSignIn(token, setUser, refreshToken);
 
         if (!completed && isActive) {

@@ -18,10 +18,12 @@ export async function signInWithGoogle(): Promise<AuthResult> {
   }
   // console.log(result);
 
-  let token: string | null = null
+  let token: string | null = null;
+  let refreshToken: string | null = null;
   try {
     const url = new URL(result.url)
-    token = url.searchParams.get('access_token')
+    token = url.searchParams.get('access_token');
+    refreshToken = url.searchParams.get('refresh_token');
   } catch {
     throw new AuthError('Could not parse redirect URL', 'INVALID_RESPONSE')
   }
@@ -30,7 +32,7 @@ export async function signInWithGoogle(): Promise<AuthResult> {
     throw new AuthError('No token returned from backend', 'INVALID_RESPONSE')
   }
 
-  return { token }
+  return { token, refreshToken }
 }
 
 

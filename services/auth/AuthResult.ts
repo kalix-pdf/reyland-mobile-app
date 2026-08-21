@@ -9,7 +9,7 @@ export const REDIRECT_URI = `${REDIRECT_SCHEME}://auth/callback`
 
 export interface AuthResult {
   token: string
-  // refreshToken: string;
+  refreshToken: string | null;
 }
 
 export class AuthError extends Error {

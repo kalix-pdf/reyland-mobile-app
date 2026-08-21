@@ -5,7 +5,7 @@ import { User } from "@/types/user.types";
 
 type SetUser = (user: User | null) => void;
 
-export async function completeOAuthSignIn(token: string, setUser: SetUser, refreshToken?: string) {
+export async function completeOAuthSignIn(token: string, setUser: SetUser, refreshToken: string) {
   if (!token) {
     return false;
   }

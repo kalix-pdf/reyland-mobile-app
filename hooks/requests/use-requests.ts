@@ -1,6 +1,7 @@
+import { useAuth } from '@/context/auth-context';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { fetchUserRequests, RequestFilter, UserRequest } from '@/services/fetchData/requests/request.api';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 const ACTIVE_STATUSES = new Set([
   'new',
@@ -16,7 +17,12 @@ const ACTIVE_STATUSES = new Set([
 ]);
 
 export function useRequests(filter: RequestFilter = 'all') {
-  const fetcherFn = useCallback(() => fetchUserRequests(), []);
+  const { user } = useAuth();
+
+  const fetcherFn = useCallback(() => {
+    if (!user) return Promise.resolve([]);
+    return fetchUserRequests();
+  }, [user]);
 
   const { data: requests, ...rest } = useDataFetcher<UserRequest[]>(fetcherFn, {
     initialData: [],

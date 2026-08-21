@@ -17,10 +17,13 @@ export async function signInWithFacebook(): Promise<AuthResult> {
     throw new AuthError('Unexpected auth session result', 'NETWORK')
   }
 
-  let token: string | null = null
+  let token: string | null = null;
+  let refreshToken: string | null = null;
+  
   try {
     const url = new URL(result.url)
     token = url.searchParams.get('access_token')
+    refreshToken = url.searchParams.get('refresh_token');
   } catch {
     throw new AuthError('Could not parse redirect URL', 'INVALID_RESPONSE')
   }
@@ -29,5 +32,9 @@ export async function signInWithFacebook(): Promise<AuthResult> {
     throw new AuthError('No token returned from backend', 'INVALID_RESPONSE')
   }
 
-  return { token }
+  if (!refreshToken || token.trim() === '') {
+    throw new AuthError('No refresh token returned from backend', 'INVALID_RESPONSE')
+  }
+
+  return { token, refreshToken }
 }

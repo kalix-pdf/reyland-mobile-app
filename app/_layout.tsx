@@ -24,6 +24,13 @@ function RootNavigator() {
     },
   };
 
+  // useEffect(() => {
+  //   fetch('https://jsonplaceholder.typicode.com/todos/1')
+  //     .then(r => r.json())
+  //     .then(d => console.log('[TEST FETCH OK]', d))
+  //     .catch(e => console.log('[TEST FETCH FAIL]', e.message));
+  // }, []);
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ThemeProvider value={navigationTheme}>

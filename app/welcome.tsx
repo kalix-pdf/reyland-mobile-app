@@ -22,10 +22,10 @@ export default function WelcomeRoute() {
     setIsLoadingGoogleOuth(true);
 
     try {
-      const { token } = await signInWithGoogle();
+      const { token, refreshToken } = await signInWithGoogle();
 
-      if (token) {
-        await completeOAuthSignIn(token, setUser);
+      if (token && refreshToken) {
+        await completeOAuthSignIn(token, setUser, refreshToken);
       }
     } catch (error) {
       if (error instanceof AuthError && error.code === 'CANCELLED') return;
@@ -42,12 +42,14 @@ export default function WelcomeRoute() {
     if (isLoadingFacebookOuth) return;
     setIsLoadingFacebookOuth(true);
     try {
-      const { token } = await signInWithFacebook();
+      const { token, refreshToken } = await signInWithFacebook();
 
-      if (token) {
-        await completeOAuthSignIn(token, setUser);
+      if (token && refreshToken) {
+        await completeOAuthSignIn(token, setUser, refreshToken);
       }
     } catch (error) {
+      console.log(error);
+      
       if (error instanceof AuthError && error.code === 'CANCELLED') return;
       Alert.alert(
         'Sign-in Failed',

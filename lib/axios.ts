@@ -44,6 +44,13 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config as ApiRequestConfig | undefined;
 
+    if (!error.response) {
+      console.log('[API NETWORK ERROR]', error.code, error.message, originalRequest?.url);
+      return Promise.reject(error);
+    }
+
+    console.log('[API RESPONSE ERROR]', error.response.status, error.response.config.url);
+
     const is401 = error.response?.status === 401;
     const alreadyRetried = originalRequest?._retry;
     const shouldSkipAuthRefresh = originalRequest?.skipAuthRefresh;
