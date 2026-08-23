@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type WelcomeScreenProps = {
@@ -97,7 +97,8 @@ export function WelcomeScreen({ onSignIn, onSignUp, onGoogleLogin, onFacebookLog
               </Pressable>
 
               <Pressable className="w-14 h-14 rounded-full bg-[rgba(255,255,255,0.12)] border border-[rgba(255,255,255,0.18)] items-center justify-center active:opacity-50 disabled:opacity-60"
-                onPress={onFacebookLogin}
+                onPress={() => Alert.alert("Coming Soon!")}
+                // onPress={onFacebookLogin}
                 disabled={disabled}>
                 {isFacebookLoading ? (
                   <ActivityIndicator size="small" color="white" />
