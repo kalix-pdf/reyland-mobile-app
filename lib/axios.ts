@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getToken, clearTokens } from '@/lib/token-storage';
 import { refreshSession } from '@/services/auth/auth-refresh';
 import { authEvents } from '@/lib/auth-events';
 
@@ -17,7 +17,7 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem('token');
+  const token = await getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -40,7 +40,7 @@ const flushQueue = (error: unknown, token: string | null = null) => {
 };
 
 apiClient.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   async (error) => {
     const originalRequest = error.config as ApiRequestConfig | undefined;
 
@@ -79,12 +79,12 @@ apiClient.interceptors.response.use(
       apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
       originalRequest.headers.Authorization = `Bearer ${token}`;
       flushQueue(null, token);
-      return apiClient(originalRequest); 
+      return apiClient(originalRequest);
     } catch (refreshError) {
       flushQueue(refreshError);
       // Force logout — tokens are dead
-      await AsyncStorage.multiRemove(['token', 'refreshToken']);
-      // Emit event so AuthContext can react 
+      await clearTokens();
+      // Emit event so AuthContext can react (clears cached user + state too)
       authEvents.emit('SESSION_EXPIRED');
       return Promise.reject(refreshError);
     } finally {

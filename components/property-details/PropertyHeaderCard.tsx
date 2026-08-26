@@ -38,9 +38,9 @@ export function PropertyHeaderCard({
             <Tag label={statusLabel} variant="primary" />
           </View>
 
-          <Text className="text-textMuted text-xs font-extrabold mb-[3px]">Total price</Text>
+          <Text className="text-textMuted font-extrabold mb-[3px]">Total price</Text>
           <Text className="text-accent text-[27px] font-black">{formatCurrency(totalPrice)}</Text>
-          <Text className="mt-[7px] text-textPrimary text-xl leading-[27px] font-black">
+          <Text className="mt-[7px] text-textPrimary capitalize text-xl leading-[27px] font-black">
             {title}
           </Text>
         </View>
@@ -48,14 +48,11 @@ export function PropertyHeaderCard({
         <AreaBadge areaSqm={areaSqm} />
       </View>
 
-      <View className="mt-3.5 flex-row items-start gap-[9px] pt-3.5 border-t border-border">
+      <View className="mt-3.5 flex-row items-center gap-[9px] pt-3.5 border-t border-border">
         <View className="w-[30px] h-[30px] rounded-full items-center justify-center bg-tag">
           <Ionicons name="location-outline" size={16} color={Colors.accent} />
         </View>
-        <Text
-          className="flex-1 text-textSecondary text-sm leading-5 font-bold"
-          numberOfLines={2}
-        >
+        <Text className="flex-1 capitalize text-textSecondary text-sm leading-5 font-bold" numberOfLines={2}>
           {location}
         </Text>
       </View>

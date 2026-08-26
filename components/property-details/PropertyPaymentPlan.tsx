@@ -28,7 +28,7 @@ export function PropertyPaymentPlan({
           </View>
           <View className="flex-1 min-w-0">
             <Text className="text-textOnDark/70 text-xs font-extrabold">
-              Estimated monthly installment
+              Monthly installment
             </Text>
             <Text className="mt-[5px] text-textOnDark text-[23px] font-black">
               {formatCurrencyOrFallback(monthlyInstallment)}

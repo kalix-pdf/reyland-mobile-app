@@ -22,7 +22,7 @@ export default function TabLayout() {
 
   // Base content height (icon + label) stays constant across devices.
   const BAR_CONTENT_HEIGHT = Platform.OS === 'ios' ? 60 : 56;
-  const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 0);
+  const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 10 : 0);
 
   return (
     <Tabs

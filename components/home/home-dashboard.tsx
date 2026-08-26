@@ -37,7 +37,7 @@ const LocationChip = React.memo(({ location }: { location: string }) => {
   return (
     <View className="flex-row items-center gap-3 bg-surface rounded-full py-[10px] px-3 border border-border me-3 mb-[15px]">
         <Text className="text-textPrimary text-[15px] font-black"><Ionicons name="location-outline" size={20} color={Colors.textPrimary} /></Text>
-      <Text className="text-textPrimary text-[14px] font-bold max-w-[140px]">{location}</Text>
+      <Text className="text-textPrimary capitalize text-[14px] font-bold max-w-[140px]">{location}</Text>
     </View>
   );
 });

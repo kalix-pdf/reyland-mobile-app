@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getRefreshToken, setTokens } from '@/lib/token-storage';
 import { authApiBaseUrl } from './auth-shared';
 
 type RefreshResult = {
@@ -7,31 +7,48 @@ type RefreshResult = {
   expiresAt: number;
 };
 
+let inFlightRefresh: Promise<RefreshResult> | null = null;
+
 export const refreshSession = async (): Promise<RefreshResult> => {
-  const refreshToken = await AsyncStorage.getItem('refreshToken');
-
-  if (!refreshToken) {
-    throw new Error('No refresh token available!.');
+  // Dedupe concurrent callers (e.g. an axios interceptor firing on
+  // several parallel 401s) so we don't fire multiple refresh requests
+  // and race each other writing tokens.
+  if (inFlightRefresh) {
+    return inFlightRefresh;
   }
 
-  const response = await fetch(`${authApiBaseUrl}/api/auth/refresh`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
-  });
+  inFlightRefresh = (async () => {
+    try {
+      const refreshToken = await getRefreshToken();
 
-  if (!response.ok) {
-    throw new Error('Refresh failed.');
-  }
+      if (!refreshToken) {
+        throw new Error('No refresh token available.');
+      }
 
-  const json = await response.json();
-  const { token, refreshToken: newRefreshToken, expiresAt } = json.data;
+      const response = await fetch(`${authApiBaseUrl}/api/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
 
-  // Persist the new tokens immediately
-  await AsyncStorage.multiSet([
-    ['token', token],
-    ['refreshToken', newRefreshToken],
-  ]);
+      if (!response.ok) {
+        throw new Error('Refresh failed.');
+      }
 
-  return { token, refreshToken: newRefreshToken, expiresAt };
+      const json = await response.json();
+      const { token, refreshToken: newRefreshToken, expiresAt } = json.data ?? {};
+
+      if (!token || !newRefreshToken || !expiresAt) {
+        throw new Error('Malformed refresh response.');
+      }
+
+      await setTokens(token, newRefreshToken);
+
+      return { token, refreshToken: newRefreshToken, expiresAt };
+    } finally {
+      inFlightRefresh = null;
+    }
+  })();
+
+  return inFlightRefresh;
 };
