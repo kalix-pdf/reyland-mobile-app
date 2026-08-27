@@ -22,7 +22,7 @@ export default function TabLayout() {
 
   // Base content height (icon + label) stays constant across devices.
   const BAR_CONTENT_HEIGHT = Platform.OS === 'ios' ? 60 : 56;
-  const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 0);
+  const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 10 : 0);
 
   return (
     <Tabs
@@ -35,7 +35,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: Colors.textMuted,
 
         tabBarStyle: {
-          height: BAR_CONTENT_HEIGHT + bottomInset,
+          height: BAR_CONTENT_HEIGHT + 42,
           paddingTop: 10,
           paddingBottom: bottomInset,
           paddingHorizontal: 14,

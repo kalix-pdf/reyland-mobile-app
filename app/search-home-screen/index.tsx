@@ -62,7 +62,7 @@ export default function SearchHomeScreen() {
       } catch (err) {
         const errorName = err instanceof Error ? err.name : '';
         if (errorName === 'AbortError' || errorName === 'CanceledError') return;
-        setError('Search failed. Please try again.');
+        setError('Search failed. You application is pending approval or check your internet connection.');
       } finally {
         setLoading(false);
         setRefreshing(false);

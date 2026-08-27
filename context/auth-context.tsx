@@ -1,9 +1,9 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "@/services/auth/auth-login";
 import { logoutUser } from "@/services/auth/auth-logout";
-import { clearCachedUser, establishAuthenticatedSession, getCachedUser } from "@/services/auth/auth-session";
+import { establishAuthenticatedSession } from "@/services/auth/auth-session";
+import { getCachedUser, getToken, endSession } from "@/lib/token-storage";
 import { User } from "@/types/user.types";
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { authEvents } from "@/lib/auth-events";
 import { refreshSession } from "@/services/auth/auth-refresh";
 import { AppState, AppStateStatus } from "react-native";
@@ -26,51 +26,48 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: false,
   login: async () => ({ success: false }),
   logout: async () => {},
-  setUser: () => {}
+  setUser: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isRestoring = useRef(true);
 
-  //persistent login session restoration
+  // Persistent login session restoration
   useEffect(() => {
-      const isRestoring = { current: true };
+    const subscription = AppState.addEventListener('change', async (nextState: AppStateStatus) => {
+      if (nextState === 'active' && !isRestoring.current) {
+        const token = await getToken();
+        if (token) refreshSession();
+      }
+    });
 
-      const subscription = AppState.addEventListener('change', async (nextState: AppStateStatus) => {
-        if (nextState === 'active' && !isRestoring.current) {
-          const token = await AsyncStorage.getItem('token');
-          if (token) refreshSession();
-        }
-      });
+    const restoreSession = async () => {
+      try {
+        const token = await getToken();
+        if (!token) return;
 
-      const restoreSession = async () => {
-        try {
-          const token = await AsyncStorage.getItem('token');
-          if (!token) return;
+        const cachedUser = await getCachedUser();
+        if (cachedUser) setUser(cachedUser);
 
-          const cachedUser = await getCachedUser();
-          if (cachedUser) setUser(cachedUser);
+        await refreshSession();
+      } catch {
+        await endSession(setUser);
+      } finally {
+        setIsLoading(false);
+        isRestoring.current = false;
+      }
+    };
 
-          await refreshSession();
-        } catch {
-          await AsyncStorage.multiRemove(['token', 'refreshToken']);
-          await clearCachedUser();
-        } finally {
-          setIsLoading(false);
-          isRestoring.current = false; 
-        }
-      };
+    restoreSession();
+    return () => subscription.remove();
+  }, []);
 
-      restoreSession();
-      return () => subscription.remove();
-    }, []);
-
-  //Listen for forced logout from axios interceptor
+  // Listen for forced logout from axios interceptor
   useEffect(() => {
     const handleExpired = async () => {
-      await AsyncStorage.multiRemove(['token', 'refreshToken']);
-      setUser(null);
+      await endSession(setUser);
     };
 
     authEvents.on('SESSION_EXPIRED', handleExpired);
@@ -99,17 +96,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const token = await AsyncStorage.getItem('token');
+      const token = await getToken();
       if (token) {
         await logoutUser(token);
       }
     } catch (error) {
       console.error(error);
-      alert('Something Went Wrong During Logout. Please try again.');
+      alert('Something went wrong during logout. Please try again.');
     } finally {
-      await AsyncStorage.multiRemove(['token', 'refreshToken']);
-      await clearCachedUser(); 
-      setUser(null);
+      await endSession(setUser);
       setIsLoading(false);
     }
   }, []);

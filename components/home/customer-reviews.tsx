@@ -81,7 +81,7 @@ const ReviewCard = React.memo(({ review }: { review: Review }) => {
 
 export function CustomerReviews() {
   return (
-    <View className="mt-[15px] mb-[10px]">
+    <View className="mt-[15px] mb-[50px]">
       <View className="mx-[18px] mb-[15px]">
         <Text className="text-[23px] font-semibold tracking-[-0.7px]">Satisfied Customers</Text>
         <Text className="mt-1 text-[13px] font-semibold text-textMuted">

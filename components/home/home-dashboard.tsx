@@ -37,7 +37,7 @@ const LocationChip = React.memo(({ location }: { location: string }) => {
   return (
     <View className="flex-row items-center gap-3 bg-surface rounded-full py-[10px] px-3 border border-border me-3 mb-[15px]">
         <Text className="text-textPrimary text-[15px] font-black"><Ionicons name="location-outline" size={20} color={Colors.textPrimary} /></Text>
-      <Text className="text-textPrimary text-[14px] font-bold max-w-[140px]">{location}</Text>
+      <Text className="text-textPrimary capitalize text-[14px] font-bold max-w-[140px]">{location}</Text>
     </View>
   );
 });
@@ -235,7 +235,7 @@ export function HomeDashboard() {
             </View>
 
             {/* ── Project Locations ────────────────────────────────────────── */}
-            <View className="mx-[18px] mt-[15px]">
+            <View className="mx-[18px] mt-[25px]">
               <View className="flex-row justify-between items-center mb-[15px]">
                 <View>
                   <Text className="text-[23px] font-semibold tracking-[-0.7px]">Project Locations</Text>

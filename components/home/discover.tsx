@@ -261,13 +261,13 @@ export function DiscoverScreen() {
       <View className="flex-1 bg-background">
         <StatusBar barStyle="dark-content" />
 
-        <SafeAreaView edges={['top']} className="bg-surface pt-5">
-          <HeaderShell>
+        {/* <SafeAreaView edges={['top']} className="bg-surface pt-5"> */}
+          {/* <HeaderShell>
             <View className="py-4">
               <Text className="text-[18px] font-black text-textPrimary">Discover</Text>
             </View>
-          </HeaderShell>
-        </SafeAreaView>
+          </HeaderShell> */}
+        {/* </SafeAreaView> */}
 
         <AccountApprovalRequired message="Your account needs to be approved before you can explore Reyland projects and property listings." />
       </View>
