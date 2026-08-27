@@ -4,7 +4,7 @@
     "slug": "reyland-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/playstore-icon.png",
     "scheme": "reylandapp",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -12,15 +12,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/logo_transparent.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/images/playstore-icon.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.reyland.ph",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": []
     },
     "web": {
       "output": "static",
@@ -44,7 +41,8 @@
         }
       ],
       "expo-web-browser",
-      "expo-video"
+      "expo-video",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

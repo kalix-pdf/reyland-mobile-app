@@ -56,7 +56,7 @@ function ProjectCard({ project, user }: { project: Project; user: User | null })
           </Text>
           <View className="flex-row items-center gap-[3px]">
             <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
-            <Text className="text-[14px] text-textMuted flex-1" numberOfLines={1}>
+            <Text className="text-[14px] text-textMuted flex-1 capitalize" numberOfLines={1}>
               {project.location}
             </Text>
           </View>
