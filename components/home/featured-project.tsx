@@ -4,8 +4,7 @@ import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
 import { Href, router } from 'expo-router';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { Pressable, ScrollView, Text, View } from 'react-native';
-import { Shadow } from 'react-native-shadow-2';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 interface Props {
   projects: Project[];
@@ -21,15 +20,9 @@ function ProjectCard({ project, user }: { project: Project; user: User | null })
   });
 
   return (
-    <Shadow
-      distance={12}
-      startColor="rgba(0,0,0,0.10)"
-      endColor="rgba(0,0,0,0)"
-      offset={[-5, 6]}
-      style={{ borderRadius: 24 }}
-    >
       <Pressable
         className="w-[180px] rounded-[18px] bg-white "
+        style={styles.cardShadow}
         onPress={() => {
           if (!user) {
             router.push("/welcome");
@@ -63,13 +56,12 @@ function ProjectCard({ project, user }: { project: Project; user: User | null })
           </Text>
           <View className="flex-row items-center gap-[3px]">
             <Ionicons name="location-sharp" size={15} color={Colors.textMuted} />
-            <Text className="text-[14px] text-textMuted flex-1" numberOfLines={1}>
+            <Text className="text-[14px] text-textMuted flex-1 capitalize" numberOfLines={1}>
               {project.location}
             </Text>
           </View>
         </View>
     </Pressable>
-    </Shadow>
   );
 }
 
@@ -124,20 +116,11 @@ export function FeaturedPropertiesScroll({ properties, user }: FeaturedPropertie
         const totalPrice = property.total_price ?? Number(property.price ?? 0) * Number(property.area ?? 0);
 
         return (
-          <Shadow
+          <Pressable
             key={property.id}
-            distance={12}
-            startColor="rgba(0,0,0,0.10)"
-            endColor="rgba(0,0,0,0)"
-            offset={[-5, 6]}
-            style={{ borderRadius: 24 }}
-            >
-            
-            <Pressable
-              key={property.id}
-              className="w-[180px] rounded-[18px] bg-white"
-            
-              onPress={() => { if (!user) {
+            className="w-[180px] rounded-[18px] bg-white"
+            style={styles.cardShadow}
+            onPress={() => { if (!user) {
                 router.push('/welcome');
               } else {
                 router.push({
@@ -171,9 +154,18 @@ export function FeaturedPropertiesScroll({ properties, user }: FeaturedPropertie
                 </View>
               </View>
             </Pressable>
-          </Shadow>
         );
       })}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  cardShadow: {
+    shadowColor: '#00171C',
+    shadowOffset: { width: -5, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+});

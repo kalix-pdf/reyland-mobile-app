@@ -1,10 +1,11 @@
 import { useAppTheme } from '@/context/theme-context';
+import { sharedLoginPillBase, sharedLoginPillText, sharedSmallAvatarBase } from '@/styles/shared-primitives';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
-import { getInitials } from '../profile/get-initials';
 import { User } from '../../types/user.types';
-import { sharedLoginPillBase, sharedLoginPillText, sharedSmallAvatarBase } from '@/styles/shared-primitives';
+import { getInitials } from '../profile/get-initials';
 
 interface HeaderBrandProps {
     user?: User | null;
@@ -27,7 +28,8 @@ export function HeaderBrand({ user, onLogin }: HeaderBrandProps) {
 
             <View className="flex-row items-center flex-shrink-0">
                 {user ? (
-                    <View className="flex-row items-center gap-2 max-w-[180px]">
+                    <Pressable className="flex-row items-center gap-2 max-w-[180px]"
+                    onPress={() => router.push('/profile')}>
                         <Text
                             className="text-[13px] font-extrabold flex-shrink"
                             style={{ color: colors.textSecondary }}
@@ -51,7 +53,7 @@ export function HeaderBrand({ user, onLogin }: HeaderBrandProps) {
                             priority="normal"
                             transition={200}
                         />
-                    </View>
+                    </Pressable>
                 ) : (
                     <Pressable
                         className="min-h-10 px-3.5 py-[9px] active:opacity-50"

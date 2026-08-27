@@ -1,26 +1,23 @@
 {
   "expo": {
-    "name": "reyland-app",
+    "name": "Reyland",
     "slug": "reyland-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/logo.png",
+    "icon": "./assets/images/playstore-icon.png",
     "scheme": "reylandapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/logo_transparent.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/images/playstore-icon.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ryuzaki16.reylandapp"
+      "package": "com.reyland.ph",
+      "permissions": []
     },
     "web": {
       "output": "static",
@@ -31,13 +28,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#000000"
-          }
+          "backgroundColor": "#ffffff"
         }
       ],
       [
@@ -47,7 +41,8 @@
         }
       ],
       "expo-web-browser",
-      "expo-video"
+      "expo-video",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -56,8 +51,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "a402e7b6-f6ff-4c7d-934a-a97e5af288a8"
+        "projectId": "493f1a8e-b55a-4c4d-88ff-321b3f67bfc5"
       }
-    }
+    },
+    "owner": "reyland-development-ph"
   }
 }

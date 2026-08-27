@@ -16,7 +16,6 @@ import { DashboardSkeleton, ProjectCardsSkeleton, PromotionalCarouselSkeleton, W
 import { HomeRequestsPreview } from '../requests/home-requests-preview';
 import { PromotionalCarousel } from './carousel';
 import { FeaturedProjectsScroll, FeaturedPropertiesScroll } from './featured-project';
-import { CustomerReviews } from './customer-reviews';
 
 // const QUICK_ACTIONS = [
 //   { key: 'browse',  label: 'Browse',   icon: 'search-outline'              },
@@ -67,8 +66,11 @@ export function HomeDashboard() {
   });
 
   const handleLoginPress = useCallback(() => router.push('/welcome'), []);
-  const handleDiscoverPress = useCallback(() => {
-    router.push(user ? '/(tabs)/discover' : '/welcome');
+  // const handleDiscoverPress = useCallback(() => {
+  //   router.push(user ? '/(tabs)/discover' : '/welcome');
+  // }, [user]);
+  const handleExploreMorePress = useCallback(() => {
+    router.push(user ? '/(tabs)/discover' : '/welcome')
   }, [user]);
 
   const handleSearchSubmit = useCallback((query: string) => {
@@ -76,10 +78,10 @@ export function HomeDashboard() {
     if (!trimmedQuery) return;
 
     router.push({
-      pathname: '/search-home-screen',
+      pathname: user ? '/search-home-screen' : '/welcome',
       params: { q: trimmedQuery },
     } as unknown as Href);
-  }, []);
+  }, [user]);
 
   const handleRefresh = useCallback(() => {
     refreshDashboard();
@@ -170,7 +172,7 @@ export function HomeDashboard() {
             <View className="mt-[15px]">
               <View className="mx-[18px] flex-row justify-between items-center mb-[15px]">
                 <Text className="text-[23px] font-semibold tracking-[-0.7px]">Top Projects</Text>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
+                <TouchableOpacity onPress={handleExploreMorePress}>
                   <Text className="text-[13px] font-extrabold text-accent">
                     Explore More
                   </Text>
@@ -212,7 +214,8 @@ export function HomeDashboard() {
                       { borderColor: 'rgba(255, 255, 255, 0.14)', backgroundColor: 'rgba(0, 23, 28, 0.63)' },
                       pressed && sharedPressedScale,
                     ]}>
-                    <Text className="text-white text-[11px] leading-[14px] font-black">
+                    <Text className="text-white text-[11px] leading-[14px] font-black"
+                    onPress={() => router.push('/contact-us')}>
                       Need Help?
                     </Text>
                   </Pressable>
@@ -243,7 +246,7 @@ export function HomeDashboard() {
                     Browse by city and growth area
                   </Text>
                 </View>
-                <Pressable
+                {/* <Pressable
                   className="py-1.5"
                   style={({ pressed }) => pressed && sharedPressedScale}
                   onPress={handleDiscoverPress}
@@ -251,7 +254,7 @@ export function HomeDashboard() {
                   <Text className="text-[13px] font-extrabold text-accent">
                     Explore
                   </Text>
-                </Pressable>
+                </Pressable> */}
               </View>
               <ScrollView
                 horizontal
@@ -265,10 +268,10 @@ export function HomeDashboard() {
             </View>
 
             {/* Featured Properties  */}
-            <View className="mt-[15px]">
+            <View className="mt-[15px] mb-[15px]">
               <View className="mx-[18px] flex-row justify-between items-center mb-[15px]">
                 <Text className="text-[23px] font-semibold tracking-[-0.7px]">Featured Properties</Text>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/discover')}>
+                <TouchableOpacity onPress={handleExploreMorePress}>
                   <Text className="text-[13px] font-extrabold text-accent">
                     Explore More
                   </Text>
@@ -277,7 +280,7 @@ export function HomeDashboard() {
               <FeaturedPropertiesScroll user={user} properties={featuredProperties} />
             </View>
 
-            <CustomerReviews />
+            {/* <CustomerReviews /> */}
 
       </ScrollView>
     </SafeAreaView>

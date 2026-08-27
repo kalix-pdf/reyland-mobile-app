@@ -62,7 +62,7 @@ export function AccountApprovalRequired({
 
         {/* Title */}
         <Text className="text-[30px] font-black text-textPrimary text-center">
-          Were reviewing
+          We&apos;re reviewing
         </Text>
 
         <Text className="text-[30px] font-black text-accent text-center">
