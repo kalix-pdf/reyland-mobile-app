@@ -68,7 +68,7 @@ function PropertyCard({ property }: Props) {
         <View className="flex-row items-start gap-3">
           <View className="flex-1">
             <Text className="text-xl font-black text-accent mb-1">{formatPrice(totalPrice)}</Text>
-            <Text className="text-lg font-black text-textPrimary leading-[23px]" numberOfLines={2}>
+            <Text className="text-lg capitalize font-black text-textPrimary leading-[23px]" numberOfLines={2}>
               {property.title}
             </Text>
           </View>
@@ -79,7 +79,7 @@ function PropertyCard({ property }: Props) {
 
         <View className="flex-row items-center gap-1 mt-2 mb-3.5">
           <Ionicons name="location-outline" size={14} color={AppColors.accent} />
-          <Text className="flex-1 text-[13px] text-textSecondary font-semibold" numberOfLines={1}>
+          <Text className="flex-1 text-[13px] capitalize text-textSecondary font-semibold" numberOfLines={1}>
             {location}
           </Text>
         </View>
@@ -87,12 +87,12 @@ function PropertyCard({ property }: Props) {
         <View className="flex-row items-center pt-3 border-t border-border">
           <View className="flex-row items-center flex-1 justify-center">
             <Ionicons
-              name="bed-outline"
+              name="map-outline"
               size={14}
               color={AppColors.textSecondary}
               style={{ marginRight: 5 }}
             />
-            <Text className="text-xs text-textSecondary font-semibold">{property.units} Units</Text>
+            <Text className="text-xs text-textSecondary font-semibold">{property.lot_type === 0 ? "Regular Lot" : "Corner Lot"}</Text>
           </View>
           <View className="w-px h-4 bg-border mx-2" />
           <View className="flex-row items-center flex-1 justify-center">

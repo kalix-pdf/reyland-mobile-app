@@ -119,7 +119,7 @@ function RequestFilterChip({
   return (
     <Pressable
       onPress={onPress}
-      className={`min-h-[38px] flex-row items-center gap-1.5 rounded-[15px] border px-3 ${
+      className={`min-h-[38px] flex-shrink-0 flex-row items-center gap-1.5 rounded-[15px] border px-2 ${
         selected ? 'border-primary bg-primary' : 'border-border bg-surface'
       }`}
     >

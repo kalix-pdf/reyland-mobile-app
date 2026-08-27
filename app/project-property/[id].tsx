@@ -19,6 +19,7 @@ import { useAuth } from '@/context/auth-context';
 import { useProjectProperties } from '@/hooks/useProjectProperties';
 import type { Property } from '@/types/property.types';
 import { ErrorScreen } from '@/components/helper/error-project';
+import { ScrollView } from 'react-native';
 
 // Resolved hex values pulled from tailwind.colors so non-NativeWind APIs
 // (ActivityIndicator color, StatusBar backgroundColor, Ionicons color) stay in sync.
@@ -30,8 +31,8 @@ const STATUS_FILTERS: {
   icon: keyof typeof Ionicons.glyphMap;
 }[] = [
   { label: 'All', value: 'All', icon: 'apps-outline' },
-  { label: 'Company Hold', value: 0, icon: 'business-outline' },
-  { label: 'Reserved', value: 1, icon: 'bookmark-outline' },
+  { label: 'On Going', value: 0, icon: 'business-outline' },
+  { label: 'Completed', value: 1, icon: 'bookmark-outline' },
   { label: 'Sold', value: 2, icon: 'checkmark-circle-outline' },
 ];
 
@@ -121,11 +122,11 @@ export default function ProjectPropertiesScreen() {
 
   const renderListHeader = () => (
     <View>
-      <Text className="mx-[18px] mb-2 text-[12px] font-black uppercase text-textSecondary">
+      <Text className="mx-[18px] my-2 text-[12px] font-black uppercase text-textSecondary">
         Property type
       </Text>
 
-      <View className="mx-[18px] flex-row flex-wrap gap-[9px] pb-3">
+      <View className="mx-[18px] mb-2 flex-row flex-wrap gap-[9px] pb-3">
         {STATUS_FILTERS.map((filter) => {
           const isActive = activeStatus === filter.value;
           const count = statusCounts[filter.value];
@@ -133,7 +134,7 @@ export default function ProjectPropertiesScreen() {
           return (
             <Pressable
               key={filter.label}
-              className={`min-h-[38px] flex-row items-center justify-center gap-1.5 rounded-[15px] border px-3 active:opacity-80 active:scale-[0.98] ${
+              className={`min-h-[38px] flex-row flex-shrink-0 items-center justify-center gap-1.5 rounded-[15px] border px-3 active:opacity-80 active:scale-[0.98] ${
                 isActive ? 'border-primary bg-primary' : 'border-border bg-surface'
               }`}
               onPress={() => setActiveStatus(filter.value)}
@@ -143,7 +144,6 @@ export default function ProjectPropertiesScreen() {
                 size={14}
                 color={isActive ? AppColors.textOnDark : AppColors.accent}
               />
-
               <Text
                 className={`text-[12px] font-black ${
                   isActive ? 'text-textOnDark' : 'text-textSecondary'
@@ -151,7 +151,6 @@ export default function ProjectPropertiesScreen() {
               >
                 {filter.label}
               </Text>
-
               <View
                 className={`min-w-[22px] rounded-full px-1.5 py-0.5 ${
                   isActive ? 'bg-textOnDark/15' : 'bg-surfaceMuted'
@@ -301,7 +300,7 @@ export default function ProjectPropertiesScreen() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <PropertyCard property={item} />}
         ListHeaderComponent={renderListHeader}
-        contentContainerClassName={`pt-4 pb-24 ${filteredProperties.length === 0 ? 'flex-grow' : ''}`}
+        contentContainerClassName={`pb-24 ${filteredProperties.length === 0 ? 'flex-grow' : ''}`}
         showsVerticalScrollIndicator={false}
         onEndReached={() => {
           if (hasMore && !loadingMore) {

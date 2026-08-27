@@ -235,7 +235,7 @@ export function HomeDashboard() {
             </View>
 
             {/* ── Project Locations ────────────────────────────────────────── */}
-            <View className="mx-[18px] mt-[15px]">
+            <View className="mx-[18px] mt-[25px]">
               <View className="flex-row justify-between items-center mb-[15px]">
                 <View>
                   <Text className="text-[23px] font-semibold tracking-[-0.7px]">Project Locations</Text>
