@@ -4,7 +4,7 @@
     "slug": "reyland-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/playstore-icon.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "reylandapp",
     "userInterfaceStyle": "automatic",
     "ios": {
