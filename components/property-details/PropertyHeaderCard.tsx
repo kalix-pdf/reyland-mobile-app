@@ -11,6 +11,7 @@ type PropertyHeaderCardProps = {
   title: string;
   areaSqm: number | null | undefined;
   location: string;
+  price: number | null | undefined;
 };
 
 export function PropertyHeaderCard({
@@ -20,6 +21,7 @@ export function PropertyHeaderCard({
   title,
   areaSqm,
   location,
+  price,
 }: PropertyHeaderCardProps) {
   return (
     <View
@@ -40,6 +42,7 @@ export function PropertyHeaderCard({
 
           <Text className="text-textMuted font-extrabold mb-[3px]">Total price</Text>
           <Text className="text-accent text-[27px] font-black">{formatCurrency(totalPrice)}</Text>
+          <Text className="text-textPrimary mt-2 font-black">{formatCurrency(price)} per SQM</Text>
           <Text className="mt-[7px] text-textPrimary capitalize text-xl leading-[27px] font-black">
             {title}
           </Text>

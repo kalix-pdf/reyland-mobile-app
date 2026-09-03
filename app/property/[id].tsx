@@ -208,6 +208,7 @@ export default function PropertyDetailsScreen() {
           title={property.title}
           areaSqm={property.area}
           location={location}
+          price={property.price}
         />
 
         <PropertyQuickStats
