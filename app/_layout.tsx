@@ -67,7 +67,7 @@ function RootNavigator() {
           <Stack.Screen name="search-home-screen/index" />
         </Stack>
 
-        <StatusBar style={isDarkMode ? 'light' : 'dark'} backgroundColor="transparent" translucent />
+        <StatusBar />
       </ThemeProvider>
     </View>
   );
