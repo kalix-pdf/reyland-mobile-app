@@ -18,7 +18,7 @@ export function HeaderBrand({ user, onLogin }: HeaderBrandProps) {
     return (
         <View className="flex-row justify-between items-center gap-3.5 pt-2.5">
             <Image
-                source={require('@/assets/images/new-logo-header.jpg')}
+                source={require('@/assets/images/new-logo-header.png')}
                 contentFit="contain"
                 style={{width: 180, height: 50}}
                 cachePolicy="memory-disk"
