@@ -171,7 +171,7 @@ export default function TermsAndConditionsScreen() {
         </View>
 
         <Text className="text-center text-xs font-semibold text-textMuted mt-7">
-          RDevelopment Development PH
+          RDevelopment PH
         </Text>
       </ScrollView>
     </SafeAreaView>

@@ -4,7 +4,7 @@
     "slug": "reyland-app",
     "version": "1.1.0",
     "orientation": "default",
-    "icon": "./assets/images/new-app-logo.jpg",
+    "icon": "./assets/images/new-app-logo.png",
     "scheme": "reylandapp",
     "userInterfaceStyle": "automatic",
     "ios": {
@@ -13,7 +13,7 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#000000",
-        "foregroundImage": "./assets/images/new-app-logo.jpg"
+        "foregroundImage": "./assets/images/new-app-logo.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.reyland.ph",
@@ -28,7 +28,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/new-app-logo.jpg",
+          "image": "./assets/images/new-app-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -40,10 +40,19 @@
           "photosPermission": "Allow Reyland to access your photos so you can update your profile photo."
         }
       ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableMinifyInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
       "expo-web-browser",
       "expo-video",
       "expo-secure-store",
-      ["./plugins/withMlkitOrientationFix.js"]
+      "./plugins/withMlkitOrientationFix.js"
     ],
     "experiments": {
       "typedRoutes": true,
