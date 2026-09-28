@@ -72,7 +72,7 @@ const policySections: PolicySection[] = [
   },
   {
     title: '3. Sharing of Information',
-    body: ['Reyland PH does not sell personal information.', 'Your information may only be shared:'],
+    body: ['RDevelopment PH does not sell personal information.', 'Your information may only be shared:'],
     items: [
       'With authorized employees and administrators for service operations',
       'With service providers supporting the application and system functions',
@@ -116,13 +116,13 @@ const policySections: PolicySection[] = [
   {
     title: '8. Updates to This Privacy Policy',
     body: [
-      'Reyland PH may update this Privacy Policy periodically. Changes become effective once published within the application.',
+      'RDevelopment PH may update this Privacy Policy periodically. Changes become effective once published within the application.',
       'Continued use of the application constitutes acceptance of the updated policy.',
     ],
   },
   {
     title: '9. Contact Information',
-    body: ['For questions regarding this Privacy Policy, contact:', 'Reyland PH', 'Minantok West, Amadeo, Cavite 4119'],
+    body: ['For questions regarding this Privacy Policy, contact:', 'RDevelopment PH', 'Minantok West, Amadeo, Cavite 4119'],
   },
 ];
 
@@ -182,7 +182,7 @@ export default function PrivacyPolicyScreen() {
         <View className="rounded-2xl border border-border bg-surface px-4 py-4 mb-5">
           <Text className="text-2xl leading-[30px] font-black text-textPrimary">Privacy Policy</Text>
           <Text className="text-[14px] leading-[22px] font-medium text-textSecondary mt-3">
-            Welcome to Reyland PH. Your privacy is important to us. This Privacy Policy explains how the Reyland PH
+            Welcome to RDevelopment PH. Your privacy is important to us. This Privacy Policy explains how the RDevelopment PH
             Mobile Application collects, uses, stores, and protects your information when you access and use our
             services.
           </Text>
@@ -198,7 +198,7 @@ export default function PrivacyPolicyScreen() {
         </View>
 
         <Text className="text-center text-xs font-semibold text-textMuted mt-7">
-          Reyland PH Mobile Application
+          RDevelopment PH Mobile Application
         </Text>
       </ScrollView>
     </SafeAreaView>

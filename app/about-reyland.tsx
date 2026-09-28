@@ -40,7 +40,7 @@ export default function AboutReylandScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>
       <View className="px-5">
-        <HeaderNav title="About Reyland PH" />
+        <HeaderNav title="About RDevelopment PH" />
       </View>
 
       <ScrollView
@@ -48,21 +48,21 @@ export default function AboutReylandScreen() {
         contentContainerClassName="px-5 pt-4 pb-12"
       >
         <View className="rounded-2xl border border-border bg-surface px-4 py-4 mb-5">
-          <Text className="text-2xl leading-[30px] font-black text-textPrimary">About Reyland PH</Text>
+          <Text className="text-2xl leading-[30px] font-black text-textPrimary">About RDevelopment PH</Text>
           <Text className="text-[14px] leading-[22px] font-medium text-textSecondary mt-3">
-            Welcome to Reyland PH.
+            Welcome to RDevelopment PH.
           </Text>
           <Text className="text-[14px] leading-[22px] font-medium text-textSecondary mt-3">
-            Based in Minantok West, Amadeo, Cavite 4119, Reyland PH is engaged in the development of farm lots and
+            Based in Minantok West, Amadeo, Cavite 4119, RDevelopment PH is engaged in the development of farm lots and
             subdivided properties, providing opportunities for buyers and investors through accessible and organized
             property services.
           </Text>
         </View>
 
         <View className="gap-5">
-          <Section title="Reyland Development PH">
+          <Section title="RDevelopment PH">
             <Text className="text-[14px] leading-[22px] font-medium text-textSecondary">
-              The Reyland PH Mobile Application was developed to provide a more convenient and efficient way for
+              The RDevelopment PH Mobile Application was developed to provide a more convenient and efficient way for
               clients to access services and stay connected with property updates. Through the application, buyers and
               investors can manage their accounts and interact with available services anytime and anywhere.
             </Text>
@@ -85,7 +85,7 @@ export default function AboutReylandScreen() {
 
           <Section title="Our Commitment">
             <Text className="text-[14px] leading-[22px] font-medium text-textSecondary">
-              At Reyland PH, we aim to make property ownership and investment more accessible through innovation,
+              At RDevelopment PH, we aim to make property ownership and investment more accessible through innovation,
               transparency, and reliable service.
             </Text>
           </Section>
@@ -95,13 +95,13 @@ export default function AboutReylandScreen() {
               Location: Minantok West, Amadeo, Cavite 4119
             </Text>
             <Text className="text-[14px] leading-[22px] font-medium text-textSecondary mt-1">
-              Application: Reyland PH Mobile Application
+              Application: RDevelopment PH Mobile Application
             </Text>
           </Section>
         </View>
 
         <Text className="text-center text-xs font-semibold text-textMuted mt-7">
-          Reyland Development PH
+          RDevelopment PH
         </Text>
       </ScrollView>
     </SafeAreaView>

@@ -12,12 +12,12 @@ const termsSections: TermsSection[] = [
   {
     title: '1. Acceptance of Terms',
     body: [
-      'By creating an account or using Reyland PH, you confirm that you have read, understood, and agree to these Terms and Conditions, including any future updates.',
+      'By creating an account or using RDevelopment PH, you confirm that you have read, understood, and agree to these Terms and Conditions, including any future updates.',
     ],
   },
   {
     title: '2. Description of Service',
-    body: ['Reyland PH is a mobile application designed to provide users access to:'],
+    body: ['RDevelopment PH is a mobile application designed to provide users access to:'],
     items: [
       'Farm lot and subdivided property listings',
       'Buyer and investor account management',
@@ -44,7 +44,7 @@ const termsSections: TermsSection[] = [
     items: [
       'Property reservations are subject to availability and approval',
       'All transactions and agreements may require verification from authorized personnel',
-      'Reyland PH reserves the right to reject or cancel any reservation due to incomplete requirements or policy violations',
+      'RDevelopment PH reserves the right to reject or cancel any reservation due to incomplete requirements or policy violations',
     ],
   },
   {
@@ -60,13 +60,13 @@ const termsSections: TermsSection[] = [
   {
     title: '6. Intellectual Property',
     body: [
-      'All content within the application, including logos, design, text, images, and system features, are owned by Reyland PH unless otherwise stated. Unauthorized use is strictly prohibited.',
+      'All content within the application, including logos, design, text, images, and system features, are owned by RDevelopment PH unless otherwise stated. Unauthorized use is strictly prohibited.',
     ],
   },
   {
-    title: '7. Account Statements and Information Accuracy',
+    title: '7. Account Statements and Information Accuracy',  
     body: [
-      'While Reyland PH strives to ensure accuracy of account statements and property information:',
+      'While RDevelopment PH strives to ensure accuracy of account statements and property information:',
     ],
     items: [
       'Minor delays or discrepancies may occur',
@@ -76,7 +76,7 @@ const termsSections: TermsSection[] = [
   },
   {
     title: '8. Limitation of Liability',
-    body: ['Reyland PH shall not be held liable for:'],
+    body: ['RDevelopment PH shall not be held liable for:'],
     items: [
       'Service interruptions or downtime',
       'Data loss due to technical issues',
@@ -86,7 +86,7 @@ const termsSections: TermsSection[] = [
   },
   {
     title: '9. Termination of Access',
-    body: ['Reyland PH reserves the right to suspend or terminate access to users who:'],
+    body: ['RDevelopment PH reserves the right to suspend or terminate access to users who:'],
     items: [
       'Violate these Terms',
       'Engage in suspicious or harmful activity',
@@ -107,7 +107,7 @@ const termsSections: TermsSection[] = [
   },
   {
     title: '12. Contact Information',
-    body: ['For questions or concerns:', 'Reyland PH', 'Minantok West, Amadeo, Cavite 4119'],
+    body: ['For questions or concerns:', 'RDevelopment PH', 'Minantok West, Amadeo, Cavite 4119'],
   },
 ];
 
@@ -156,7 +156,7 @@ export default function TermsAndConditionsScreen() {
         <View className="rounded-2xl border border-border bg-surface px-4 py-4 mb-5">
           <Text className="text-2xl leading-[30px] font-black text-textPrimary">Terms and Conditions</Text>
           <Text className="text-[14px] leading-[22px] font-medium text-textSecondary mt-3">
-            Welcome to Reyland PH Mobile Application. By accessing or using this application, you agree to comply
+            Welcome to RDevelopment PH Mobile Application. By accessing or using this application, you agree to comply
             with and be bound by the following Terms and Conditions.
           </Text>
           <Text className="text-[14px] leading-[22px] font-medium text-textSecondary mt-3">
@@ -171,7 +171,7 @@ export default function TermsAndConditionsScreen() {
         </View>
 
         <Text className="text-center text-xs font-semibold text-textMuted mt-7">
-          Reyland Development PH
+          RDevelopment Development PH
         </Text>
       </ScrollView>
     </SafeAreaView>

@@ -87,7 +87,7 @@ const ListHeader = React.memo(function ListHeader({
               Explore
             </Text>
             <Text className="text-[22px] font-black text-textPrimary">
-              Reyland Projects
+              RDevelopment Projects
             </Text>
           </View>
           <View className="w-11 h-11 rounded-2xl items-center justify-center bg-tag">
@@ -269,7 +269,7 @@ export function DiscoverScreen() {
           </HeaderShell> */}
         {/* </SafeAreaView> */}
 
-        <AccountApprovalRequired message="Your account needs to be approved before you can explore Reyland projects and property listings." />
+        <AccountApprovalRequired message="Your account needs to be approved before you can explore RDevelopment projects and property listings." />
       </View>
     );
   }

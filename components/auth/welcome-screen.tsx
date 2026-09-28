@@ -51,7 +51,7 @@ export function WelcomeScreen({ onSignIn, onSignUp, onGoogleLogin, onFacebookLog
           style={{ paddingTop: insets.top, paddingBottom: 36 + insets.bottom }}>
           <View className="items-center">
             <Image
-              source={require('@/assets/images/logo_transparent.png')}
+              source={require('@/assets/images/new-app-logo-icon.png')}
               style={{width: 360, height: 360}}
               contentFit="contain"
             />

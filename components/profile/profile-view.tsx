@@ -91,8 +91,8 @@ export function ViewProfile({ user, onLogout, onRefresh, refreshing = false, ref
           </View>
 
           <Image
-            source={require('@/assets/images/logo_transparent_without_text_bg.png')}
-            className='absolute w-[440px] h-[440px] -top-[30px] -right-[128px] opacity-[0.12] rotate-1'
+            source={require('@/assets/images/new-app-icon.png')}
+            className='absolute w-[440px] h-[420px] -top-[20px] -right-[120px] opacity-[0.12] rotate-1'
             resizeMode="contain"
           />
 
